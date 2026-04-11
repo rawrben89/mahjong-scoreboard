@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>HK Mahjong Scoreboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0c1a0c;
+      --surface:  #162416;
+      --surface2: #1e321e;
+      --border:   #2a432a;
+      --accent:   #4caf50;
+      --accent2:  #81c784;
+      --text:     #e8f5e9;
+      --dim:      #8fba91;
+      --red:      #ef5350;
+      --gold:     #ffd54f;
+      --radius:   14px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      max-width: 500px;
+      margin: 0 auto;
+      padding-bottom: 72px;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px 12px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    header h1 { font-size: 19px; color: var(--gold); letter-spacing: 1px; }
+    header p  { font-size: 11px; color: var(--dim); margin-top: 2px; }
+
+    /* ── Bottom Tab Bar ── */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 500px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      z-index: 100;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 8px 4px 10px;
+      background: none;
+      border: none;
+      color: var(--dim);
+      font-size: 10px;
+      cursor: pointer;
+      border-top: 2px solid transparent;
+      transition: color .2s, border-color .2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .tab-btn span { font-size: 20px; }
+    .tab-btn.active { color: var(--gold); border-top-color: var(--gold); }
+
+    /* ── Tab Content ── */
+    .tab-pane { display: none; padding: 16px; }
+    .tab-pane.active { display: block; }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 11px;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 10px;
+    }
+
+    /* ═══════════════════════════
+       SCORES TAB
+    ═══════════════════════════ */
+    .players-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .player-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 12px;
+      text-align: center;
+      position: relative;
+    }
+    .player-card.top    { border-color: var(--gold);  background: linear-gradient(135deg, #1e320e, #2a2a0c); }
+    .player-card.losing { border-color: var(--red);   opacity: .82; }
+    .p-rank  { position: absolute; top: 7px; right: 9px; font-size: 10px; color: var(--dim); background: var(--surface2); border-radius: 8px; padding: 2px 6px; }
+    .p-name  { font-size: 12px; color: var(--dim); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p-score { font-size: 30px; font-weight: 700; color: var(--accent2); line-height: 1.1; }
+    .p-score.neg { color: var(--red); }
+
+    /* ═══════════════════════════
+       ADD ROUND TAB
+    ═══════════════════════════ */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .15s;
+      user-select: none;
+    }
+    .chip.on  { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
+    .chip.red { background: var(--red);    border-color: var(--red);    color: #fff; font-weight: 700; }
+
+    .win-type-row { display: flex; gap: 8px; }
+    .win-type-btn {
+      flex: 1;
+      padding: 10px 8px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 13px;
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s;
+      line-height: 1.4;
+      user-select: none;
+    }
+    .win-type-btn.on { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
+
+    .points-input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 24px;
+      text-align: center;
+      outline: none;
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
+    .points-input::-webkit-inner-spin-button,
+    .points-input::-webkit-outer-spin-button { display: none; }
+    .points-input:focus { border-color: var(--accent); }
+
+    /* Preview */
+    .preview-box {
+      background: var(--surface2);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .preview-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 0;
+      font-size: 14px;
+    }
+    .preview-row .chg       { font-weight: 700; }
+    .preview-row .chg.pos   { color: var(--accent2); }
+    .preview-row .chg.neg   { color: var(--red); }
+    .preview-row .chg.zero  { color: var(--dim); }
+
+    .submit-btn {
+      width: 100%;
+      padding: 15px;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--accent);
+      color: #000;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .submit-btn:disabled { opacity: .35; cursor: default; }
+    .submit-btn:not(:disabled):hover { background: var(--accent2); }
+
+    /* ═══════════════════════════
+       HISTORY TAB
+    ═══════════════════════════ */
+    .history-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .history-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .round-badge {
+      font-size: 11px;
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 2px 8px;
+      color: var(--dim);
+      flex-shrink: 0;
+    }
+    .win-label { font-size: 13px; color: var(--gold); font-weight: 700; flex: 1; }
+    .del-btn   { background: none; border: none; color: var(--red); font-size: 18px; cursor: pointer; line-height: 1; padding: 0 2px; flex-shrink: 0; }
+    .win-sub   { font-size: 11px; color: var(--dim); margin-bottom: 8px; }
+    .chip-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip-sm {
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 10px;
+      background: var(--surface2);
+    }
+    .chip-sm.pos  { color: var(--accent2); }
+    .chip-sm.neg  { color: var(--red); }
+    .chip-sm.zero { color: var(--dim); }
+
+    /* ═══════════════════════════
+       PLAYERS TAB
+    ═══════════════════════════ */
+    .player-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+    }
+    .player-row-name  { font-size: 15px; }
+    .player-row-right { display: flex; align-items: center; gap: 10px; }
+    .player-row-score { font-size: 14px; font-weight: 700; }
+    .remove-btn { border: 1.5px solid var(--red); color: var(--red); background: none; border-radius: 7px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+
+    .add-row { display: flex; gap: 8px; margin-top: 14px; }
+    .text-input {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+    .text-input:focus { border-color: var(--accent); }
+    .add-btn { padding: 10px 18px; border-radius: 10px; border: none; background: var(--accent); color: #000; font-weight: 700; cursor: pointer; font-size: 14px; }
+
+    .danger-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1.5px solid var(--red);
+      background: none;
+      color: var(--red);
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    /* ═══════════════════════════
+       MODAL
+    ═══════════════════════════ */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-bg.show { display: flex; }
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px 20px;
+      width: 88%;
+      max-width: 340px;
+    }
+    .modal-box h3 { margin-bottom: 10px; font-size: 17px; }
+    .modal-box p  { font-size: 14px; color: var(--dim); margin-bottom: 20px; line-height: 1.5; }
+    .modal-btns   { display: flex; gap: 10px; }
+    .modal-btns button { flex: 1; padding: 11px; border-radius: 10px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; }
+    .m-cancel  { background: var(--surface2); color: var(--text); }
+    .m-confirm { background: var(--red); color: #fff; }
+
+    /* ═══════════════════════════
+       TOAST
+    ═══════════════════════════ */
+    .toast {
+      position: fixed;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      color: var(--text);
+      padding: 9px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      opacity: 0;
+      transition: opacity .25s, transform .25s;
+      z-index: 300;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ═══════════════════════════
+       EMPTY STATE
+    ═══════════════════════════ */
+    .empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--dim);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    /* Utility */
+    .mt8  { margin-top: 8px; }
+    .mt16 { margin-top: 16px; }
+    small { font-size: 11px; opacity: .7; display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🀄 HK Mahjong</h1>
+  <p>Hong Kong Style Scoreboard</p>
+</header>
+
+<!-- ── SCORES ── -->
+<div id="pane-scores" class="tab-pane active">
+  <div id="players-grid" class="players-grid"></div>
+</div>
+
+<!-- ── ADD ROUND ── -->
+<div id="pane-round" class="tab-pane">
+
+  <div class="form-card">
+    <div class="section-label">Winner 🏆</div>
+    <div id="winner-chips" class="chip-row"></div>
+  </div>
+
+  <div class="form-card">
+    <div class="section-label">Base Points <span style="color:var(--dim);font-size:10px;text-transform:none;letter-spacing:0">(amount each payer contributes)</span></div>
+    <input id="pts-input" type="number" class="points-input" placeholder="0" min="1" inputmode="numeric">
+  </div>
+
+  <div class="form-card">
+    <div class="section-label">Win Type</div>
+    <div class="win-type-row">
+      <div id="btn-zimo"    class="win-type-btn on"  data-type="zimo">🀄 Zimo<br><small>All 3 pay</small></div>
+      <div id="btn-discard" class="win-type-btn"      data-type="discard">🎴 Discard<br><small>Discarder pays all</small></div>
+    </div>
+  </div>
+
+  <div id="discard-card" class="form-card" style="display:none">
+    <div class="section-label">Who Discarded? 🃏</div>
+    <div id="discard-chips" class="chip-row"></div>
+  </div>
+
+  <div id="preview-box" class="preview-box" style="display:none">
+    <div class="section-label" style="margin-bottom:8px">Preview</div>
+    <div id="preview-rows"></div>
+  </div>
+
+  <button id="submit-btn" class="submit-btn" disabled>Confirm Round ✓</button>
+</div>
+
+<!-- ── HISTORY ── -->
+<div id="pane-history" class="tab-pane">
+  <div id="history-list"></div>
+</div>
+
+<!-- ── PLAYERS ── -->
+<div id="pane-players" class="tab-pane">
+  <div class="section-label">Players</div>
+  <div id="player-list"></div>
+
+  <div class="add-row">
+    <input id="new-name" type="text" class="text-input" placeholder="New player name…" maxlength="20">
+    <button class="add-btn" id="add-player-btn">Add</button>
+  </div>
+
+  <div class="mt16">
+    <div class="section-label">Danger Zone</div>
+    <button class="danger-btn" id="btn-reset-scores">Reset All Scores to 0</button>
+    <button class="danger-btn mt8" id="btn-clear-history">Clear All History</button>
+    <button class="danger-btn mt8" id="btn-reset-all">Full Reset (Scores + History)</button>
+  </div>
+</div>
+
+<!-- ── BOTTOM TAB BAR ── -->
+<nav class="tab-bar">
+  <button class="tab-btn active" data-tab="scores">  <span>📊</span>Scores</button>
+  <button class="tab-btn"        data-tab="round">   <span>✏️</span>Add Round</button>
+  <button class="tab-btn"        data-tab="history"> <span>📜</span>History</button>
+  <button class="tab-btn"        data-tab="players"> <span>👥</span>Players</button>
+</nav>
+
+<!-- ── MODAL ── -->
+<div id="modal-bg" class="modal-bg">
+  <div class="modal-box">
+    <h3 id="modal-title">Confirm</h3>
+    <p  id="modal-text">Are you sure?</p>
+    <div class="modal-btns">
+      <button class="m-cancel"  id="modal-cancel">Cancel</button>
+      <button class="m-confirm" id="modal-ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+'use strict';
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+const DEFAULT_PLAYERS = ['QA', 'Dev', 'UX/UI', 'Scrum Master', 'Project Manager'];
+
+let S = {
+  players: [...DEFAULT_PLAYERS],
+  scores: {},
+  history: [],
+  nextRound: 1
+};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem('hk-mahjong-v2');
+    if (raw) S = JSON.parse(raw);
+  } catch (_) {}
+  // Ensure all players have a score entry
+  S.players.forEach(p => { if (!(p in S.scores)) S.scores[p] = 0; });
+}
+
+function saveState() {
+  localStorage.setItem('hk-mahjong-v2', JSON.stringify(S));
+}
+
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmtScore(n) {
+  return (n > 0 ? '+' : '') + n;
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+let modalCb = null;
+function confirm(title, text, cb) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-text').textContent  = text;
+  modalCb = cb;
+  document.getElementById('modal-bg').classList.add('show');
+}
+
+document.getElementById('modal-ok').addEventListener('click', () => {
+  if (modalCb) modalCb();
+  document.getElementById('modal-bg').classList.remove('show');
+  modalCb = null;
+});
+document.getElementById('modal-cancel').addEventListener('click', () => {
+  document.getElementById('modal-bg').classList.remove('show');
+  modalCb = null;
+});
+document.getElementById('modal-bg').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-bg')) {
+    document.getElementById('modal-bg').classList.remove('show');
+    modalCb = null;
+  }
+});
+
+/* ═══════════════════════════════════════
+   TABS
+═══════════════════════════════════════ */
+const PANES = { scores: 'pane-scores', round: 'pane-round', history: 'pane-history', players: 'pane-players' };
+
+function switchTab(tab) {
+  Object.values(PANES).forEach(id => document.getElementById(id).classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(PANES[tab]).classList.add('active');
+  document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+  if (tab === 'scores')   renderScores();
+  if (tab === 'round')    renderRoundForm();
+  if (tab === 'history')  renderHistory();
+  if (tab === 'players')  renderPlayers();
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn =>
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab))
+);
+
+/* ═══════════════════════════════════════
+   SCORES TAB
+═══════════════════════════════════════ */
+function renderScores() {
+  const grid = document.getElementById('players-grid');
+  if (!S.players.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No players yet.<br>Add players in the Players tab.</div>';
+    return;
+  }
+  const sorted = [...S.players].sort((a,b) => (S.scores[b]||0) - (S.scores[a]||0));
+  const topScore = S.scores[sorted[0]] || 0;
+
+  grid.innerHTML = S.players.map(p => {
+    const sc   = S.scores[p] || 0;
+    const rank = sorted.indexOf(p) + 1;
+    const cls  = (sc === topScore && sc > 0) ? 'top' : sc < 0 ? 'losing' : '';
+    return `
+      <div class="player-card ${cls}">
+        <span class="p-rank">#${rank}</span>
+        <div class="p-name">${esc(p)}</div>
+        <div class="p-score ${sc < 0 ? 'neg' : ''}">${fmtScore(sc)}</div>
+      </div>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════
+   ADD ROUND TAB
+═══════════════════════════════════════ */
+let F = { winner: null, discarder: null, winType: 'zimo' };
+
+function renderRoundForm() {
+  // Winner chips
+  document.getElementById('winner-chips').innerHTML =
+    S.players.map((p,i) =>
+      `<div class="chip${F.winner === i ? ' on' : ''}" data-role="winner" data-idx="${i}">${esc(p)}</div>`
+    ).join('');
+
+  // Discarder chips (exclude winner)
+  const discHtml = S.players.map((p,i) => {
+    if (i === F.winner) return '';
+    return `<div class="chip${F.discarder === i ? ' red' : ''}" data-role="discarder" data-idx="${i}">${esc(p)}</div>`;
+  }).join('');
+  document.getElementById('discard-chips').innerHTML = discHtml;
+
+  calcPreview();
+}
+
+// Chip delegation
+document.getElementById('winner-chips').addEventListener('click', e => {
+  const chip = e.target.closest('[data-role="winner"]');
+  if (!chip) return;
+  const idx = +chip.dataset.idx;
+  F.winner = (F.winner === idx) ? null : idx;
+  if (F.discarder === idx) F.discarder = null;
+  renderRoundForm();
+});
+
+document.getElementById('discard-chips').addEventListener('click', e => {
+  const chip = e.target.closest('[data-role="discarder"]');
+  if (!chip) return;
+  const idx = +chip.dataset.idx;
+  F.discarder = (F.discarder === idx) ? null : idx;
+  renderRoundForm();
+});
+
+// Win type toggle
+document.getElementById('btn-zimo').addEventListener('click', () => {
+  F.winType = 'zimo';
+  F.discarder = null;
+  document.getElementById('btn-zimo').classList.add('on');
+  document.getElementById('btn-discard').classList.remove('on');
+  document.getElementById('discard-card').style.display = 'none';
+  renderRoundForm();
+});
+document.getElementById('btn-discard').addEventListener('click', () => {
+  F.winType = 'discard';
+  document.getElementById('btn-discard').classList.add('on');
+  document.getElementById('btn-zimo').classList.remove('on');
+  document.getElementById('discard-card').style.display = 'block';
+  renderRoundForm();
+});
+
+document.getElementById('pts-input').addEventListener('input', calcPreview);
+
+function calcChanges() {
+  const pts = parseInt(document.getElementById('pts-input').value) || 0;
+  if (F.winner === null || pts <= 0) return null;
+  if (F.winType === 'discard' && F.discarder === null) return null;
+
+  const changes = {};
+  S.players.forEach((p,i) => changes[i] = 0);
+  const losers = S.players.map((_,i) => i).filter(i => i !== F.winner);
+
+  if (F.winType === 'zimo') {
+    // Each loser pays pts; winner collects from all
+    changes[F.winner] = pts * losers.length;
+    losers.forEach(i => changes[i] = -pts);
+  } else {
+    // Discarder pays as if all 3 paid (standard HK rule)
+    const total = pts * losers.length;
+    changes[F.winner]    =  total;
+    changes[F.discarder] = -total;
+    // other losers pay 0
+  }
+  return changes;
+}
+
+function calcPreview() {
+  const changes = calcChanges();
+  const previewBox = document.getElementById('preview-box');
+  const submitBtn  = document.getElementById('submit-btn');
+  submitBtn.disabled = !changes;
+
+  if (!changes) { previewBox.style.display = 'none'; return; }
+
+  previewBox.style.display = 'block';
+  document.getElementById('preview-rows').innerHTML =
+    S.players.map((p,i) => {
+      const c = changes[i];
+      const cls = c > 0 ? 'pos' : c < 0 ? 'neg' : 'zero';
+      return `
+        <div class="preview-row">
+          <span>${esc(p)}</span>
+          <span class="chg ${cls}">${fmtScore(c)}</span>
+        </div>`;
+    }).join('');
+}
+
+document.getElementById('submit-btn').addEventListener('click', () => {
+  const changes = calcChanges();
+  if (!changes) return;
+  const pts = parseInt(document.getElementById('pts-input').value);
+  const winnerName   = S.players[F.winner];
+  const discarderName = F.discarder !== null ? S.players[F.discarder] : null;
+
+  // Apply
+  Object.entries(changes).forEach(([idx, delta]) => {
+    S.scores[S.players[+idx]] = (S.scores[S.players[+idx]] || 0) + delta;
+  });
+
+  // Record
+  const record = {
+    id: Date.now(),
+    round: S.nextRound++,
+    winner: winnerName,
+    winType: F.winType,
+    discarder: discarderName,
+    pts,
+    changes: {}
+  };
+  S.players.forEach((p,i) => record.changes[p] = changes[i]);
+  S.history.push(record);
+
+  saveState();
+
+  const roundNum = record.round;
+  // Reset form
+  F = { winner: null, discarder: null, winType: 'zimo' };
+  document.getElementById('pts-input').value = '';
+  document.getElementById('btn-zimo').classList.add('on');
+  document.getElementById('btn-discard').classList.remove('on');
+  document.getElementById('discard-card').style.display = 'none';
+  document.getElementById('preview-box').style.display = 'none';
+  document.getElementById('submit-btn').disabled = true;
+
+  switchTab('scores');
+  toast(`Round ${roundNum} recorded — ${esc(winnerName)} wins! 🎉`);
+});
+
+/* ═══════════════════════════════════════
+   HISTORY TAB
+═══════════════════════════════════════ */
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (!S.history.length) {
+    list.innerHTML = '<div class="empty">No rounds yet.<br>Add a round to get started.</div>';
+    return;
+  }
+
+  list.innerHTML = [...S.history].reverse().map(h => {
+    const typeLabel = h.winType === 'zimo'
+      ? '🀄 Zimo (Self-draw)'
+      : `🎴 Discard — ${esc(h.discarder)} discarded`;
+
+    const chips = S.players
+      .filter(p => p in h.changes)
+      .map(p => {
+        const c = h.changes[p];
+        const cls = c > 0 ? 'pos' : c < 0 ? 'neg' : 'zero';
+        return `<span class="chip-sm ${cls}">${esc(p)}: ${fmtScore(c)}</span>`;
+      }).join('');
+
+    // Also show any players no longer in the game who have entries
+    const extra = Object.entries(h.changes)
+      .filter(([p]) => !S.players.includes(p))
+      .map(([p,c]) => {
+        const cls = c > 0 ? 'pos' : c < 0 ? 'neg' : 'zero';
+        return `<span class="chip-sm ${cls}" style="opacity:.6">${esc(p)}: ${fmtScore(c)}</span>`;
+      }).join('');
+
+    return `
+      <div class="history-card">
+        <div class="history-head">
+          <span class="round-badge">Round ${h.round}</span>
+          <span class="win-label">🏆 ${esc(h.winner)}</span>
+          <button class="del-btn" data-id="${h.id}" title="Delete round">✕</button>
+        </div>
+        <div class="win-sub">${typeLabel} · ${h.pts} pts/payer</div>
+        <div class="chip-list">${chips}${extra}</div>
+      </div>`;
+  }).join('');
+
+  // Delete round buttons
+  document.getElementById('history-list').querySelectorAll('.del-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = +btn.dataset.id;
+      const h  = S.history.find(x => x.id === id);
+      if (!h) return;
+      confirm('Delete Round', `Delete Round ${h.round}? The scores will be reversed.`, () => {
+        Object.entries(h.changes).forEach(([p, delta]) => {
+          if (p in S.scores) S.scores[p] -= delta;
+        });
+        S.history = S.history.filter(x => x.id !== id);
+        saveState();
+        renderHistory();
+        renderScores();
+        toast('Round deleted — scores reversed.');
+      });
+    });
+  });
+}
+
+/* ═══════════════════════════════════════
+   PLAYERS TAB
+═══════════════════════════════════════ */
+function renderPlayers() {
+  const list = document.getElementById('player-list');
+  if (!S.players.length) {
+    list.innerHTML = '<div class="empty" style="padding:20px 0">No players. Add one below.</div>';
+    return;
+  }
+  list.innerHTML = S.players.map((p,i) => {
+    const sc = S.scores[p] || 0;
+    const scColor = sc >= 0 ? 'var(--accent2)' : 'var(--red)';
+    return `
+      <div class="player-row">
+        <span class="player-row-name">${esc(p)}</span>
+        <div class="player-row-right">
+          <span class="player-row-score" style="color:${scColor}">${fmtScore(sc)}</span>
+          <button class="remove-btn" data-idx="${i}">Remove</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  list.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = +btn.dataset.idx;
+      const name = S.players[idx];
+      confirm('Remove Player', `Remove "${name}"? Their score will be deleted (history entries are kept).`, () => {
+        S.players.splice(idx, 1);
+        delete S.scores[name];
+        saveState();
+        renderPlayers();
+        renderScores();
+        toast(`${name} removed.`);
+      });
+    });
+  });
+}
+
+function addPlayer() {
+  const input = document.getElementById('new-name');
+  const name  = input.value.trim();
+  if (!name) return;
+  if (S.players.includes(name)) { toast('Player name already exists!'); return; }
+  S.players.push(name);
+  S.scores[name] = 0;
+  input.value = '';
+  saveState();
+  renderPlayers();
+  renderScores();
+  toast(`${name} added!`);
+}
+
+document.getElementById('add-player-btn').addEventListener('click', addPlayer);
+document.getElementById('new-name').addEventListener('keydown', e => { if (e.key === 'Enter') addPlayer(); });
+
+// Danger zone buttons
+document.getElementById('btn-reset-scores').addEventListener('click', () => {
+  confirm('Reset Scores', 'Reset all scores to 0? History is kept intact.', () => {
+    S.players.forEach(p => S.scores[p] = 0);
+    saveState();
+    renderPlayers();
+    renderScores();
+    toast('All scores reset to 0.');
+  });
+});
+document.getElementById('btn-clear-history').addEventListener('click', () => {
+  confirm('Clear History', 'Delete all round history? Scores will NOT change.', () => {
+    S.history = [];
+    S.nextRound = 1;
+    saveState();
+    toast('History cleared.');
+  });
+});
+document.getElementById('btn-reset-all').addEventListener('click', () => {
+  confirm('Full Reset', 'Reset everything — scores and history will be erased. Players are kept.', () => {
+    S.players.forEach(p => S.scores[p] = 0);
+    S.history = [];
+    S.nextRound = 1;
+    saveState();
+    renderPlayers();
+    renderScores();
+    toast('Full reset done!');
+  });
+});
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+loadState();
+renderScores();
+</script>
+</body>
+</html>
