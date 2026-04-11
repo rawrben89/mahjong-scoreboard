@@ -28,6 +28,7 @@
       min-height: 100vh;
       max-width: 500px;
       margin: 0 auto;
+      overflow-x: hidden;
     }
 
     /* ── Shared Header ── */
@@ -117,6 +118,18 @@
     /* Header inside #main-top must NOT be independently sticky */
     #main-top .app-header {
       position: relative;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 12px 6px;
+    }
+    #main-top .app-header .title { flex: none; }
+    .main-header-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      justify-content: center;
+      width: 100%;
     }
 
     .main-sticky-bar {
@@ -639,6 +652,8 @@
       display: block;
       border-radius: 50%;
       box-shadow: 0 4px 20px rgba(0,0,0,.6), 0 0 0 3px var(--gold);
+      max-width: calc(100vw - 60px);
+      height: auto;
     }
     .spin-btn {
       width: 100%;
@@ -720,7 +735,7 @@
     }
 
     /* ═══ HELP VIEW ═══ */
-    #view-help { display: none; }
+    #view-help { display: none; overflow-x: hidden; }
 
     /* ═══ COMBINED VIEW ═══ */
     #view-combined { display: none; }
@@ -794,7 +809,7 @@
     }
 
     /* ═══ CALCULATOR VIEW ═══ */
-    #view-calc { display: none; }
+    #view-calc { display: none; overflow-x: hidden; }
     .calc-group { margin-bottom: 10px; }
     .calc-item {
       display: flex;
@@ -1004,9 +1019,9 @@
         <h1>🀄 Mahjong Scoreboard</h1>
         <p>Hong Kong Style</p>
       </div>
-      <div style="display:flex;gap:6px;flex-shrink:0">
+      <div class="main-header-btns">
         <button class="spin-open-btn" id="btn-open-calc">🧮 Calc</button>
-        <button class="spin-open-btn" id="btn-open-combined">📊 All</button>
+        <button class="spin-open-btn" id="btn-open-combined">📊 All Scores</button>
         <button class="spin-open-btn" id="btn-open-spinner">🌀🎲 Spin/Dice</button>
         <button class="help-open-btn" id="btn-help">❓ Help</button>
       </div>
