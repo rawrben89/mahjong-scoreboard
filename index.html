@@ -158,6 +158,52 @@
     .ts-score.pos { color: var(--accent2); }
     .ts-score.neg { color: var(--red); }
     .ts-score.zero { color: var(--dim); }
+    .ts-money { font-size: 10px; color: var(--gold); margin-top: 1px; }
+
+    .stake-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+    }
+    .stake-row label { font-size: 12px; color: var(--dim); flex: 1; }
+    .stake-input {
+      width: 80px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      color: var(--gold);
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    .stake-input::-webkit-inner-spin-button,
+    .stake-input::-webkit-outer-spin-button { display: none; }
+    .stake-input:focus { border-color: var(--gold); }
+    .stake-save-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: #000;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .persist-note {
+      font-size: 11px;
+      color: var(--dim);
+      text-align: center;
+      padding: 8px 0 4px;
+      opacity: .7;
+    }
 
     .table-card-footer {
       padding: 10px 14px;
@@ -258,6 +304,7 @@
     .p-name  { font-size: 12px; color: var(--dim); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .p-score { font-size: 28px; font-weight: 700; color: var(--accent2); line-height: 1.1; }
     .p-score.neg { color: var(--red); }
+    .p-money { font-size: 12px; color: var(--gold); margin-top: 3px; opacity: .9; }
 
     /* Form */
     .form-card {
@@ -533,6 +580,11 @@
         <div id="d-sum-neg" class="summary-val neg">0</div>
       </div>
     </div>
+    <div id="d-stake-row" class="stake-row">
+      <label>💰 Bet per point</label>
+      <input id="d-stake-input" type="number" class="stake-input" min="0.01" step="0.01" inputmode="decimal" value="1">
+      <button class="stake-save-btn" id="d-stake-save">Save</button>
+    </div>
     <div id="d-players-grid" class="players-grid"></div>
   </div>
 
@@ -588,6 +640,7 @@
       <button class="danger-btn" id="d-btn-reset-scores">Reset All Scores to 0</button>
       <button class="danger-btn mt10" id="d-btn-clear-history">Clear Round History</button>
     </div>
+    <p class="persist-note">💾 Scores are saved in your browser and will resume next time you open this link.</p>
   </div>
 
   <!-- Bottom tab bar (detail) -->
@@ -606,8 +659,12 @@
   <div class="modal-box">
     <div class="modal-drag"></div>
     <h3>Create New Table</h3>
-    <div style="margin-bottom:10px">
+    <div style="margin-bottom:8px">
       <input id="nt-name" class="modal-input full" placeholder="Table name (e.g. Table 1)" maxlength="30">
+    </div>
+    <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      <span style="font-size:12px;color:var(--dim);flex:1">Bet per point ($)</span>
+      <input id="nt-stake" type="number" class="modal-input" style="width:90px;text-align:center;color:var(--gold)" placeholder="1" min="0.01" step="0.01" inputmode="decimal">
     </div>
     <div class="modal-input-grid">
       <input id="nt-p1" class="modal-input" placeholder="Player 1" maxlength="20">
@@ -654,10 +711,16 @@ function loadState() {
   try {
     const raw = localStorage.getItem('hk-mahjong-v3');
     if (raw) S = JSON.parse(raw);
+    // Migrate older tables that don't have a stake field
+    S.tables.forEach(t => { if (!t.stake) t.stake = 1; });
   } catch (_) {}
 }
 function saveState() {
-  localStorage.setItem('hk-mahjong-v3', JSON.stringify(S));
+  try {
+    localStorage.setItem('hk-mahjong-v3', JSON.stringify(S));
+  } catch (_) {
+    toast('⚠️ Could not save — browser storage may be full.');
+  }
 }
 
 /* ═══════════════════════════════════════
@@ -669,6 +732,13 @@ function esc(s) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function fmt(n) { return (n > 0 ? '+' : '') + n; }
+function fmtMoney(pts, stake) {
+  if (!stake || stake === 0) return '';
+  const val = pts * stake;
+  const abs = Math.abs(val);
+  const str = abs % 1 === 0 ? String(abs) : abs.toFixed(2);
+  return (pts < 0 ? '-' : pts > 0 ? '+' : '') + '$' + str;
+}
 
 let _toastTimer;
 function toast(msg) {
@@ -754,30 +824,40 @@ function renderMain() {
     const totalPos  = allScores.filter(s => s > 0).reduce((a,b) => a+b, 0);
     const totalNeg  = allScores.filter(s => s < 0).reduce((a,b) => a+b, 0);
 
+    const stake = t.stake || 1;
     const cells = t.players.map(p => {
       const sc  = t.scores[p] || 0;
       const cls = sc > 0 ? 'pos' : sc < 0 ? 'neg' : 'zero';
+      const money = fmtMoney(sc, stake);
       return `
         <div class="table-score-cell">
           <span class="ts-name">${esc(p)}</span>
-          <span class="ts-score ${cls}">${fmt(sc)}</span>
+          <div style="text-align:right">
+            <div class="ts-score ${cls}">${fmt(sc)}</div>
+            ${money ? `<div class="ts-money">${money}</div>` : ''}
+          </div>
         </div>`;
     }).join('');
+
+    const moneyPos = fmtMoney(totalPos, stake);
+    const moneyNeg = fmtMoney(totalNeg, stake);
 
     return `
       <div class="table-card" data-id="${t.id}">
         <div class="table-card-header">
           <span class="table-name">${esc(t.name)}</span>
-          <span class="table-round-count">${rounds} round${rounds !== 1 ? 's' : ''}</span>
+          <span class="table-round-count">💰$${stake}/pt · ${rounds} round${rounds !== 1 ? 's' : ''}</span>
         </div>
         <div class="table-summary-row">
           <div class="ts-sum pos-sum">
             <span class="lbl">Positive</span>
             <span class="val">${fmt(totalPos)}</span>
+            ${moneyPos ? `<span class="lbl" style="color:var(--gold);opacity:1">${moneyPos}</span>` : ''}
           </div>
           <div class="ts-sum neg-sum">
             <span class="lbl">Negative</span>
             <span class="val">${fmt(totalNeg)}</span>
+            ${moneyNeg ? `<span class="lbl" style="color:var(--gold);opacity:1">${moneyNeg}</span>` : ''}
           </div>
         </div>
         <div class="table-scores-grid">${cells}</div>
@@ -813,6 +893,7 @@ function renderMain() {
 ═══════════════════════════════════════ */
 document.getElementById('btn-new-table').addEventListener('click', () => {
   ['nt-name','nt-p1','nt-p2','nt-p3','nt-p4'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('nt-stake').value = '1';
   document.getElementById('modal-newtable').classList.add('show');
   document.getElementById('nt-name').focus();
 });
@@ -825,16 +906,17 @@ document.getElementById('modal-newtable').addEventListener('click', e => {
 });
 
 document.getElementById('nt-create').addEventListener('click', createTable);
-['nt-name','nt-p1','nt-p2','nt-p3','nt-p4'].forEach(id => {
+['nt-name','nt-stake','nt-p1','nt-p2','nt-p3','nt-p4'].forEach(id => {
   document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') createTable(); });
 });
 
 function createTable() {
-  const name = document.getElementById('nt-name').value.trim();
-  const p1   = document.getElementById('nt-p1').value.trim();
-  const p2   = document.getElementById('nt-p2').value.trim();
-  const p3   = document.getElementById('nt-p3').value.trim();
-  const p4   = document.getElementById('nt-p4').value.trim();
+  const name  = document.getElementById('nt-name').value.trim();
+  const stake = parseFloat(document.getElementById('nt-stake').value) || 1;
+  const p1    = document.getElementById('nt-p1').value.trim();
+  const p2    = document.getElementById('nt-p2').value.trim();
+  const p3    = document.getElementById('nt-p3').value.trim();
+  const p4    = document.getElementById('nt-p4').value.trim();
 
   if (!name)                    { toast('Please enter a table name.'); return; }
   if (!p1||!p2||!p3||!p4)      { toast('Please fill in all 4 player names.'); return; }
@@ -846,6 +928,7 @@ function createTable() {
   const t = {
     id: S.nextTableId++,
     name,
+    stake,
     players,
     scores:    Object.fromEntries(players.map(p => [p, 0])),
     history:   [],
@@ -895,24 +978,30 @@ function renderDScores() {
   const t = tableById(currentId);
   if (!t) return;
 
+  const stake     = t.stake || 1;
   const allScores = t.players.map(p => t.scores[p] || 0);
   const totalPos  = allScores.filter(s => s > 0).reduce((a,b) => a+b, 0);
   const totalNeg  = allScores.filter(s => s < 0).reduce((a,b) => a+b, 0);
-  document.getElementById('d-sum-pos').textContent = '+' + totalPos;
-  document.getElementById('d-sum-neg').textContent = fmt(totalNeg);
+  document.getElementById('d-sum-pos').textContent = '+' + totalPos + (stake ? '  ' + fmtMoney(totalPos, stake) : '');
+  document.getElementById('d-sum-neg').textContent = fmt(totalNeg)  + (stake ? '  ' + fmtMoney(totalNeg, stake)  : '');
+
+  // Sync stake input
+  document.getElementById('d-stake-input').value = stake;
 
   const sorted   = [...t.players].sort((a,b) => (t.scores[b]||0) - (t.scores[a]||0));
   const topScore = t.scores[sorted[0]] || 0;
 
   document.getElementById('d-players-grid').innerHTML = t.players.map(p => {
-    const sc   = t.scores[p] || 0;
-    const rank = sorted.indexOf(p) + 1;
-    const cls  = (sc === topScore && sc > 0) ? 'top' : sc < 0 ? 'losing' : '';
+    const sc    = t.scores[p] || 0;
+    const rank  = sorted.indexOf(p) + 1;
+    const cls   = (sc === topScore && sc > 0) ? 'top' : sc < 0 ? 'losing' : '';
+    const money = fmtMoney(sc, stake);
     return `
       <div class="player-card ${cls}">
         <span class="p-rank">#${rank}</span>
         <div class="p-name">${esc(p)}</div>
         <div class="p-score ${sc < 0 ? 'neg' : ''}">${fmt(sc)}</div>
+        ${money ? `<div class="p-money">${money}</div>` : ''}
       </div>`;
   }).join('');
 }
@@ -1072,10 +1161,13 @@ function renderDHistory() {
     const typeLabel = h.winType === 'zimo'
       ? '🀄 Zimo (Self-draw)'
       : `🎴 Discard — ${esc(h.discarder)} discarded`;
+    const stake = t.stake || 1;
     const chips = Object.entries(h.changes).map(([p, c]) => {
-      const cls = c > 0 ? 'pos' : c < 0 ? 'neg' : 'zero';
-      return `<span class="chip-sm ${cls}">${esc(p)}: ${fmt(c)}</span>`;
+      const cls   = c > 0 ? 'pos' : c < 0 ? 'neg' : 'zero';
+      const money = fmtMoney(c, stake);
+      return `<span class="chip-sm ${cls}">${esc(p)}: ${fmt(c)}${money ? ' ('+money+')' : ''}</span>`;
     }).join('');
+    const ptsMoneyLabel = stake ? ` · ${fmtMoney(h.pts, stake)}/payer` : '';
     return `
       <div class="history-card">
         <div class="history-head">
@@ -1083,7 +1175,7 @@ function renderDHistory() {
           <span class="win-label">🏆 ${esc(h.winner)}</span>
           <button class="del-btn" data-hid="${h.id}">✕</button>
         </div>
-        <div class="win-sub">${typeLabel} · ${h.pts} pts/payer</div>
+        <div class="win-sub">${typeLabel} · ${h.pts} pts/payer${ptsMoneyLabel}</div>
         <div class="chip-list">${chips}</div>
       </div>`;
   }).join('');
@@ -1160,6 +1252,20 @@ function dAddPlayer() {
   renderDPlayers();
   toast(`${name} added!`);
 }
+
+document.getElementById('d-stake-save').addEventListener('click', () => {
+  const t = tableById(currentId);
+  if (!t) return;
+  const val = parseFloat(document.getElementById('d-stake-input').value);
+  if (!val || val <= 0) { toast('Enter a valid bet amount.'); return; }
+  t.stake = val;
+  saveState();
+  renderDScores();
+  toast(`Bet set to $${val} per point.`);
+});
+document.getElementById('d-stake-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('d-stake-save').click();
+});
 
 document.getElementById('d-btn-reset-scores').addEventListener('click', () => {
   showConfirm('Reset Scores', 'Reset all scores in this table to 0? History is kept.', () => {
