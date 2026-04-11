@@ -91,6 +91,26 @@
     /* ═══════════════════════════
        SCORES TAB
     ═══════════════════════════ */
+    .score-summary {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .summary-box {
+      flex: 1;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      text-align: center;
+    }
+    .summary-box.pos-box { border-color: var(--accent2); }
+    .summary-box.neg-box { border-color: var(--red); }
+    .summary-label { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+    .summary-val   { font-size: 22px; font-weight: 700; }
+    .summary-val.pos { color: var(--accent2); }
+    .summary-val.neg { color: var(--red); }
+
     .players-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -362,6 +382,16 @@
 
 <!-- ── SCORES ── -->
 <div id="pane-scores" class="tab-pane active">
+  <div class="score-summary">
+    <div class="summary-box pos-box">
+      <div class="summary-label">Total Positive</div>
+      <div id="sum-pos" class="summary-val pos">+0</div>
+    </div>
+    <div class="summary-box neg-box">
+      <div class="summary-label">Total Negative</div>
+      <div id="sum-neg" class="summary-val neg">0</div>
+    </div>
+  </div>
   <div id="players-grid" class="players-grid"></div>
 </div>
 
@@ -543,6 +573,14 @@ document.querySelectorAll('.tab-btn').forEach(btn =>
 ═══════════════════════════════════════ */
 function renderScores() {
   const grid = document.getElementById('players-grid');
+
+  // Summary totals
+  const allScores = S.players.map(p => S.scores[p] || 0);
+  const totalPos = allScores.filter(s => s > 0).reduce((a,b) => a + b, 0);
+  const totalNeg = allScores.filter(s => s < 0).reduce((a,b) => a + b, 0);
+  document.getElementById('sum-pos').textContent = '+' + totalPos;
+  document.getElementById('sum-neg').textContent = fmtScore(totalNeg);
+
   if (!S.players.length) {
     grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No players yet.<br>Add players in the Players tab.</div>';
     return;
