@@ -106,11 +106,41 @@
     /* ════════════════════════════
        MAIN VIEW — TABLE CARDS
     ════════════════════════════ */
+
+    /* Sticky bar containing New Table button + global totals */
+    .main-sticky-bar {
+      position: sticky;
+      top: 52px;          /* sits just below the .app-header */
+      z-index: 99;
+      background: var(--bg);
+      padding: 10px 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Global totals strip */
+    .global-totals {
+      display: flex;
+      gap: 8px;
+      padding: 8px 0 10px;
+    }
+    .gt-item {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: var(--surface2);
+    }
+    .gt-item .lbl { color: var(--dim); display: block; margin-bottom: 2px; }
+    .gt-item .val { font-weight: 700; font-size: 15px; display: block; }
+    .gt-item.pos-sum .val { color: var(--accent2); }
+    .gt-item.neg-sum .val { color: var(--red); }
+
     #main-body { padding: 14px 14px 100px; }
 
     .add-table-btn {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       border-radius: var(--radius);
       border: 1.5px dashed var(--accent);
       background: none;
@@ -118,7 +148,6 @@
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      margin-bottom: 14px;
       transition: background .15s;
     }
     .add-table-btn:hover { background: var(--surface); }
@@ -869,14 +898,21 @@
       <p>Hong Kong Style</p>
     </div>
     <div style="display:flex;gap:6px;flex-shrink:0">
-      <button class="spin-open-btn" id="btn-open-combined">📊 All</button>
+      <button class="spin-open-btn" id="btn-open-combined">📊 All Scores</button>
       <button class="spin-open-btn" id="btn-open-spinner">🎲 Spin</button>
       <button class="help-open-btn" id="btn-help">❓ Help</button>
     </div>
   </div>
 
-  <div id="main-body">
+  <div class="main-sticky-bar">
     <button class="add-table-btn" id="btn-new-table">＋ New Table</button>
+    <div id="global-totals" class="global-totals" style="display:none">
+      <div class="gt-item pos-sum"><span class="lbl">All Positive</span><span class="val" id="gt-pos">+0</span></div>
+      <div class="gt-item neg-sum"><span class="lbl">All Negative</span><span class="val" id="gt-neg">0</span></div>
+    </div>
+  </div>
+
+  <div id="main-body">
     <div id="tables-container"></div>
   </div>
 </div>
@@ -1659,6 +1695,24 @@ document.getElementById('btn-back').addEventListener('click', showMain);
 ═══════════════════════════════════════ */
 function renderMain() {
   const container = document.getElementById('tables-container');
+
+  // Update global totals strip
+  const globalTotals = document.getElementById('global-totals');
+  if (S.tables.length) {
+    let gPos = 0, gNeg = 0;
+    S.tables.forEach(t => {
+      t.players.forEach(p => {
+        const sc = t.scores[p] || 0;
+        if (sc > 0) gPos += sc; else gNeg += sc;
+      });
+    });
+    document.getElementById('gt-pos').textContent = '+' + gPos;
+    document.getElementById('gt-neg').textContent = fmt(gNeg);
+    globalTotals.style.display = 'flex';
+  } else {
+    globalTotals.style.display = 'none';
+  }
+
   if (!S.tables.length) {
     container.innerHTML = `
       <div class="empty-main">
