@@ -745,46 +745,30 @@
     }
     .help-tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
 
-    /* ═══ TILE DISPLAY ═══ */
+    /* ═══ TILE DISPLAY — image-based tiles from Wikimedia Commons ═══ */
     .tile {
       display: inline-flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(150deg, #fffef5, #f0e8d0);
-      border: 1.5px solid #c4a96a;
-      border-bottom: 3px solid #9a7840;
-      border-radius: 4px;
-      box-shadow: 1px 2px 4px rgba(0,0,0,.45);
-      width: 36px;
-      height: 46px;
+      width: 38px;
+      height: 50px;
       margin: 2px;
-      padding: 2px 0 0;
-      user-select: none;
-      position: relative;
+      border-radius: 3px;
+      overflow: hidden;
+      flex-shrink: 0;
+      vertical-align: bottom;
+      background: #fffef5;
     }
-    .tile::after {
-      content: '';
-      position: absolute;
-      inset: 3px 3px 5px 3px;
-      border: 1px solid rgba(160,120,60,.22);
-      border-radius: 2px;
-      pointer-events: none;
+    .tile img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    /* Special (non-image) placeholder tiles */
+    .tile.special {
+      flex-direction: column;
+      background: linear-gradient(150deg, #fffef5, #f0e8d0);
+      border: 1.5px solid var(--gold);
+      border-bottom: 3px solid #9a7840;
+      box-shadow: 1px 2px 4px rgba(0,0,0,.45);
     }
-    .tile .t-n { font-size: 15px; font-weight: 700; line-height: 1; font-family: serif; }
-    .tile .t-s { font-size: 9px;  font-weight: 600; line-height: 1.2; font-family: serif; }
-    .tile .t-c { font-size: 20px; font-weight: 700; line-height: 1; font-family: serif; }
-    .tile.wan .t-n, .tile.wan .t-s { color: #c0392b; }
-    .tile.bam .t-n, .tile.bam .t-s { color: #27ae60; }
-    .tile.dot .t-n, .tile.dot .t-s { color: #2471a3; }
-    .tile.wind   .t-c { color: #2c3e50; }
-    .tile.dr     .t-c { color: #e74c3c; }
-    .tile.dg     .t-c { color: #1e8449; }
-    .tile.dw     .t-c { color: #7f8c8d; font-size: 16px; }
-    .tile.flower .t-c { color: #8e44ad; font-size: 13px; }
-    .tile.season .t-c { color: #d35400; font-size: 13px; }
-    .tile.special .t-c { color: var(--dim); font-size: 11px; }
-    .tile.special { border-color: var(--gold); }
+    .tile.special .t-c { color: var(--dim); font-size: 10px; font-family: serif; font-weight: 700; text-align: center; padding: 0 2px; }
     .tile-with-label {
       display: inline-flex;
       flex-direction: column;
@@ -808,6 +792,105 @@
       align-items: flex-end;
       padding: 6px 0 2px;
     }
+
+    /* ═══ CALCULATOR VIEW ═══ */
+    #view-calc { display: none; }
+    .calc-group { margin-bottom: 10px; }
+    .calc-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: background .1s, border-color .1s;
+      user-select: none;
+    }
+    .calc-item.on { background: var(--surface2); border-color: var(--accent); }
+    .calc-item-check { font-size: 18px; color: var(--dim); flex-shrink: 0; width: 22px; text-align: center; }
+    .calc-item.on .calc-item-check { color: var(--accent); }
+    .calc-item-info { flex: 1; min-width: 0; }
+    .calc-item-name { font-size: 13px; font-weight: 600; }
+    .calc-item-desc { font-size: 11px; color: var(--dim); margin-top: 1px; line-height: 1.4; }
+    .calc-item-fan { font-size: 14px; font-weight: 700; color: var(--gold); flex-shrink: 0; min-width: 28px; text-align: right; }
+    .calc-item.on .calc-item-fan { color: var(--accent2); }
+    .calc-result-bar {
+      position: fixed;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 100%; max-width: 500px;
+      background: var(--surface);
+      border-top: 2px solid var(--accent);
+      padding: 12px 16px 20px;
+      z-index: 99;
+    }
+    .calc-result-content { display: flex; align-items: center; gap: 14px; }
+    .calc-fan-num { font-size: 44px; font-weight: 900; color: var(--gold); line-height: 1; }
+    .calc-fan-lbl { font-size: 12px; color: var(--dim); }
+    .calc-result-detail { flex: 1; }
+    .calc-result-row { font-size: 13px; margin-bottom: 2px; }
+    .calc-result-row .lbl { color: var(--dim); }
+    .calc-result-row .val { font-weight: 700; }
+    .calc-result-row .val.pos { color: var(--accent2); }
+    .calc-result-row .val.neg { color: var(--red); }
+    .calc-result-row .val.gold { color: var(--gold); }
+    .calc-warn { font-size: 12px; color: var(--red); }
+
+    /* ═══ DICE ROLLER ═══ */
+    .dice-section {
+      width: 100%;
+      border-top: 1px solid var(--border);
+      margin-top: 24px;
+      padding-top: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .dice-faces {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin: 12px 0 8px;
+    }
+    .die-face {
+      font-size: 76px;
+      line-height: 1;
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,.5));
+      transition: transform .05s;
+    }
+    .die-face.rolling { animation: dieShake .08s infinite alternate; }
+    @keyframes dieShake {
+      from { transform: rotate(-8deg) scale(1.05); }
+      to   { transform: rotate( 8deg) scale(0.95); }
+    }
+    .dice-total {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--gold);
+      min-height: 28px;
+      text-align: center;
+    }
+    .roll-btn {
+      width: 100%;
+      max-width: 260px;
+      padding: 14px;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--gold);
+      color: #000;
+      font-size: 18px;
+      font-weight: 900;
+      cursor: pointer;
+      letter-spacing: 2px;
+      margin-top: 10px;
+      box-shadow: 0 4px 12px rgba(255,213,79,.35);
+    }
+    .roll-btn:active { transform: scale(.96); }
+    .roll-btn:disabled { opacity: .4; cursor: default; transform: none; }
 
     /* ═══ HELP TILES SECTION ═══ */
     .suit-card {
@@ -908,8 +991,9 @@
         <p>Hong Kong Style</p>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
-        <button class="spin-open-btn" id="btn-open-combined">📊 All Scores</button>
-        <button class="spin-open-btn" id="btn-open-spinner">🎲 Spin</button>
+        <button class="spin-open-btn" id="btn-open-calc">🧮 Calc</button>
+        <button class="spin-open-btn" id="btn-open-combined">📊 All</button>
+        <button class="spin-open-btn" id="btn-open-spinner">🌀 Spin</button>
         <button class="help-open-btn" id="btn-help">❓ Help</button>
       </div>
     </div>
@@ -1038,7 +1122,7 @@
 <div id="view-spinner">
   <div class="app-header">
     <button class="back-btn" id="btn-spinner-back">← Back</button>
-    <div class="title"><h1>🎲 Wind Spinner</h1></div>
+    <div class="title"><h1>🌀 Wind Spinner</h1></div>
     <div style="width:60px"></div>
   </div>
 
@@ -1059,13 +1143,24 @@
       <div id="spin-placeholder" style="font-size:13px;color:var(--dim)">Spin to pick a starting wind!</div>
     </div>
 
-    <button class="spin-btn" id="btn-spin">🎲  S P I N !</button>
+    <button class="spin-btn" id="btn-spin">🌀  S P I N !</button>
 
     <div class="wind-legend">
       <div class="wind-legend-item"><div class="wind-dot" style="background:#e74c3c"></div><span>東 East</span></div>
       <div class="wind-legend-item"><div class="wind-dot" style="background:#e67e22"></div><span>南 South</span></div>
       <div class="wind-legend-item"><div class="wind-dot" style="background:#27ae60"></div><span>西 West</span></div>
       <div class="wind-legend-item"><div class="wind-dot" style="background:#2980b9"></div><span>北 North</span></div>
+    </div>
+
+    <!-- ── Dice Roller ── -->
+    <div class="dice-section">
+      <p class="spinner-subtitle" style="margin-bottom:4px">🎲 Roll 2 Dice</p>
+      <div class="dice-faces">
+        <div class="die-face" id="dice-1">⚁</div>
+        <div class="die-face" id="dice-2">⚄</div>
+      </div>
+      <div class="dice-total" id="dice-total"></div>
+      <button class="roll-btn" id="btn-roll-dice">🎲  R O L L !</button>
     </div>
   </div>
 </div>
@@ -1543,6 +1638,47 @@
 </div>
 
 <!-- ═══════════════════════════════════
+     CALCULATOR VIEW
+═══════════════════════════════════ -->
+<div id="view-calc">
+  <div class="app-header">
+    <button class="back-btn" id="btn-calc-back">← Back</button>
+    <div class="title"><h1>🧮 Fan Calculator</h1></div>
+    <button class="header-action" id="btn-calc-reset" style="color:var(--dim);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px">Reset</button>
+  </div>
+
+  <div id="calc-body" style="padding:10px 14px 180px">
+    <!-- Win Type -->
+    <div class="form-card" style="margin-bottom:10px">
+      <div class="section-label">Win Type</div>
+      <div class="win-type-row" id="calc-win-type">
+        <div class="win-type-btn on" data-wtype="zimo">🀄 Zimo<br><small style="font-size:10px;opacity:.7">All 3 pay</small></div>
+        <div class="win-type-btn"    data-wtype="discard">🎴 Discard<br><small style="font-size:10px;opacity:.7">Discarder pays all</small></div>
+      </div>
+    </div>
+    <!-- Stake -->
+    <div class="stake-row" style="margin-bottom:10px">
+      <label>💰 Bet per point ($)</label>
+      <input id="calc-stake" type="number" class="stake-input" min="0.01" step="0.01" inputmode="decimal" value="1">
+    </div>
+    <!-- Calc groups injected by JS -->
+  </div>
+
+  <!-- Sticky result bar -->
+  <div class="calc-result-bar">
+    <div class="calc-result-content">
+      <div>
+        <span id="calc-fan-num" class="calc-fan-num">0</span>
+        <span class="calc-fan-lbl"> fan</span>
+      </div>
+      <div id="calc-result-detail" class="calc-result-detail">
+        <span class="calc-warn" style="color:var(--dim)">Select combinations above</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
      COMBINED VIEW  (All tables scores)
 ═══════════════════════════════════ -->
 <div id="view-combined">
@@ -1686,6 +1822,7 @@ function showMain() {
   document.getElementById('view-help').style.display     = 'none';
   document.getElementById('view-spinner').style.display  = 'none';
   document.getElementById('view-combined').style.display = 'none';
+  document.getElementById('view-calc').style.display     = 'none';
   currentId = null;
   renderMain();
 }
@@ -2416,55 +2553,95 @@ document.querySelectorAll('.help-tab-btn').forEach(btn =>
 );
 
 /* ═══════════════════════════════════════
-   TILE BUILDER — renders CSS tiles into help panes
+   TILE BUILDER — image tiles from Wikimedia Commons
 ═══════════════════════════════════════ */
-function makeTile(suit, val, lbl) {
-  const inner = (suit === 'wan' || suit === 'bam' || suit === 'dot')
-    ? `<span class="t-n">${val}</span><span class="t-s">${{wan:'萬',bam:'竹',dot:'筒'}[suit]}</span>`
-    : `<span class="t-c">${val}</span>`;
-  const tile = `<div class="tile ${suit}">${inner}</div>`;
+const TILE_IMG = {
+  s1:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/MJs1-.svg/60px-MJs1-.svg.png',
+  s2:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/MJs2-.svg/60px-MJs2-.svg.png',
+  s3:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/MJs3-.svg/60px-MJs3-.svg.png',
+  s4:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/MJs4-.svg/60px-MJs4-.svg.png',
+  s5:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/MJs5-.svg/60px-MJs5-.svg.png',
+  s6:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/MJs6-.svg/60px-MJs6-.svg.png',
+  s7:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/MJs7-.svg/60px-MJs7-.svg.png',
+  s8:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/MJs8-.svg/60px-MJs8-.svg.png',
+  s9:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/MJs9-.svg/60px-MJs9-.svg.png',
+  t1:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/MJt1-.svg/60px-MJt1-.svg.png',
+  t2:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/MJt2-.svg/60px-MJt2-.svg.png',
+  t3:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/MJt3-.svg/60px-MJt3-.svg.png',
+  t4:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/MJt4-.svg/60px-MJt4-.svg.png',
+  t5:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/MJt5-.svg/60px-MJt5-.svg.png',
+  t6:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/MJt6-.svg/60px-MJt6-.svg.png',
+  t7:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/MJt7-.svg/60px-MJt7-.svg.png',
+  t8:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/MJt8-.svg/60px-MJt8-.svg.png',
+  t9:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/MJt9-.svg/60px-MJt9-.svg.png',
+  w1:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/MJw1-.svg/60px-MJw1-.svg.png',
+  w2:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/MJw2-.svg/60px-MJw2-.svg.png',
+  w3:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/MJw3-.svg/60px-MJw3-.svg.png',
+  w4:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/MJw4-.svg/60px-MJw4-.svg.png',
+  w5:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/MJw5-.svg/60px-MJw5-.svg.png',
+  w6:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/MJw6-.svg/60px-MJw6-.svg.png',
+  w7:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/MJw7-.svg/60px-MJw7-.svg.png',
+  w8:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/MJw8-.svg/60px-MJw8-.svg.png',
+  w9:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/MJw9-.svg/60px-MJw9-.svg.png',
+  fe:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/MJf1-.svg/60px-MJf1-.svg.png',
+  fs:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/MJf2-.svg/60px-MJf2-.svg.png',
+  fw:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/MJf3-.svg/60px-MJf3-.svg.png',
+  fn:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/MJf4-.svg/60px-MJf4-.svg.png',
+  dr:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/MJd1-.svg/60px-MJd1-.svg.png',
+  dg:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/MJd2-.svg/60px-MJd2-.svg.png',
+  dw:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/MJd3-.svg/60px-MJd3-.svg.png',
+  h1:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/MJh1-.svg/60px-MJh1-.svg.png',
+  h2:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/MJh2-.svg/60px-MJh2-.svg.png',
+  h3:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/MJh3-.svg/60px-MJh3-.svg.png',
+  h4:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/MJh4-.svg/60px-MJh4-.svg.png',
+};
+
+function makeTile(key, lbl) {
+  const url  = TILE_IMG[key];
+  const tile = url
+    ? `<div class="tile"><img src="${url}" alt="${key}" loading="lazy"></div>`
+    : `<div class="tile special"><span class="t-c">${key}</span></div>`;
   return lbl
     ? `<div class="tile-with-label">${tile}<span class="t-lbl">${lbl}</span></div>`
     : tile;
 }
-const P = '<span class="tile-sep">|</span>';
+const P    = '<span class="tile-sep">|</span>';
 const PLUS = '<span class="tile-sep">+</span>';
 function qTile(lbl) { return `<div class="tile special"><span class="t-c">${lbl}</span></div>`; }
 
 function buildTilesPane() {
-  const wan = [1,2,3,4,5,6,7,8,9].map(n=>makeTile('wan',n,n+'萬')).join('');
-  const bam = [1,2,3,4,5,6,7,8,9].map(n=>makeTile('bam',n,n+'竹')).join('');
-  const dot = [1,2,3,4,5,6,7,8,9].map(n=>makeTile('dot',n,n+'筒')).join('');
-  const winds = [['wind','東','East 東'],['wind','南','South 南'],['wind','西','West 西'],['wind','北','North 北']].map(a=>makeTile(...a)).join('');
-  const dragons = [makeTile('dr','中','Red 中'),makeTile('dg','發','Green 發'),makeTile('dw','白','White 白')].join('');
-  const flowers = [['flower','梅','Plum'],['flower','蘭','Orchid'],['flower','菊','Chrysanth.'],['flower','竹','Bamboo']].map(a=>makeTile(...a)).join('');
-  const seasons = [['season','春','Spring'],['season','夏','Summer'],['season','秋','Autumn'],['season','冬','Winter']].map(a=>makeTile(...a)).join('');
+  const wan  = [1,2,3,4,5,6,7,8,9].map(n => makeTile(`w${n}`, `${n}萬`)).join('');
+  const bam  = [1,2,3,4,5,6,7,8,9].map(n => makeTile(`s${n}`, `${n}竹`)).join('');
+  const dot  = [1,2,3,4,5,6,7,8,9].map(n => makeTile(`t${n}`, `${n}筒`)).join('');
+  const winds   = [['fe','East 東'],['fs','South 南'],['fw','West 西'],['fn','North 北']].map(a=>makeTile(...a)).join('');
+  const dragons = [makeTile('dr','Red 中'), makeTile('dg','Green 發'), makeTile('dw','White 白')].join('');
+  const seasons = [makeTile('h1','Spring 春'), makeTile('h2','Summer 夏'), makeTile('h3','Autumn 秋'), makeTile('h4','Winter 冬')].join('');
 
   document.getElementById('hpane-tiles').innerHTML = `
-    <div class="help-cat-label">Tile Set Reference Photo</div>
+    <div class="help-cat-label">Tile Set Reference</div>
     <img src="https://t3.ftcdn.net/jpg/00/59/61/52/360_F_59615225_ZDcfHzGxyDO8VRNXVyKoJBiEcAn1n20D.jpg" class="ref-img" alt="Mahjong tile reference" loading="lazy">
 
     <div class="help-cat-label">Number Tiles (Suits) — 序數牌</div>
     <div class="suit-card"><div class="suit-title">🟥 Characters / Wan (萬)</div><div class="suit-subtitle">Red tiles with Chinese numerals. Also called "Maan" or "Cracks".</div><div class="tiles-row">${wan}</div></div>
-    <div class="suit-card"><div class="suit-title">🟩 Bamboo / Bam (竹)</div><div class="suit-subtitle">Green tiles with bamboo sticks. Also called "Sou". Note: 1 Bamboo is traditionally a bird.</div><div class="tiles-row">${bam}</div></div>
-    <div class="suit-card"><div class="suit-title">🔵 Circles / Dots (筒)</div><div class="suit-subtitle">Blue tiles with circle patterns. Also called "Tong", "Pin" or "Dots".</div><div class="tiles-row">${dot}</div></div>
+    <div class="suit-card"><div class="suit-title">🟩 Bamboo / Bam (竹 / 索)</div><div class="suit-subtitle">Tiles with bamboo stick pips. Note: 1 Bamboo is traditionally a peacock bird (孔雀).</div><div class="tiles-row">${bam}</div></div>
+    <div class="suit-card"><div class="suit-title">🔵 Circles / Dots (筒 / 餅)</div><div class="suit-subtitle">Tiles with circular coin pips. Also called "Tong", "Pin" or "Dots".</div><div class="tiles-row">${dot}</div></div>
 
     <div class="help-cat-label">Honor Tiles — 字牌</div>
-    <div class="suit-card"><div class="suit-title">🌬️ Wind Tiles (風牌)</div><div class="suit-subtitle">Four winds. Each player has a seat wind. The round also has a prevailing wind.</div><div class="tiles-row">${winds}</div></div>
-    <div class="suit-card"><div class="suit-title">🐉 Dragon Tiles (箭牌)</div><div class="suit-subtitle">Three dragons. A triplet of any dragon always scores bonus fan.</div><div class="tiles-row">${dragons}</div></div>
+    <div class="suit-card"><div class="suit-title">🌬️ Wind Tiles (風牌)</div><div class="suit-subtitle">Four winds. Each player has a seat wind. Pung of seat wind or round wind = 1 fan each.</div><div class="tiles-row">${winds}</div></div>
+    <div class="suit-card"><div class="suit-title">🐉 Dragon Tiles (箭牌)</div><div class="suit-subtitle">Three dragons — Red (中), Green (發), White (白). A triplet of any dragon = 1 fan.</div><div class="tiles-row">${dragons}</div></div>
 
     <div class="help-cat-label">Bonus Tiles — 花牌 (scored separately, not part of your hand)</div>
-    <div class="suit-card"><div class="suit-title">🌸 Flower &amp; Season Tiles</div><div class="suit-subtitle">Drawn immediately for bonus points when picked from the wall.</div><div class="tiles-row">${flowers}${seasons}</div></div>
+    <div class="suit-card"><div class="suit-title">🌸 Season Tiles (四季)</div><div class="suit-subtitle">Drawn immediately for bonus fan. Own-wind season = 1 fan. All 4 = 2 fan.</div><div class="tiles-row">${seasons}</div></div>
 
-    <div class="suit-card" style="border-color:var(--gold)"><div class="suit-title">🧩 Set Types — Building Blocks</div><div class="suit-subtitle">Every winning hand = 4 sets + 1 pair.</div>
-      <div style="margin-top:10px"><div class="suit-subtitle" style="margin-bottom:4px">Chow / Sequence (順子) — 3 consecutive tiles, same suit</div>
-        <div class="tiles-row">${makeTile('wan',1)}${makeTile('wan',2)}${makeTile('wan',3)}</div></div>
+    <div class="suit-card" style="border-color:var(--gold)"><div class="suit-title">🧩 Set Types — Building Blocks</div><div class="suit-subtitle">Every winning hand = 4 sets + 1 pair (except Seven Pairs / Thirteen Orphans).</div>
+      <div style="margin-top:10px"><div class="suit-subtitle" style="margin-bottom:4px">Chow / Sequence (順子) — 3 consecutive same-suit tiles</div>
+        <div class="tiles-row">${makeTile('w1')}${makeTile('w2')}${makeTile('w3')}</div></div>
       <div style="margin-top:10px"><div class="suit-subtitle" style="margin-bottom:4px">Pung / Triplet (刻子) — 3 identical tiles</div>
-        <div class="tiles-row">${makeTile('wind','東')}${makeTile('wind','東')}${makeTile('wind','東')}</div></div>
+        <div class="tiles-row">${makeTile('fe')}${makeTile('fe')}${makeTile('fe')}</div></div>
       <div style="margin-top:10px"><div class="suit-subtitle" style="margin-bottom:4px">Kong / Quad (槓子) — 4 identical tiles</div>
-        <div class="tiles-row">${makeTile('dr','中')}${makeTile('dr','中')}${makeTile('dr','中')}${makeTile('dr','中')}</div></div>
-      <div style="margin-top:10px"><div class="suit-subtitle" style="margin-bottom:4px">Pair / Eyes (雀頭) — 2 identical tiles (exactly 1 per hand)</div>
-        <div class="tiles-row">${makeTile('dot',9)}${makeTile('dot',9)}</div></div>
+        <div class="tiles-row">${makeTile('dr')}${makeTile('dr')}${makeTile('dr')}${makeTile('dr')}</div></div>
+      <div style="margin-top:10px"><div class="suit-subtitle" style="margin-bottom:4px">Pair / Eyes (雀頭) — 2 identical (exactly 1 per hand)</div>
+        <div class="tiles-row">${makeTile('t9')}${makeTile('t9')}</div></div>
     </div>`;
 }
 
@@ -2475,47 +2652,53 @@ function buildWinsPane() {
       <div class="combo-desc">${desc}</div>
       <div class="combo-tiles">${tilesHTML}</div></div>`;
   }
-  const w=n=>makeTile('wan',n), b=n=>makeTile('bam',n), d=n=>makeTile('dot',n);
-  const E=makeTile('wind','東'), S=makeTile('wind','南'), W=makeTile('wind','西'), N=makeTile('wind','北');
-  const CR=makeTile('dr','中'), CG=makeTile('dg','發'), CW=makeTile('dw','白');
+  const w=n=>makeTile(`w${n}`), b=n=>makeTile(`s${n}`), d=n=>makeTile(`t${n}`);
+  const E=makeTile('fe'), S=makeTile('fs'), W=makeTile('fw'), N=makeTile('fn');
+  const CR=makeTile('dr'), CG=makeTile('dg'), CW=makeTile('dw');
 
   document.getElementById('hpane-wins').innerHTML = `
     <div class="suit-card" style="border-color:var(--accent)">
-      <div class="suit-title">📐 Basic Winning Hand</div>
-      <div class="suit-subtitle">4 sets (chow or pung) + 1 pair. Minimum 3 fan to declare a win in HK rules.</div>
+      <div class="suit-title">📐 Basic Winning Hand — Minimum 3 Fan</div>
+      <div class="suit-subtitle">4 sets (chow or pung) + 1 pair. Must score at least 3 fan to declare a win in HK rules.</div>
       <div class="combo-tiles" style="margin-top:10px">${w(1)}${w(2)}${w(3)}${P}${w(4)}${w(4)}${w(4)}${P}${d(1)}${d(2)}${d(3)}${P}${b(5)}${b(6)}${b(7)}${P}${E}${E}</div>
     </div>
 
     <div class="help-cat-label">Win Method Bonuses</div>
     ${combo('自摸 Zimo — Self Draw','Drawing your own winning tile from the wall','+1 Fan','bonus','All three losers pay you equally.','')}
-    ${combo('門清 Concealed Gate','Win by discard with a fully concealed hand (no called sets)','+1 Fan','bonus','Adds 1 fan on top of your hand\'s value.','')}
-    ${combo('嶺上開花 Dead Wall Draw','After declaring a kong, the supplement tile wins','+1 Fan','bonus','Rare and valuable — counts as self-draw.','')}
-    ${combo('海底撈月 Last Wall Tile','Winning on the very last drawable tile in the wall','+1 Fan','bonus','The final tile drawn completes your hand.','')}
-    ${combo('搶槓 Robbing the Kong','Stealing an opponent\'s added kong tile to win','+1 Fan','bonus','When an opponent extends a pung to a kong, you may steal it if it completes your hand.','')}
+    ${combo('門清 Concealed Gate','Win by discard with a fully concealed hand','+1 Fan','bonus','No called sets; adds 1 fan on top of your hand value.','')}
+    ${combo('槓上開花 Win by Kong','Winning tile is drawn from the supplement wall after a kong','+2 Fan','bonus','Counts as self-draw. All three pay.','')}
+    ${combo('海底撈月 Last Tile','Winning on the very last drawable tile in the wall','+1 Fan','bonus','The final tile drawn completes your hand.','')}
+    ${combo('搶槓 Robbing the Kong',"Stealing an opponent's added kong tile to win",'+1 Fan','bonus','When an opponent extends a pung to a kong, steal it if it completes your hand.','')}
+    ${combo('槓上槓 Double-Kong','Kong declared using the replacement tile from a prior kong','+9 Fan','bonus','Extremely rare — effectively a limit bonus.','')}
+    ${combo('天糊 Heavenly Hand','East wins with the initial 13 tiles on first draw','13 Fan','limit','Instant maximum score before anyone discards.','')}
+    ${combo('地糊 Earthly Hand',"Any non-East wins on East's very first discard",'13 Fan','limit','Instant maximum. No tiles may have been called.','')}
 
     <div class="help-cat-label">Suit Patterns</div>
-    ${combo('混一色 Half Flush','Hùn yī sè — One suit + honor tiles','2 Fan','','All tiles from one suit (Wan/Bam/Circles) plus wind or dragon tiles.',`${w(1)}${w(2)}${w(3)}${P}${w(4)}${w(5)}${w(6)}${P}${w(7)}${w(8)}${w(9)}${P}${E}${E}${E}${P}${CR}${CR}`)}
-    ${combo('清一色 Full Flush','Qīng yī sè — All tiles same suit, no honors','3 Fan','',`Every tile in the hand belongs to the same suit.`,`${d(1)}${d(2)}${d(3)}${P}${d(4)}${d(5)}${d(6)}${P}${d(7)}${d(8)}${d(9)}${P}${d(1)}${d(1)}${d(1)}${P}${d(9)}${d(9)}`)}
+    ${combo('平糊 Common Hand','Píng hú — Every meld is a Chow (sequence)','1 Fan','','No pungs or kongs — pure sequences only.',`${w(1)}${w(2)}${w(3)}${P}${b(4)}${b(5)}${b(6)}${P}${d(7)}${d(8)}${d(9)}${P}${w(5)}${w(6)}${w(7)}${P}${d(2)}${d(2)}`)}
+    ${combo('混一色 Half Flush','Hùn yī sè — One suit + honor tiles','3 Fan','','All tiles from one suit (Wan/Bam/Circles) plus wind or dragon tiles.',`${w(1)}${w(2)}${w(3)}${P}${w(4)}${w(5)}${w(6)}${P}${w(7)}${w(8)}${w(9)}${P}${E}${E}${E}${P}${CR}${CR}`)}
+    ${combo('清一色 Full Flush','Qīng yī sè — All tiles same suit, no honors','7 Fan','','Every tile in the hand belongs to the same suit.',`${d(1)}${d(2)}${d(3)}${P}${d(4)}${d(5)}${d(6)}${P}${d(7)}${d(8)}${d(9)}${P}${d(1)}${d(1)}${d(1)}${P}${d(9)}${d(9)}`)}
 
     <div class="help-cat-label">Structure Patterns</div>
-    ${combo('碰碰胡 All Pungs','Pèng pèng hú — Four triplets + one pair','2 Fan','','No sequences at all — every set is a triplet or kong.',`${w(1)}${w(1)}${w(1)}${P}${w(4)}${w(4)}${w(4)}${P}${d(1)}${d(1)}${d(1)}${P}${E}${E}${E}${P}${CR}${CR}`)}
-    ${combo('混么九 Mixed Terminals &amp; Honors','Every set contains a 1, 9, wind, or dragon','2 Fan','','No middle number tiles (2–8) allowed in any set.',`${w(1)}${w(1)}${w(1)}${P}${w(9)}${w(9)}${w(9)}${P}${d(1)}${d(1)}${d(1)}${P}${E}${E}${E}${P}${d(9)}${d(9)}`)}
-    ${combo('字一色 All Honors','Zì yī sè — Only wind and dragon tiles','Limit','limit','The entire hand uses only honor tiles. No number tiles whatsoever.',`${E}${E}${E}${P}${S}${S}${S}${P}${CR}${CR}${CR}${P}${CG}${CG}${CG}${P}${CW}${CW}`)}
+    ${combo('對對糊 All Pungs','Pèng pèng hú — Four triplets + one pair','3 Fan','','No sequences at all — every set is a triplet or kong.',`${w(1)}${w(1)}${w(1)}${P}${w(4)}${w(4)}${w(4)}${P}${d(1)}${d(1)}${d(1)}${P}${E}${E}${E}${P}${CR}${CR}`)}
+    ${combo('七對子 Seven Pairs','Qī duì zǐ — Hand consists of seven pairs','4 Fan','','No sets — just seven different pairs. Each pair must be distinct.',`${w(1)}${w(1)}${P}${w(3)}${w(3)}${P}${b(5)}${b(5)}${P}${b(7)}${b(7)}${P}${d(2)}${d(2)}${P}${E}${E}${P}${CR}${CR}`)}
+    ${combo('混么九 Mixed Terminals &amp; Honors','Every set contains a 1, 9, wind, or dragon','1 Fan','','No middle number tiles (2–8) allowed in any set.',`${w(1)}${w(1)}${w(1)}${P}${w(9)}${w(9)}${w(9)}${P}${d(1)}${d(1)}${d(1)}${P}${E}${E}${E}${P}${d(9)}${d(9)}`)}
+    ${combo('字一色 All Honors','Zì yī sè — Only wind and dragon tiles','10 Fan','','The entire hand uses only honor tiles. No number tiles.',`${E}${E}${E}${P}${S}${S}${S}${P}${CR}${CR}${CR}${P}${CG}${CG}${CG}${P}${CW}${CW}`)}
 
     <div class="help-cat-label">Dragon Hands</div>
-    ${combo('小三元 Small Three Dragons','Xiǎo sān yuán — 2 dragon triplets + 1 dragon pair','Limit','limit','Two dragons as triplets; third dragon forms the pair eyes.',`${CR}${CR}${CR}${P}${CG}${CG}${CG}${P}${CW}${CW}${P}${w(1)}${w(2)}${w(3)}${P}${d(5)}${d(6)}${w(7)}`)}
-    ${combo('大三元 Big Three Dragons','Dà sān yuán — All 3 dragon triplets','Limit','limit','Triplets of all three dragons. One of the most prized hands.',`${CR}${CR}${CR}${P}${CG}${CG}${CG}${P}${CW}${CW}${CW}${P}${w(1)}${w(2)}${w(3)}${P}${w(4)}${w(4)}`)}
+    ${combo('小三元 Small Three Dragons','Xiǎo sān yuán — 2 dragon triplets + 1 dragon pair','5 Fan','','Two dragons as triplets; third dragon forms the pair eyes.',`${CR}${CR}${CR}${P}${CG}${CG}${CG}${P}${CW}${CW}${P}${w(1)}${w(2)}${w(3)}${P}${d(5)}${d(6)}${d(7)}`)}
+    ${combo('大三元 Big Three Dragons','Dà sān yuán — All 3 dragon triplets','8 Fan','','Triplets of all three dragons.',`${CR}${CR}${CR}${P}${CG}${CG}${CG}${P}${CW}${CW}${CW}${P}${w(1)}${w(2)}${w(3)}${P}${w(4)}${w(4)}`)}
 
     <div class="help-cat-label">Wind Hands</div>
-    ${combo('小四喜 Small Four Winds','Xiǎo sì xǐ — 3 wind triplets + 1 wind pair','Limit','limit','Three winds as triplets; fourth wind is the pair.',`${E}${E}${E}${P}${S}${S}${S}${P}${W}${W}${W}${P}${N}${N}${P}${w(3)}${w(4)}${w(5)}`)}
-    ${combo('大四喜 Big Four Winds','Dà sì xǐ — All 4 wind triplets','Limit','limit','Triplets of all four winds. Rarest of the wind hands.',`${E}${E}${E}${P}${S}${S}${S}${P}${W}${W}${W}${P}${N}${N}${N}${P}${CG}${CG}`)}
+    ${combo('小四喜 Small Four Winds','Xiǎo sì xǐ — 3 wind triplets + 1 wind pair','6 Fan','','Three winds as triplets; fourth wind is the pair.',`${E}${E}${E}${P}${S}${S}${S}${P}${W}${W}${W}${P}${N}${N}${P}${w(3)}${w(4)}${w(5)}`)}
+    ${combo('大四喜 Big Four Winds','Dà sì xǐ — All 4 wind triplets','13 Fan','limit','Triplets of all four winds. Rarest of the wind hands.',`${E}${E}${E}${P}${S}${S}${S}${P}${W}${W}${W}${P}${N}${N}${N}${P}${CG}${CG}`)}
 
     <div class="help-cat-label">Legendary Limit Hands</div>
-    ${combo('清么九 All Terminals','Qīng yāo jiǔ — Only 1s and 9s, no honors','Limit','limit','All tiles are 1s and 9s from any suit. No honor tiles.',`${w(1)}${w(1)}${w(1)}${P}${w(9)}${w(9)}${w(9)}${P}${d(1)}${d(1)}${d(1)}${P}${b(9)}${b(9)}${b(9)}${P}${d(9)}${d(9)}`)}
-    ${combo('綠一色 All Green','Lǜ yī sè — Only green-colored bamboo tiles','Limit','limit','Only bamboo 2, 3, 4, 6, 8 and Green Dragon (發). All green!',`${b(2)}${b(3)}${b(4)}${P}${b(2)}${b(3)}${b(4)}${P}${b(6)}${b(6)}${b(6)}${P}${CG}${CG}${CG}${P}${b(8)}${b(8)}`)}
-    ${combo('九蓮寶燈 Nine Gates','Jiǔ lián bǎo dēng — 1112345678999 of one suit','Limit','limit','Hold 1-1-1-2-3-4-5-6-7-8-9-9-9 of one suit; 14th tile = any tile of that suit.',`${w(1)}${w(1)}${w(1)}${w(2)}${w(3)}${w(4)}${w(5)}${w(6)}${w(7)}${w(8)}${w(9)}${w(9)}${w(9)}${PLUS}${qTile('?萬')}`)}
-    ${combo('十三么 Thirteen Orphans','Shísān yāo — One of every terminal + all honors + one duplicate','Limit','limit','One each of: 1m 9m 1b 9b 1c 9c East South West North Red Green White, plus any duplicate.',`${w(1)}${w(9)}${b(1)}${b(9)}${d(1)}${d(9)}${E}${S}${W}${N}${CR}${CG}${CW}${PLUS}${qTile('dup')}`)}
-    ${combo('四暗刻 Four Concealed Pungs','Sì àn kè — 4 concealed triplets drawn from the wall','Limit','limit','All four triplets must be self-drawn (no called sets). Win by self-draw only.',`${w(2)}${w(2)}${w(2)}${P}${d(5)}${d(5)}${d(5)}${P}${b(8)}${b(8)}${b(8)}${P}${E}${E}${E}${P}${CG}${CG}<div style="font-size:11px;color:var(--dim);margin-top:8px;width:100%">⚠️ All sets must be concealed</div>`)}`;
+    ${combo('清么九 All Terminals','Qīng yāo jiǔ — Only 1s and 9s, no honors','10 Fan','','All tiles are 1s and 9s from any suit. No honor tiles.',`${w(1)}${w(1)}${w(1)}${P}${w(9)}${w(9)}${w(9)}${P}${d(1)}${d(1)}${d(1)}${P}${b(9)}${b(9)}${b(9)}${P}${d(9)}${d(9)}`)}
+    ${combo('綠一色 All Green','Lǜ yī sè — Only green-colored bamboo tiles','Limit','limit','Only bamboo 2,3,4,6,8 and Green Dragon (發). All tiles are green!',`${b(2)}${b(3)}${b(4)}${P}${b(2)}${b(3)}${b(4)}${P}${b(6)}${b(6)}${b(6)}${P}${CG}${CG}${CG}${P}${b(8)}${b(8)}`)}
+    ${combo('九蓮寶燈 Nine Gates','Jiǔ lián bǎo dēng — 1112345678999 of one suit (concealed)','10 Fan','','Hold 1-1-1-2-3-4-5-6-7-8-9-9-9 of one suit; 14th tile = any of that suit.',`${w(1)}${w(1)}${w(1)}${w(2)}${w(3)}${w(4)}${w(5)}${w(6)}${w(7)}${w(8)}${w(9)}${w(9)}${w(9)}${PLUS}${qTile('?萬')}`)}
+    ${combo('十三么 Thirteen Orphans','Shísān yāo — One of every terminal and honor + one duplicate','13 Fan','limit','One each of 1m 9m 1b 9b 1c 9c East South West North Red Green White, plus any duplicate.',`${w(1)}${w(9)}${b(1)}${b(9)}${d(1)}${d(9)}${E}${S}${W}${N}${CR}${CG}${CW}${PLUS}${qTile('dup')}`)}
+    ${combo('四暗刻 Four Concealed Pungs','Sì àn kè — 4 self-drawn triplets','10 Fan','','All four triplets must be self-drawn (no called sets). Win by self-draw only.',`${w(2)}${w(2)}${w(2)}${P}${d(5)}${d(5)}${d(5)}${P}${b(8)}${b(8)}${b(8)}${P}${E}${E}${E}${P}${CG}${CG}<div style="font-size:11px;color:var(--dim);margin-top:8px;width:100%">⚠️ All sets must be concealed</div>`)}
+    ${combo('四槓子 All Kongs','Sì gàng zǐ — Four kongs + pair','13 Fan','limit','Four kongs and a pair. Each kong draws a replacement tile.',`${w(1)}${w(1)}${w(1)}${w(1)}${P}${b(5)}${b(5)}${b(5)}${b(5)}${P}${d(9)}${d(9)}${d(9)}${d(9)}${P}${E}${E}${E}${E}${P}${CR}${CR}`)}`;
 }
 
 function initHelpPanes() {
@@ -2583,11 +2766,209 @@ function renderCombined() {
 }
 
 /* ═══════════════════════════════════════
+   DICE ROLLER
+═══════════════════════════════════════ */
+const DICE_FACES = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+let diceRolling = false;
+
+function rollDice() {
+  if (diceRolling) return;
+  diceRolling = true;
+  document.getElementById('btn-roll-dice').disabled = true;
+  document.getElementById('dice-total').textContent = '';
+  const d1 = document.getElementById('dice-1');
+  const d2 = document.getElementById('dice-2');
+  d1.classList.add('rolling');
+  d2.classList.add('rolling');
+
+  let count = 0;
+  const frames = 18 + Math.floor(Math.random() * 10);
+  function tick() {
+    d1.textContent = DICE_FACES[Math.floor(Math.random() * 6)];
+    d2.textContent = DICE_FACES[Math.floor(Math.random() * 6)];
+    count++;
+    if (count < frames) {
+      setTimeout(tick, 40 + count * 5);
+    } else {
+      const v1 = 1 + Math.floor(Math.random() * 6);
+      const v2 = 1 + Math.floor(Math.random() * 6);
+      d1.textContent = DICE_FACES[v1 - 1];
+      d2.textContent = DICE_FACES[v2 - 1];
+      d1.classList.remove('rolling');
+      d2.classList.remove('rolling');
+      document.getElementById('dice-total').textContent = `Total: ${v1 + v2}`;
+      diceRolling = false;
+      document.getElementById('btn-roll-dice').disabled = false;
+    }
+  }
+  tick();
+}
+
+document.getElementById('btn-roll-dice').addEventListener('click', rollDice);
+
+/* ═══════════════════════════════════════
+   FAN CALCULATOR
+═══════════════════════════════════════ */
+const CALC_GROUPS = [
+  { label: 'Win Method', items: [
+    { id:'c_zimo',  name:'自摸 Zimo — Self Draw',         desc:'Draw winning tile from the wall. All 3 losers pay.', fan:1 },
+    { id:'c_gate',  name:'門清 Concealed Gate',           desc:'Win by discard with a fully concealed hand.', fan:1 },
+    { id:'c_kong',  name:'槓上開花 Win by Kong',          desc:'Winning tile from supplement wall after a kong.', fan:2 },
+    { id:'c_dkong', name:'槓上槓 Double-Kong',            desc:'Kong declared with replacement tile from prior kong.', fan:9 },
+    { id:'c_last',  name:'海底撈月 Last Tile',            desc:'Win on the very last drawable tile in the wall.', fan:1 },
+    { id:'c_rob',   name:'搶槓 Robbing the Kong',         desc:"Steal an opponent's added kong tile to win.", fan:1 },
+    { id:'c_hv',    name:'天糊 Heavenly Hand',            desc:'East wins with initial tiles on first draw.', fan:13 },
+    { id:'c_ea',    name:'地糊 Earthly Hand',             desc:"Non-East wins on East's very first discard.", fan:13 },
+  ]},
+  { label: 'Hand Pattern', items: [
+    { id:'c_chow',  name:'平糊 Common Hand',              desc:'Every meld is a Chow (sequence). No pungs/kongs.', fan:1 },
+    { id:'c_pung',  name:'對對糊 All Pungs',              desc:'Every meld is a Triplet or Kong. No sequences.', fan:3 },
+    { id:'c_7p',    name:'七對子 Seven Pairs',            desc:'Hand consists of seven different pairs.', fan:4 },
+    { id:'c_half',  name:'混一色 Half Flush',             desc:'One suit only + honor tiles (winds/dragons).', fan:3 },
+    { id:'c_full',  name:'清一色 Full Flush',             desc:'All tiles from one suit. No winds or dragons.', fan:7 },
+    { id:'c_hon',   name:'字一色 All Honors',             desc:'Only wind and dragon tiles — no number tiles.', fan:10 },
+  ]},
+  { label: 'Dragon & Wind Melds', items: [
+    { id:'c_dred',  name:'紅中 Red Dragon Pung',          desc:'A triplet (or kong) of the Red Dragon (中).', fan:1 },
+    { id:'c_dgrn',  name:'發財 Green Dragon Pung',        desc:'A triplet of the Green Dragon (發).', fan:1 },
+    { id:'c_dwht',  name:'白板 White Dragon Pung',        desc:'A triplet of the White Dragon (白).', fan:1 },
+    { id:'c_sw',    name:'門風 Seat Wind Pung',           desc:"A triplet of the winner's own seat wind.", fan:1 },
+    { id:'c_rw',    name:'圈風 Round Wind Pung',          desc:'A triplet of the prevailing (round) wind.', fan:1 },
+    { id:'c_s3d',   name:'小三元 Small Three Dragons',    desc:'Pungs of 2 dragons + pair of the 3rd.', fan:5 },
+    { id:'c_b3d',   name:'大三元 Big Three Dragons',      desc:'Triplets of all three dragons.', fan:8 },
+    { id:'c_s4w',   name:'小四喜 Small Four Winds',       desc:'Pungs of 3 winds + pair of the 4th.', fan:6 },
+    { id:'c_b4w',   name:'大四喜 Big Four Winds',         desc:'Triplets of all four winds.', fan:13 },
+  ]},
+  { label: 'Bonus Tiles', items: [
+    { id:'c_nof',   name:'无花 No Flowers/Seasons',       desc:'No bonus tiles drawn at all.', fan:1 },
+    { id:'c_of',    name:'正花 Own Wind Flower',          desc:"Bonus flower matches winner's seat wind number.", fan:1 },
+    { id:'c_os',    name:'正花 Own Wind Season',          desc:"Bonus season matches winner's seat wind number.", fan:1 },
+    { id:'c_af',    name:'一台花 All Flowers',            desc:'All four flower bonus tiles drawn.', fan:2 },
+    { id:'c_as',    name:'一台花 All Seasons',            desc:'All four season bonus tiles drawn.', fan:2 },
+  ]},
+  { label: 'Limit Hands', items: [
+    { id:'c_term',  name:'清么九 All Terminals',          desc:'Only 1s and 9s from any suit. No honor tiles.', fan:10 },
+    { id:'c_9g',    name:'九蓮寶燈 Nine Gates',           desc:'1112345678999 of one suit (fully concealed).', fan:10 },
+    { id:'c_4p',    name:'四暗刻 Four Concealed Pungs',   desc:'All 4 triplets concealed (not called from discards).', fan:10 },
+    { id:'c_4k',    name:'四槓子 All Kongs',              desc:'Four kongs and a pair.', fan:13 },
+    { id:'c_t13',   name:'十三么 Thirteen Orphans',       desc:'One of each terminal and honor + duplicate.', fan:13 },
+  ]},
+];
+
+let calcState   = {};
+let calcWinType = 'zimo';
+
+function initCalcItems() {
+  const body = document.getElementById('calc-body');
+  CALC_GROUPS.forEach(grp => {
+    const div = document.createElement('div');
+    div.className = 'calc-group';
+    div.innerHTML = `<div class="section-label">${grp.label}</div>` +
+      grp.items.map(item => `
+        <div class="calc-item" data-cid="${item.id}">
+          <div class="calc-item-check">☐</div>
+          <div class="calc-item-info">
+            <div class="calc-item-name">${item.name}</div>
+            <div class="calc-item-desc">${item.desc}</div>
+          </div>
+          <div class="calc-item-fan">+${item.fan}</div>
+        </div>`).join('');
+    body.appendChild(div);
+  });
+
+  body.addEventListener('click', e => {
+    const item = e.target.closest('.calc-item');
+    if (!item) return;
+    const cid = item.dataset.cid;
+    calcState[cid] = !calcState[cid];
+    item.classList.toggle('on', !!calcState[cid]);
+    item.querySelector('.calc-item-check').textContent = calcState[cid] ? '☑' : '☐';
+    updateCalcResult();
+  });
+}
+
+function calcTotalFan() {
+  let total = 0;
+  CALC_GROUPS.forEach(grp => grp.items.forEach(item => {
+    if (calcState[item.id]) total += item.fan;
+  }));
+  return total;
+}
+
+function updateCalcResult() {
+  const fan   = calcTotalFan();
+  const stake = parseFloat(document.getElementById('calc-stake').value) || 1;
+  document.getElementById('calc-fan-num').textContent = fan;
+
+  const detail = document.getElementById('calc-result-detail');
+  if (fan === 0) {
+    detail.innerHTML = `<span style="color:var(--dim);font-size:12px">Select combinations above</span>`;
+    return;
+  }
+  if (fan < 3) {
+    detail.innerHTML = `<div class="calc-warn">Need ${3 - fan} more fan (minimum 3 to win)</div>`;
+    return;
+  }
+
+  // HK standard: base points = 2^fan, cap at 13 fan
+  const basePts = fan >= 13 ? 8192 : Math.pow(2, fan);
+  const money   = n => { const a = n * stake; return (a % 1 === 0 ? a : a.toFixed(2)); };
+  const isLimit = fan >= 13;
+  let html = '';
+  if (isLimit) {
+    html += `<div class="calc-result-row"><span class="lbl">Score: </span><span class="val gold">LIMIT (${fan} fan)</span></div>`;
+  } else {
+    html += `<div class="calc-result-row"><span class="lbl">Base pts: </span><span class="val gold">${basePts} pts/payer</span></div>`;
+  }
+  if (calcWinType === 'zimo') {
+    html += `<div class="calc-result-row"><span class="lbl">Zimo — each pays: </span><span class="val pos">+$${money(basePts)}</span></div>`;
+    html += `<div class="calc-result-row"><span class="lbl">Winner gets: </span><span class="val gold">+$${money(basePts * 3)}</span></div>`;
+  } else {
+    html += `<div class="calc-result-row"><span class="lbl">Discard — pays: </span><span class="val neg">-$${money(basePts * 3)}</span></div>`;
+    html += `<div class="calc-result-row"><span class="lbl">Winner gets: </span><span class="val gold">+$${money(basePts * 3)}</span></div>`;
+  }
+  detail.innerHTML = html;
+}
+
+function resetCalc() {
+  calcState = {};
+  document.querySelectorAll('.calc-item').forEach(el => {
+    el.classList.remove('on');
+    el.querySelector('.calc-item-check').textContent = '☐';
+  });
+  updateCalcResult();
+}
+
+function showCalc() {
+  document.getElementById('view-main').style.display     = 'none';
+  document.getElementById('view-detail').style.display   = 'none';
+  document.getElementById('view-help').style.display     = 'none';
+  document.getElementById('view-spinner').style.display  = 'none';
+  document.getElementById('view-combined').style.display = 'none';
+  document.getElementById('view-calc').style.display     = 'block';
+  updateCalcResult();
+}
+
+document.getElementById('btn-open-calc').addEventListener('click', showCalc);
+document.getElementById('btn-calc-back').addEventListener('click', showMain);
+document.getElementById('btn-calc-reset').addEventListener('click', resetCalc);
+document.getElementById('calc-stake').addEventListener('input', updateCalcResult);
+document.getElementById('calc-win-type').addEventListener('click', e => {
+  const btn = e.target.closest('[data-wtype]');
+  if (!btn) return;
+  calcWinType = btn.dataset.wtype;
+  document.querySelectorAll('#calc-win-type .win-type-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  updateCalcResult();
+});
+
+/* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
 loadState();
 showMain();
 initHelpPanes();
+initCalcItems();
 </script>
 </body>
 </html>
