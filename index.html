@@ -798,7 +798,7 @@
     .calc-group { margin-bottom: 10px; }
     .calc-item {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 10px;
       background: var(--surface);
       border: 1px solid var(--border);
@@ -810,13 +810,27 @@
       user-select: none;
     }
     .calc-item.on { background: var(--surface2); border-color: var(--accent); }
-    .calc-item-check { font-size: 18px; color: var(--dim); flex-shrink: 0; width: 22px; text-align: center; }
+    .calc-item-check { font-size: 18px; color: var(--dim); flex-shrink: 0; width: 22px; text-align: center; padding-top: 1px; }
     .calc-item.on .calc-item-check { color: var(--accent); }
     .calc-item-info { flex: 1; min-width: 0; }
     .calc-item-name { font-size: 13px; font-weight: 600; }
     .calc-item-desc { font-size: 11px; color: var(--dim); margin-top: 1px; line-height: 1.4; }
-    .calc-item-fan { font-size: 14px; font-weight: 700; color: var(--gold); flex-shrink: 0; min-width: 28px; text-align: right; }
+    .calc-item-fan { font-size: 14px; font-weight: 700; color: var(--gold); flex-shrink: 0; min-width: 28px; text-align: right; padding-top: 2px; }
     .calc-item.on .calc-item-fan { color: var(--accent2); }
+    .calc-ex {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 6px;
+      padding-top: 5px;
+      border-top: 1px dashed var(--border);
+      gap: 1px;
+    }
+    .calc-ex .tile { width: 22px; height: 30px; margin: 1px; }
+    .calc-ex .tile img { width: 100%; height: 100%; object-fit: contain; }
+    .calc-ex .tile.special .t-c { font-size: 7px; }
+    .calc-ex .tile-sep { font-size: 12px; color: var(--border); margin: 0 2px; align-self: center; }
+    .calc-ex-none { font-size: 10px; color: var(--dim); margin-top: 6px; padding-top: 5px; border-top: 1px dashed var(--border); }
     .calc-result-bar {
       position: fixed;
       bottom: 0; left: 50%;
@@ -2811,52 +2825,92 @@ document.getElementById('btn-roll-dice').addEventListener('click', rollDice);
 ═══════════════════════════════════════ */
 const CALC_GROUPS = [
   { label: 'Win Method', items: [
-    { id:'c_zimo',  name:'自摸 Zimo — Self Draw',         desc:'Draw winning tile from the wall. All 3 losers pay.', fan:1 },
-    { id:'c_gate',  name:'門清 Concealed Gate',           desc:'Win by discard with a fully concealed hand.', fan:1 },
-    { id:'c_kong',  name:'槓上開花 Win by Kong',          desc:'Winning tile from supplement wall after a kong.', fan:2 },
-    { id:'c_dkong', name:'槓上槓 Double-Kong',            desc:'Kong declared with replacement tile from prior kong.', fan:9 },
-    { id:'c_last',  name:'海底撈月 Last Tile',            desc:'Win on the very last drawable tile in the wall.', fan:1 },
-    { id:'c_rob',   name:'搶槓 Robbing the Kong',         desc:"Steal an opponent's added kong tile to win.", fan:1 },
-    { id:'c_hv',    name:'天糊 Heavenly Hand',            desc:'East wins with initial tiles on first draw.', fan:13 },
-    { id:'c_ea',    name:'地糊 Earthly Hand',             desc:"Non-East wins on East's very first discard.", fan:13 },
+    { id:'c_zimo',  name:'自摸 Zimo — Self Draw',         desc:'Draw winning tile from the wall. All 3 losers pay.',        fan:1,
+      ex:['w1','w2','w3','|','t4','t5','t6','|','s7','s8','s9','|','w5','w5','w5','|','t9','t9'] },
+    { id:'c_gate',  name:'門清 Concealed Gate',           desc:'Win by discard with a fully concealed hand.',               fan:1,
+      ex:['w1','w2','w3','|','w4','w5','w6','|','s7','s8','s9','|','t1','t2','t3','|','s5','s5'] },
+    { id:'c_kong',  name:'槓上開花 Win by Kong',          desc:'Winning tile from supplement wall after a kong.',           fan:2,
+      ex:['t7','t7','t7','t7','|','w1','w2','w3','|','s4','s5','s6','|','t2','t2','t2','|','s9','s9'] },
+    { id:'c_dkong', name:'槓上槓 Double-Kong',            desc:'Kong declared with replacement tile from prior kong.',      fan:9,
+      ex:['t7','t7','t7','t7','|','s3','s3','s3','s3','|','w2','w3','w4','|','t1','t1','t1','|','s5','s5'] },
+    { id:'c_last',  name:'海底撈月 Last Tile',            desc:'Win on the very last drawable tile in the wall.',          fan:1,
+      ex:['w1','w2','w3','|','t4','t5','t6','|','s4','s5','s6','|','w7','w7','w7','|','w9'] },
+    { id:'c_rob',   name:'搶槓 Robbing the Kong',         desc:"Steal an opponent's added kong tile to win.",               fan:1,
+      ex:['s5','s5','s5','s5','|','w1','w2','w3','|','t6','t7','t8','|','w4','w4','w4','|','t9','t9'] },
+    { id:'c_hv',    name:'天糊 Heavenly Hand',            desc:'East wins with initial 13 tiles + first self-draw.',       fan:13,
+      ex:['w1','w1','w1','|','w2','w3','w4','|','w5','w6','w7','|','w8','w9','w9','w9','|','w5','w5'] },
+    { id:'c_ea',    name:'地糊 Earthly Hand',             desc:"Non-East wins on East's very first discard.",               fan:13,
+      ex:['fe','fe','fe','|','t1','t2','t3','|','s4','s5','s6','|','w7','w8','w9','|','t9','t9'] },
   ]},
   { label: 'Hand Pattern', items: [
-    { id:'c_chow',  name:'平糊 Common Hand',              desc:'Every meld is a Chow (sequence). No pungs/kongs.', fan:1 },
-    { id:'c_pung',  name:'對對糊 All Pungs',              desc:'Every meld is a Triplet or Kong. No sequences.', fan:3 },
-    { id:'c_7p',    name:'七對子 Seven Pairs',            desc:'Hand consists of seven different pairs.', fan:4 },
-    { id:'c_half',  name:'混一色 Half Flush',             desc:'One suit only + honor tiles (winds/dragons).', fan:3 },
-    { id:'c_full',  name:'清一色 Full Flush',             desc:'All tiles from one suit. No winds or dragons.', fan:7 },
-    { id:'c_hon',   name:'字一色 All Honors',             desc:'Only wind and dragon tiles — no number tiles.', fan:10 },
+    { id:'c_chow',  name:'平糊 Common Hand',              desc:'Every meld is a Chow (sequence). No pungs/kongs.',         fan:1,
+      ex:['w1','w2','w3','|','w4','w5','w6','|','s7','s8','s9','|','t1','t2','t3','|','w9','w9'] },
+    { id:'c_pung',  name:'對對糊 All Pungs',              desc:'Every meld is a Triplet or Kong. No sequences.',           fan:3,
+      ex:['w1','w1','w1','|','w5','w5','w5','|','t9','t9','t9','|','s3','s3','s3','|','t6','t6'] },
+    { id:'c_7p',    name:'七對子 Seven Pairs',            desc:'Hand consists of seven different pairs.',                  fan:4,
+      ex:['w1','w1','|','w3','w3','|','w5','w5','|','w7','w7','|','w9','w9','|','t2','t2','|','t4','t4'] },
+    { id:'c_half',  name:'混一色 Half Flush',             desc:'One suit only + honor tiles (winds/dragons).',            fan:3,
+      ex:['w1','w2','w3','|','w4','w5','w6','|','w7','w8','w9','|','dr','dr','dr','|','fe','fe'] },
+    { id:'c_full',  name:'清一色 Full Flush',             desc:'All tiles from one suit. No winds or dragons.',           fan:7,
+      ex:['s1','s2','s3','|','s4','s5','s6','|','s7','s8','s9','|','s1','s2','s3','|','s5','s5'] },
+    { id:'c_hon',   name:'字一色 All Honors',             desc:'Only wind and dragon tiles — no number tiles.',           fan:10,
+      ex:['fe','fe','fe','|','fs','fs','fs','|','fw','fw','fw','|','dr','dr','dr','|','dg','dg'] },
   ]},
   { label: 'Dragon & Wind Melds', items: [
-    { id:'c_dred',  name:'紅中 Red Dragon Pung',          desc:'A triplet (or kong) of the Red Dragon (中).', fan:1 },
-    { id:'c_dgrn',  name:'發財 Green Dragon Pung',        desc:'A triplet of the Green Dragon (發).', fan:1 },
-    { id:'c_dwht',  name:'白板 White Dragon Pung',        desc:'A triplet of the White Dragon (白).', fan:1 },
-    { id:'c_sw',    name:'門風 Seat Wind Pung',           desc:"A triplet of the winner's own seat wind.", fan:1 },
-    { id:'c_rw',    name:'圈風 Round Wind Pung',          desc:'A triplet of the prevailing (round) wind.', fan:1 },
-    { id:'c_s3d',   name:'小三元 Small Three Dragons',    desc:'Pungs of 2 dragons + pair of the 3rd.', fan:5 },
-    { id:'c_b3d',   name:'大三元 Big Three Dragons',      desc:'Triplets of all three dragons.', fan:8 },
-    { id:'c_s4w',   name:'小四喜 Small Four Winds',       desc:'Pungs of 3 winds + pair of the 4th.', fan:6 },
-    { id:'c_b4w',   name:'大四喜 Big Four Winds',         desc:'Triplets of all four winds.', fan:13 },
+    { id:'c_dred',  name:'紅中 Red Dragon Pung',          desc:'A triplet (or kong) of the Red Dragon (中).',              fan:1,
+      ex:['dr','dr','dr'] },
+    { id:'c_dgrn',  name:'發財 Green Dragon Pung',        desc:'A triplet of the Green Dragon (發).',                      fan:1,
+      ex:['dg','dg','dg'] },
+    { id:'c_dwht',  name:'白板 White Dragon Pung',        desc:'A triplet of the White Dragon (白).',                      fan:1,
+      ex:['dw','dw','dw'] },
+    { id:'c_sw',    name:'門風 Seat Wind Pung',           desc:"A triplet of the winner's own seat wind.",                 fan:1,
+      ex:['fe','fe','fe'] },
+    { id:'c_rw',    name:'圈風 Round Wind Pung',          desc:'A triplet of the prevailing (round) wind.',               fan:1,
+      ex:['fs','fs','fs'] },
+    { id:'c_s3d',   name:'小三元 Small Three Dragons',    desc:'Pungs of 2 dragons + pair of the 3rd.',                   fan:5,
+      ex:['dr','dr','dr','|','dg','dg','dg','|','dw','dw'] },
+    { id:'c_b3d',   name:'大三元 Big Three Dragons',      desc:'Triplets of all three dragons.',                           fan:8,
+      ex:['dr','dr','dr','|','dg','dg','dg','|','dw','dw','dw'] },
+    { id:'c_s4w',   name:'小四喜 Small Four Winds',       desc:'Pungs of 3 winds + pair of the 4th.',                     fan:6,
+      ex:['fe','fe','fe','|','fs','fs','fs','|','fw','fw','fw','|','fn','fn'] },
+    { id:'c_b4w',   name:'大四喜 Big Four Winds',         desc:'Triplets of all four winds.',                              fan:13,
+      ex:['fe','fe','fe','|','fs','fs','fs','|','fw','fw','fw','|','fn','fn','fn'] },
   ]},
   { label: 'Bonus Tiles', items: [
-    { id:'c_nof',   name:'无花 No Flowers/Seasons',       desc:'No bonus tiles drawn at all.', fan:1 },
-    { id:'c_of',    name:'正花 Own Wind Flower',          desc:"Bonus flower matches winner's seat wind number.", fan:1 },
-    { id:'c_os',    name:'正花 Own Wind Season',          desc:"Bonus season matches winner's seat wind number.", fan:1 },
-    { id:'c_af',    name:'一台花 All Flowers',            desc:'All four flower bonus tiles drawn.', fan:2 },
-    { id:'c_as',    name:'一台花 All Seasons',            desc:'All four season bonus tiles drawn.', fan:2 },
+    { id:'c_nof',   name:'无花 No Flowers/Seasons',       desc:'No bonus tiles drawn at all.',                             fan:1,
+      ex:null },
+    { id:'c_of',    name:'正花 Own Wind Flower',          desc:"Bonus flower matches winner's seat wind number.",          fan:1,
+      ex:['fe'] },
+    { id:'c_os',    name:'正花 Own Wind Season',          desc:"Bonus season matches winner's seat wind number.",          fan:1,
+      ex:['h1'] },
+    { id:'c_af',    name:'一台花 All Flowers',            desc:'All four flower bonus tiles drawn.',                       fan:2,
+      ex:['fe','fs','fw','fn'] },
+    { id:'c_as',    name:'一台花 All Seasons',            desc:'All four season bonus tiles drawn.',                       fan:2,
+      ex:['h1','h2','h3','h4'] },
   ]},
   { label: 'Limit Hands', items: [
-    { id:'c_term',  name:'清么九 All Terminals',          desc:'Only 1s and 9s from any suit. No honor tiles.', fan:10 },
-    { id:'c_9g',    name:'九蓮寶燈 Nine Gates',           desc:'1112345678999 of one suit (fully concealed).', fan:10 },
-    { id:'c_4p',    name:'四暗刻 Four Concealed Pungs',   desc:'All 4 triplets concealed (not called from discards).', fan:10 },
-    { id:'c_4k',    name:'四槓子 All Kongs',              desc:'Four kongs and a pair.', fan:13 },
-    { id:'c_t13',   name:'十三么 Thirteen Orphans',       desc:'One of each terminal and honor + duplicate.', fan:13 },
+    { id:'c_term',  name:'清么九 All Terminals',          desc:'Only 1s and 9s from any suit. No honor tiles.',           fan:10,
+      ex:['w1','w1','w1','|','w9','w9','w9','|','t1','t1','t1','|','t9','t9','t9','|','s1','s1'] },
+    { id:'c_9g',    name:'九蓮寶燈 Nine Gates',           desc:'1112345678999 of one suit (fully concealed).',            fan:10,
+      ex:['w1','w1','w1','w2','w3','w4','w5','w6','w7','w8','w9','w9','w9','|','w5'] },
+    { id:'c_4p',    name:'四暗刻 Four Concealed Pungs',   desc:'All 4 triplets concealed (not called from discards).',    fan:10,
+      ex:['w1','w1','w1','|','t5','t5','t5','|','s9','s9','s9','|','fe','fe','fe','|','w9','w9'] },
+    { id:'c_4k',    name:'四槓子 All Kongs',              desc:'Four kongs and a pair.',                                   fan:13,
+      ex:['w1','w1','w1','w1','|','t5','t5','t5','t5','|','s9','s9','s9','s9','|','w9','w9','w9','w9','|','s1','s1'] },
+    { id:'c_t13',   name:'十三么 Thirteen Orphans',       desc:'One each of all 13 terminals & honors + any duplicate.',  fan:13,
+      ex:['w1','w9','t1','t9','s1','s9','fe','fs','fw','fn','dr','dg','dw','|','w1'] },
   ]},
 ];
 
 let calcState   = {};
 let calcWinType = 'zimo';
+
+function renderEx(keys) {
+  if (!keys || !keys.length) return '<div class="calc-ex-none">No bonus tiles — clean hand ✓</div>';
+  return '<div class="calc-ex">' + keys.map(k =>
+    k === '|' ? '<span class="tile-sep">│</span>' : makeTile(k)
+  ).join('') + '</div>';
+}
 
 function initCalcItems() {
   const body = document.getElementById('calc-body');
@@ -2870,6 +2924,7 @@ function initCalcItems() {
           <div class="calc-item-info">
             <div class="calc-item-name">${item.name}</div>
             <div class="calc-item-desc">${item.desc}</div>
+            ${item.ex !== undefined ? renderEx(item.ex) : ''}
           </div>
           <div class="calc-item-fan">+${item.fan}</div>
         </div>`).join('');
