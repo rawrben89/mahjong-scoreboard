@@ -28,21 +28,42 @@
       min-height: 100vh;
       max-width: 500px;
       margin: 0 auto;
-      padding-bottom: 72px;
     }
 
-    /* ── Header ── */
-    header {
+    /* ── Shared Header ── */
+    .app-header {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 14px 20px 12px;
-      text-align: center;
+      padding: 13px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       position: sticky;
       top: 0;
       z-index: 100;
     }
-    header h1 { font-size: 19px; color: var(--gold); letter-spacing: 1px; }
-    header p  { font-size: 11px; color: var(--dim); margin-top: 2px; }
+    .app-header .title   { flex: 1; text-align: center; }
+    .app-header h1       { font-size: 17px; color: var(--gold); letter-spacing: .5px; }
+    .app-header p        { font-size: 10px; color: var(--dim); margin-top: 1px; }
+    .back-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .header-action {
+      background: none;
+      border: none;
+      color: var(--red);
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      padding: 4px;
+    }
 
     /* ── Bottom Tab Bar ── */
     .tab-bar {
@@ -66,7 +87,6 @@
       font-size: 10px;
       cursor: pointer;
       border-top: 2px solid transparent;
-      transition: color .2s, border-color .2s;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -75,22 +95,129 @@
     .tab-btn span { font-size: 20px; }
     .tab-btn.active { color: var(--gold); border-top-color: var(--gold); }
 
-    /* ── Tab Content ── */
-    .tab-pane { display: none; padding: 16px; }
+    /* ── Views ── */
+    #view-main   { display: block; }
+    #view-detail { display: none;  }
+
+    /* ── Panes ── */
+    .tab-pane { display: none; padding: 14px 14px 80px; }
     .tab-pane.active { display: block; }
 
-    /* ── Section label ── */
-    .section-label {
-      font-size: 11px;
-      color: var(--dim);
-      text-transform: uppercase;
-      letter-spacing: .6px;
-      margin-bottom: 10px;
+    /* ════════════════════════════
+       MAIN VIEW — TABLE CARDS
+    ════════════════════════════ */
+    #main-body { padding: 14px 14px 100px; }
+
+    .add-table-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius);
+      border: 1.5px dashed var(--accent);
+      background: none;
+      color: var(--accent);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 14px;
+      transition: background .15s;
+    }
+    .add-table-btn:hover { background: var(--surface); }
+
+    .table-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .table-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .table-name { font-size: 15px; font-weight: 700; color: var(--gold); }
+    .table-round-count { font-size: 11px; color: var(--dim); background: var(--surface2); border-radius: 8px; padding: 2px 8px; }
+
+    .table-scores-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+    }
+    .table-score-cell {
+      background: var(--surface);
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ts-name  { font-size: 12px; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px; }
+    .ts-score { font-size: 16px; font-weight: 700; }
+    .ts-score.pos { color: var(--accent2); }
+    .ts-score.neg { color: var(--red); }
+    .ts-score.zero { color: var(--dim); }
+
+    .table-card-footer {
+      padding: 10px 14px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .open-table-btn {
+      flex: 1;
+      padding: 9px;
+      border-radius: 8px;
+      border: none;
+      background: var(--accent);
+      color: #000;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .delete-table-btn {
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1.5px solid var(--red);
+      background: none;
+      color: var(--red);
+      font-size: 13px;
+      cursor: pointer;
     }
 
-    /* ═══════════════════════════
-       SCORES TAB
-    ═══════════════════════════ */
+    .table-summary-row {
+      display: flex;
+      gap: 8px;
+      padding: 8px 14px 0;
+    }
+    .ts-sum {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      padding: 5px 6px;
+      border-radius: 8px;
+      background: var(--surface2);
+    }
+    .ts-sum .lbl { color: var(--dim); display: block; margin-bottom: 2px; }
+    .ts-sum .val { font-weight: 700; font-size: 14px; }
+    .ts-sum.pos-sum .val { color: var(--accent2); }
+    .ts-sum.neg-sum .val { color: var(--red); }
+
+    .empty-main {
+      text-align: center;
+      padding: 60px 20px 20px;
+      color: var(--dim);
+      font-size: 14px;
+      line-height: 1.9;
+    }
+    .empty-main span { font-size: 40px; display: block; margin-bottom: 12px; }
+
+    /* ════════════════════════════
+       DETAIL VIEW
+    ════════════════════════════ */
+
+    /* Score summary strip */
     .score-summary {
       display: flex;
       gap: 10px;
@@ -101,16 +228,17 @@
       background: var(--surface);
       border: 1.5px solid var(--border);
       border-radius: var(--radius);
-      padding: 12px;
+      padding: 11px;
       text-align: center;
     }
     .summary-box.pos-box { border-color: var(--accent2); }
     .summary-box.neg-box { border-color: var(--red); }
-    .summary-label { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
-    .summary-val   { font-size: 22px; font-weight: 700; }
+    .summary-label { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; }
+    .summary-val   { font-size: 20px; font-weight: 700; }
     .summary-val.pos { color: var(--accent2); }
     .summary-val.neg { color: var(--red); }
 
+    /* Player score grid */
     .players-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -120,26 +248,31 @@
       background: var(--surface);
       border: 1.5px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px 12px;
+      padding: 14px 10px;
       text-align: center;
       position: relative;
     }
-    .player-card.top    { border-color: var(--gold);  background: linear-gradient(135deg, #1e320e, #2a2a0c); }
-    .player-card.losing { border-color: var(--red);   opacity: .82; }
-    .p-rank  { position: absolute; top: 7px; right: 9px; font-size: 10px; color: var(--dim); background: var(--surface2); border-radius: 8px; padding: 2px 6px; }
-    .p-name  { font-size: 12px; color: var(--dim); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .p-score { font-size: 30px; font-weight: 700; color: var(--accent2); line-height: 1.1; }
+    .player-card.top    { border-color: var(--gold); background: linear-gradient(135deg, #1e320e, #2a2a0c); }
+    .player-card.losing { border-color: var(--red); opacity: .82; }
+    .p-rank  { position: absolute; top: 6px; right: 8px; font-size: 10px; color: var(--dim); background: var(--surface2); border-radius: 7px; padding: 1px 6px; }
+    .p-name  { font-size: 12px; color: var(--dim); margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .p-score { font-size: 28px; font-weight: 700; color: var(--accent2); line-height: 1.1; }
     .p-score.neg { color: var(--red); }
 
-    /* ═══════════════════════════
-       ADD ROUND TAB
-    ═══════════════════════════ */
+    /* Form */
     .form-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 14px;
-      margin-bottom: 12px;
+      padding: 13px;
+      margin-bottom: 11px;
+    }
+    .section-label {
+      font-size: 11px;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 9px;
     }
     .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
     .chip {
@@ -159,7 +292,7 @@
     .win-type-row { display: flex; gap: 8px; }
     .win-type-btn {
       flex: 1;
-      padding: 10px 8px;
+      padding: 10px 6px;
       border-radius: 10px;
       border: 1.5px solid var(--border);
       background: var(--surface2);
@@ -183,14 +316,12 @@
       font-size: 24px;
       text-align: center;
       outline: none;
-      appearance: textfield;
       -moz-appearance: textfield;
     }
     .points-input::-webkit-inner-spin-button,
     .points-input::-webkit-outer-spin-button { display: none; }
     .points-input:focus { border-color: var(--accent); }
 
-    /* Preview */
     .preview-box {
       background: var(--surface2);
       border-radius: 10px;
@@ -204,14 +335,14 @@
       padding: 4px 0;
       font-size: 14px;
     }
-    .preview-row .chg       { font-weight: 700; }
-    .preview-row .chg.pos   { color: var(--accent2); }
-    .preview-row .chg.neg   { color: var(--red); }
-    .preview-row .chg.zero  { color: var(--dim); }
+    .chg     { font-weight: 700; }
+    .chg.pos { color: var(--accent2); }
+    .chg.neg { color: var(--red); }
+    .chg.zero{ color: var(--dim); }
 
     .submit-btn {
       width: 100%;
-      padding: 15px;
+      padding: 14px;
       border-radius: var(--radius);
       border: none;
       background: var(--accent);
@@ -219,52 +350,29 @@
       font-size: 16px;
       font-weight: 700;
       cursor: pointer;
-      transition: background .15s;
     }
     .submit-btn:disabled { opacity: .35; cursor: default; }
-    .submit-btn:not(:disabled):hover { background: var(--accent2); }
 
-    /* ═══════════════════════════
-       HISTORY TAB
-    ═══════════════════════════ */
+    /* History */
     .history-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 14px;
+      padding: 13px;
       margin-bottom: 10px;
     }
-    .history-head {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 6px;
-    }
-    .round-badge {
-      font-size: 11px;
-      background: var(--surface2);
-      border-radius: 8px;
-      padding: 2px 8px;
-      color: var(--dim);
-      flex-shrink: 0;
-    }
-    .win-label { font-size: 13px; color: var(--gold); font-weight: 700; flex: 1; }
-    .del-btn   { background: none; border: none; color: var(--red); font-size: 18px; cursor: pointer; line-height: 1; padding: 0 2px; flex-shrink: 0; }
-    .win-sub   { font-size: 11px; color: var(--dim); margin-bottom: 8px; }
-    .chip-list { display: flex; flex-wrap: wrap; gap: 6px; }
-    .chip-sm {
-      font-size: 11px;
-      padding: 3px 9px;
-      border-radius: 10px;
-      background: var(--surface2);
-    }
+    .history-head { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .round-badge  { font-size: 11px; background: var(--surface2); border-radius: 8px; padding: 2px 8px; color: var(--dim); flex-shrink: 0; }
+    .win-label    { font-size: 13px; color: var(--gold); font-weight: 700; flex: 1; }
+    .del-btn      { background: none; border: none; color: var(--red); font-size: 18px; cursor: pointer; line-height: 1; padding: 0 2px; }
+    .win-sub      { font-size: 11px; color: var(--dim); margin-bottom: 7px; }
+    .chip-list    { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip-sm { font-size: 11px; padding: 3px 9px; border-radius: 10px; background: var(--surface2); }
     .chip-sm.pos  { color: var(--accent2); }
     .chip-sm.neg  { color: var(--red); }
     .chip-sm.zero { color: var(--dim); }
 
-    /* ═══════════════════════════
-       PLAYERS TAB
-    ═══════════════════════════ */
+    /* Players tab */
     .player-row {
       display: flex;
       align-items: center;
@@ -272,15 +380,15 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 12px 14px;
+      padding: 11px 13px;
       margin-bottom: 8px;
     }
-    .player-row-name  { font-size: 15px; }
-    .player-row-right { display: flex; align-items: center; gap: 10px; }
+    .player-row-name  { font-size: 14px; }
+    .player-row-right { display: flex; align-items: center; gap: 9px; }
     .player-row-score { font-size: 14px; font-weight: 700; }
     .remove-btn { border: 1.5px solid var(--red); color: var(--red); background: none; border-radius: 7px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
 
-    .add-row { display: flex; gap: 8px; margin-top: 14px; }
+    .add-row { display: flex; gap: 8px; margin-top: 12px; }
     .text-input {
       flex: 1;
       padding: 10px 12px;
@@ -292,11 +400,11 @@
       outline: none;
     }
     .text-input:focus { border-color: var(--accent); }
-    .add-btn { padding: 10px 18px; border-radius: 10px; border: none; background: var(--accent); color: #000; font-weight: 700; cursor: pointer; font-size: 14px; }
+    .add-btn { padding: 10px 16px; border-radius: 10px; border: none; background: var(--accent); color: #000; font-weight: 700; cursor: pointer; font-size: 14px; }
 
     .danger-btn {
       width: 100%;
-      padding: 12px;
+      padding: 11px;
       border-radius: 10px;
       border: 1.5px solid var(--red);
       background: none;
@@ -305,38 +413,61 @@
       cursor: pointer;
       margin-top: 8px;
     }
+    .mt10 { margin-top: 10px; }
+    .mt16 { margin-top: 16px; }
 
-    /* ═══════════════════════════
-       MODAL
-    ═══════════════════════════ */
+    /* ── Modal ── */
     .modal-bg {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.75);
+      background: rgba(0,0,0,.78);
       z-index: 200;
-      align-items: center;
+      align-items: flex-end;
       justify-content: center;
+      padding-bottom: env(safe-area-inset-bottom, 0);
     }
     .modal-bg.show { display: flex; }
     .modal-box {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 24px 20px;
-      width: 88%;
-      max-width: 340px;
+      border-radius: 20px 20px 0 0;
+      padding: 20px 18px 28px;
+      width: 100%;
+      max-width: 500px;
     }
-    .modal-box h3 { margin-bottom: 10px; font-size: 17px; }
-    .modal-box p  { font-size: 14px; color: var(--dim); margin-bottom: 20px; line-height: 1.5; }
-    .modal-btns   { display: flex; gap: 10px; }
+    .modal-drag { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+    .modal-box h3 { font-size: 16px; margin-bottom: 14px; }
+    .modal-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .modal-input {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      width: 100%;
+    }
+    .modal-input:focus { border-color: var(--accent); }
+    .modal-input.full  { grid-column: 1 / -1; }
+    .modal-btns { display: flex; gap: 8px; }
     .modal-btns button { flex: 1; padding: 11px; border-radius: 10px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; }
     .m-cancel  { background: var(--surface2); color: var(--text); }
-    .m-confirm { background: var(--red); color: #fff; }
+    .m-confirm { background: var(--accent); color: #000; }
+    .m-danger  { background: var(--red); color: #fff; }
 
-    /* ═══════════════════════════
-       TOAST
-    ═══════════════════════════ */
+    /* Confirm modal (small, centered) */
+    #modal-confirm .modal-box {
+      border-radius: 18px;
+      max-width: 320px;
+      margin: auto;
+      padding: 22px 18px 20px;
+    }
+    #modal-confirm .modal-box p { font-size: 14px; color: var(--dim); margin-bottom: 18px; line-height: 1.5; }
+    #modal-confirm.modal-bg { align-items: center; }
+
+    /* ── Toast ── */
     .toast {
       position: fixed;
       bottom: 84px;
@@ -356,118 +487,151 @@
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ═══════════════════════════
-       EMPTY STATE
-    ═══════════════════════════ */
-    .empty {
-      text-align: center;
-      padding: 48px 20px;
-      color: var(--dim);
-      font-size: 14px;
-      line-height: 1.8;
-    }
-
-    /* Utility */
-    .mt8  { margin-top: 8px; }
-    .mt16 { margin-top: 16px; }
-    small { font-size: 11px; opacity: .7; display: block; }
+    .empty { text-align: center; padding: 40px 20px; color: var(--dim); font-size: 14px; line-height: 1.8; }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>🀄 HK Mahjong</h1>
-  <p>Hong Kong Style Scoreboard</p>
-</header>
-
-<!-- ── SCORES ── -->
-<div id="pane-scores" class="tab-pane">
-  <div class="score-summary">
-    <div class="summary-box pos-box">
-      <div class="summary-label">Total Positive</div>
-      <div id="sum-pos" class="summary-val pos">+0</div>
-    </div>
-    <div class="summary-box neg-box">
-      <div class="summary-label">Total Negative</div>
-      <div id="sum-neg" class="summary-val neg">0</div>
-    </div>
-  </div>
-  <div id="players-grid" class="players-grid"></div>
-</div>
-
-<!-- ── ADD ROUND ── -->
-<div id="pane-round" class="tab-pane">
-
-  <div class="form-card">
-    <div class="section-label">Winner 🏆</div>
-    <div id="winner-chips" class="chip-row"></div>
-  </div>
-
-  <div class="form-card">
-    <div class="section-label">Base Points <span style="color:var(--dim);font-size:10px;text-transform:none;letter-spacing:0">(amount each payer contributes)</span></div>
-    <input id="pts-input" type="number" class="points-input" placeholder="0" min="1" inputmode="numeric">
-  </div>
-
-  <div class="form-card">
-    <div class="section-label">Win Type</div>
-    <div class="win-type-row">
-      <div id="btn-zimo"    class="win-type-btn on"  data-type="zimo">🀄 Zimo<br><small>All 3 pay</small></div>
-      <div id="btn-discard" class="win-type-btn"      data-type="discard">🎴 Discard<br><small>Discarder pays all</small></div>
+<!-- ═══════════════════════════════════
+     MAIN VIEW  (Tables list)
+═══════════════════════════════════ -->
+<div id="view-main">
+  <div class="app-header">
+    <div class="title">
+      <h1>🀄 HK Mahjong</h1>
+      <p>Hong Kong Style Scoreboard</p>
     </div>
   </div>
 
-  <div id="discard-card" class="form-card" style="display:none">
-    <div class="section-label">Who Discarded? 🃏</div>
-    <div id="discard-chips" class="chip-row"></div>
-  </div>
-
-  <div id="preview-box" class="preview-box" style="display:none">
-    <div class="section-label" style="margin-bottom:8px">Preview</div>
-    <div id="preview-rows"></div>
-  </div>
-
-  <button id="submit-btn" class="submit-btn" disabled>Confirm Round ✓</button>
-</div>
-
-<!-- ── HISTORY ── -->
-<div id="pane-history" class="tab-pane">
-  <div id="history-list"></div>
-</div>
-
-<!-- ── PLAYERS ── -->
-<div id="pane-players" class="tab-pane active">
-  <div class="section-label">Players</div>
-  <div id="player-list"></div>
-
-  <div class="add-row">
-    <input id="new-name" type="text" class="text-input" placeholder="New player name…" maxlength="20">
-    <button class="add-btn" id="add-player-btn">Add</button>
-  </div>
-
-  <div class="mt16">
-    <div class="section-label">Danger Zone</div>
-    <button class="danger-btn" id="btn-reset-scores">Reset All Scores to 0</button>
-    <button class="danger-btn mt8" id="btn-clear-history">Clear All History</button>
-    <button class="danger-btn mt8" id="btn-reset-all">Full Reset (Scores + History)</button>
+  <div id="main-body">
+    <button class="add-table-btn" id="btn-new-table">＋ New Table</button>
+    <div id="tables-container"></div>
   </div>
 </div>
 
-<!-- ── BOTTOM TAB BAR ── -->
-<nav class="tab-bar">
-  <button class="tab-btn"        data-tab="scores">  <span>📊</span>Scores</button>
-  <button class="tab-btn"        data-tab="round">   <span>✏️</span>Add Round</button>
-  <button class="tab-btn"        data-tab="history"> <span>📜</span>History</button>
-  <button class="tab-btn active" data-tab="players"> <span>👥</span>Players</button>
-</nav>
+<!-- ═══════════════════════════════════
+     DETAIL VIEW  (Single table)
+═══════════════════════════════════ -->
+<div id="view-detail">
+  <div class="app-header">
+    <button class="back-btn" id="btn-back">← Back</button>
+    <div class="title">
+      <h1 id="detail-title">Table</h1>
+    </div>
+    <button class="header-action" id="btn-delete-table">Delete</button>
+  </div>
 
-<!-- ── MODAL ── -->
-<div id="modal-bg" class="modal-bg">
+  <!-- Scores pane -->
+  <div id="dpane-scores" class="tab-pane active">
+    <div class="score-summary">
+      <div class="summary-box pos-box">
+        <div class="summary-label">Total Positive</div>
+        <div id="d-sum-pos" class="summary-val pos">+0</div>
+      </div>
+      <div class="summary-box neg-box">
+        <div class="summary-label">Total Negative</div>
+        <div id="d-sum-neg" class="summary-val neg">0</div>
+      </div>
+    </div>
+    <div id="d-players-grid" class="players-grid"></div>
+  </div>
+
+  <!-- Add Round pane -->
+  <div id="dpane-round" class="tab-pane">
+    <div class="form-card">
+      <div class="section-label">Winner 🏆</div>
+      <div id="d-winner-chips" class="chip-row"></div>
+    </div>
+
+    <div class="form-card">
+      <div class="section-label">Base Points <span style="color:var(--dim);font-size:10px;text-transform:none;letter-spacing:0">(amount each payer contributes)</span></div>
+      <input id="d-pts-input" type="number" class="points-input" placeholder="0" min="1" inputmode="numeric">
+    </div>
+
+    <div class="form-card">
+      <div class="section-label">Win Type</div>
+      <div class="win-type-row">
+        <div id="d-btn-zimo"    class="win-type-btn on" >🀄 Zimo<br><small style="font-size:10px;opacity:.7">All 3 pay</small></div>
+        <div id="d-btn-discard" class="win-type-btn"    >🎴 Discard<br><small style="font-size:10px;opacity:.7">Discarder pays all</small></div>
+      </div>
+    </div>
+
+    <div id="d-discard-card" class="form-card" style="display:none">
+      <div class="section-label">Who Discarded? 🃏</div>
+      <div id="d-discard-chips" class="chip-row"></div>
+    </div>
+
+    <div id="d-preview-box" class="preview-box" style="display:none">
+      <div class="section-label" style="margin-bottom:8px">Preview</div>
+      <div id="d-preview-rows"></div>
+    </div>
+
+    <button id="d-submit-btn" class="submit-btn" disabled>Confirm Round ✓</button>
+  </div>
+
+  <!-- History pane -->
+  <div id="dpane-history" class="tab-pane">
+    <div id="d-history-list"></div>
+  </div>
+
+  <!-- Players pane -->
+  <div id="dpane-players" class="tab-pane">
+    <div class="section-label">Players (4 required for HK Mahjong)</div>
+    <div id="d-player-list"></div>
+    <div class="add-row">
+      <input id="d-new-name" type="text" class="text-input" placeholder="New player name…" maxlength="20">
+      <button class="add-btn" id="d-add-player-btn">Add</button>
+    </div>
+
+    <div class="mt16">
+      <div class="section-label">Danger Zone</div>
+      <button class="danger-btn" id="d-btn-reset-scores">Reset All Scores to 0</button>
+      <button class="danger-btn mt10" id="d-btn-clear-history">Clear Round History</button>
+    </div>
+  </div>
+
+  <!-- Bottom tab bar (detail) -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-dtab="scores">  <span>📊</span>Scores</button>
+    <button class="tab-btn"        data-dtab="round">   <span>✏️</span>Add Round</button>
+    <button class="tab-btn"        data-dtab="history"> <span>📜</span>History</button>
+    <button class="tab-btn"        data-dtab="players"> <span>👥</span>Players</button>
+  </nav>
+</div>
+
+<!-- ═══════════════════════════════════
+     MODAL — New Table
+═══════════════════════════════════ -->
+<div id="modal-newtable" class="modal-bg">
   <div class="modal-box">
-    <h3 id="modal-title">Confirm</h3>
-    <p  id="modal-text">Are you sure?</p>
+    <div class="modal-drag"></div>
+    <h3>Create New Table</h3>
+    <div style="margin-bottom:10px">
+      <input id="nt-name" class="modal-input full" placeholder="Table name (e.g. Table 1)" maxlength="30">
+    </div>
+    <div class="modal-input-grid">
+      <input id="nt-p1" class="modal-input" placeholder="Player 1" maxlength="20">
+      <input id="nt-p2" class="modal-input" placeholder="Player 2" maxlength="20">
+      <input id="nt-p3" class="modal-input" placeholder="Player 3" maxlength="20">
+      <input id="nt-p4" class="modal-input" placeholder="Player 4" maxlength="20">
+    </div>
     <div class="modal-btns">
-      <button class="m-cancel"  id="modal-cancel">Cancel</button>
-      <button class="m-confirm" id="modal-ok">OK</button>
+      <button class="m-cancel"  id="nt-cancel">Cancel</button>
+      <button class="m-confirm" id="nt-create">Create Table</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MODAL — Confirm
+═══════════════════════════════════ -->
+<div id="modal-confirm" class="modal-bg">
+  <div class="modal-box">
+    <h3 id="mc-title">Confirm</h3>
+    <p  id="mc-text">Are you sure?</p>
+    <div class="modal-btns">
+      <button class="m-cancel" id="mc-cancel">Cancel</button>
+      <button id="mc-ok">OK</button>
     </div>
   </div>
 </div>
@@ -480,26 +644,20 @@
 /* ═══════════════════════════════════════
    STATE
 ═══════════════════════════════════════ */
-const DEFAULT_PLAYERS = [];
+let S = { tables: [], nextTableId: 1 };
 
-let S = {
-  players: [...DEFAULT_PLAYERS],
-  scores: {},
-  history: [],
-  nextRound: 1
-};
+let currentId = null; // currently open table id
+
+function tableById(id) { return S.tables.find(t => t.id === id); }
 
 function loadState() {
   try {
-    const raw = localStorage.getItem('hk-mahjong-v2');
+    const raw = localStorage.getItem('hk-mahjong-v3');
     if (raw) S = JSON.parse(raw);
   } catch (_) {}
-  // Ensure all players have a score entry
-  S.players.forEach(p => { if (!(p in S.scores)) S.scores[p] = 0; });
 }
-
 function saveState() {
-  localStorage.setItem('hk-mahjong-v2', JSON.stringify(S));
+  localStorage.setItem('hk-mahjong-v3', JSON.stringify(S));
 }
 
 /* ═══════════════════════════════════════
@@ -510,298 +668,438 @@ function esc(s) {
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+function fmt(n) { return (n > 0 ? '+' : '') + n; }
 
-function fmtScore(n) {
-  return (n > 0 ? '+' : '') + n;
-}
-
-let toastTimer;
+let _toastTimer;
 function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
 }
 
-let modalCb = null;
-function confirm(title, text, cb) {
-  document.getElementById('modal-title').textContent = title;
-  document.getElementById('modal-text').textContent  = text;
-  modalCb = cb;
-  document.getElementById('modal-bg').classList.add('show');
+let _confirmCb = null;
+function showConfirm(title, text, cb, danger = true) {
+  document.getElementById('mc-title').textContent = title;
+  document.getElementById('mc-text').textContent  = text;
+  const okBtn = document.getElementById('mc-ok');
+  okBtn.className = danger ? 'm-danger' : 'm-confirm';
+  okBtn.textContent = 'Confirm';
+  _confirmCb = cb;
+  document.getElementById('modal-confirm').classList.add('show');
 }
-
-document.getElementById('modal-ok').addEventListener('click', () => {
-  if (modalCb) modalCb();
-  document.getElementById('modal-bg').classList.remove('show');
-  modalCb = null;
+document.getElementById('mc-ok').addEventListener('click', () => {
+  if (_confirmCb) _confirmCb();
+  document.getElementById('modal-confirm').classList.remove('show');
+  _confirmCb = null;
 });
-document.getElementById('modal-cancel').addEventListener('click', () => {
-  document.getElementById('modal-bg').classList.remove('show');
-  modalCb = null;
+document.getElementById('mc-cancel').addEventListener('click', () => {
+  document.getElementById('modal-confirm').classList.remove('show');
+  _confirmCb = null;
 });
-document.getElementById('modal-bg').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal-bg')) {
-    document.getElementById('modal-bg').classList.remove('show');
-    modalCb = null;
+document.getElementById('modal-confirm').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-confirm')) {
+    document.getElementById('modal-confirm').classList.remove('show');
+    _confirmCb = null;
   }
 });
 
 /* ═══════════════════════════════════════
-   TABS
+   VIEWS
 ═══════════════════════════════════════ */
-const PANES = { scores: 'pane-scores', round: 'pane-round', history: 'pane-history', players: 'pane-players' };
-
-function switchTab(tab) {
-  Object.values(PANES).forEach(id => document.getElementById(id).classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(PANES[tab]).classList.add('active');
-  document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
-  if (tab === 'scores')   renderScores();
-  if (tab === 'round')    renderRoundForm();
-  if (tab === 'history')  renderHistory();
-  if (tab === 'players')  renderPlayers();
+function showMain() {
+  document.getElementById('view-main').style.display   = 'block';
+  document.getElementById('view-detail').style.display = 'none';
+  currentId = null;
+  renderMain();
 }
 
-document.querySelectorAll('.tab-btn').forEach(btn =>
-  btn.addEventListener('click', () => switchTab(btn.dataset.tab))
-);
+function showDetail(id) {
+  currentId = id;
+  const t = tableById(id);
+  document.getElementById('view-main').style.display   = 'none';
+  document.getElementById('view-detail').style.display = 'block';
+  document.getElementById('detail-title').textContent  = t.name;
+  // Reset form state
+  F = { winner: null, discarder: null, winType: 'zimo' };
+  document.getElementById('d-pts-input').value = '';
+  document.getElementById('d-preview-box').style.display = 'none';
+  document.getElementById('d-submit-btn').disabled = true;
+  document.getElementById('d-btn-zimo').classList.add('on');
+  document.getElementById('d-btn-discard').classList.remove('on');
+  document.getElementById('d-discard-card').style.display = 'none';
+  switchDTab('scores');
+}
+
+document.getElementById('btn-back').addEventListener('click', showMain);
 
 /* ═══════════════════════════════════════
-   SCORES TAB
+   MAIN VIEW — TABLE CARDS
 ═══════════════════════════════════════ */
-function renderScores() {
-  const grid = document.getElementById('players-grid');
-
-  // Summary totals
-  const allScores = S.players.map(p => S.scores[p] || 0);
-  const totalPos = allScores.filter(s => s > 0).reduce((a,b) => a + b, 0);
-  const totalNeg = allScores.filter(s => s < 0).reduce((a,b) => a + b, 0);
-  document.getElementById('sum-pos').textContent = '+' + totalPos;
-  document.getElementById('sum-neg').textContent = fmtScore(totalNeg);
-
-  if (!S.players.length) {
-    grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No players yet.<br>Add players in the Players tab.</div>';
+function renderMain() {
+  const container = document.getElementById('tables-container');
+  if (!S.tables.length) {
+    container.innerHTML = `
+      <div class="empty-main">
+        <span>🀄</span>
+        No tables yet.<br>Tap <strong>+ New Table</strong> to create your first game.
+      </div>`;
     return;
   }
-  const sorted = [...S.players].sort((a,b) => (S.scores[b]||0) - (S.scores[a]||0));
-  const topScore = S.scores[sorted[0]] || 0;
 
-  grid.innerHTML = S.players.map(p => {
-    const sc   = S.scores[p] || 0;
+  container.innerHTML = S.tables.map(t => {
+    const rounds    = t.history.length;
+    const allScores = t.players.map(p => t.scores[p] || 0);
+    const totalPos  = allScores.filter(s => s > 0).reduce((a,b) => a+b, 0);
+    const totalNeg  = allScores.filter(s => s < 0).reduce((a,b) => a+b, 0);
+
+    const cells = t.players.map(p => {
+      const sc  = t.scores[p] || 0;
+      const cls = sc > 0 ? 'pos' : sc < 0 ? 'neg' : 'zero';
+      return `
+        <div class="table-score-cell">
+          <span class="ts-name">${esc(p)}</span>
+          <span class="ts-score ${cls}">${fmt(sc)}</span>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="table-card" data-id="${t.id}">
+        <div class="table-card-header">
+          <span class="table-name">${esc(t.name)}</span>
+          <span class="table-round-count">${rounds} round${rounds !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="table-summary-row">
+          <div class="ts-sum pos-sum">
+            <span class="lbl">Positive</span>
+            <span class="val">${fmt(totalPos)}</span>
+          </div>
+          <div class="ts-sum neg-sum">
+            <span class="lbl">Negative</span>
+            <span class="val">${fmt(totalNeg)}</span>
+          </div>
+        </div>
+        <div class="table-scores-grid">${cells}</div>
+        <div class="table-card-footer">
+          <button class="open-table-btn"   data-action="open"   data-id="${t.id}">Open Table →</button>
+          <button class="delete-table-btn" data-action="delete" data-id="${t.id}">Delete</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Event delegation for table card buttons
+  container.querySelectorAll('[data-action]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id  = +btn.dataset.id;
+      const tbl = tableById(id);
+      if (btn.dataset.action === 'open') {
+        showDetail(id);
+      } else if (btn.dataset.action === 'delete') {
+        showConfirm(`Delete "${tbl.name}"?`, 'All scores and history for this table will be permanently removed.', () => {
+          S.tables = S.tables.filter(t => t.id !== id);
+          saveState();
+          renderMain();
+          toast(`${tbl.name} deleted.`);
+        });
+      }
+    });
+  });
+}
+
+/* ═══════════════════════════════════════
+   NEW TABLE MODAL
+═══════════════════════════════════════ */
+document.getElementById('btn-new-table').addEventListener('click', () => {
+  ['nt-name','nt-p1','nt-p2','nt-p3','nt-p4'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('modal-newtable').classList.add('show');
+  document.getElementById('nt-name').focus();
+});
+document.getElementById('nt-cancel').addEventListener('click', () => {
+  document.getElementById('modal-newtable').classList.remove('show');
+});
+document.getElementById('modal-newtable').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-newtable'))
+    document.getElementById('modal-newtable').classList.remove('show');
+});
+
+document.getElementById('nt-create').addEventListener('click', createTable);
+['nt-name','nt-p1','nt-p2','nt-p3','nt-p4'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') createTable(); });
+});
+
+function createTable() {
+  const name = document.getElementById('nt-name').value.trim();
+  const p1   = document.getElementById('nt-p1').value.trim();
+  const p2   = document.getElementById('nt-p2').value.trim();
+  const p3   = document.getElementById('nt-p3').value.trim();
+  const p4   = document.getElementById('nt-p4').value.trim();
+
+  if (!name)                    { toast('Please enter a table name.'); return; }
+  if (!p1||!p2||!p3||!p4)      { toast('Please fill in all 4 player names.'); return; }
+
+  const players = [p1, p2, p3, p4];
+  const unique  = new Set(players.map(p => p.toLowerCase()));
+  if (unique.size < 4)          { toast('Player names must be unique.'); return; }
+
+  const t = {
+    id: S.nextTableId++,
+    name,
+    players,
+    scores:    Object.fromEntries(players.map(p => [p, 0])),
+    history:   [],
+    nextRound: 1
+  };
+  S.tables.push(t);
+  saveState();
+  document.getElementById('modal-newtable').classList.remove('show');
+  renderMain();
+  toast(`${name} created!`);
+}
+
+/* ═══════════════════════════════════════
+   DETAIL VIEW — TABS
+═══════════════════════════════════════ */
+const DPANES = { scores:'dpane-scores', round:'dpane-round', history:'dpane-history', players:'dpane-players' };
+
+function switchDTab(tab) {
+  Object.values(DPANES).forEach(id => document.getElementById(id).classList.remove('active'));
+  document.querySelectorAll('[data-dtab]').forEach(b => b.classList.remove('active'));
+  document.getElementById(DPANES[tab]).classList.add('active');
+  document.querySelector(`[data-dtab="${tab}"]`).classList.add('active');
+  if (tab === 'scores')  renderDScores();
+  if (tab === 'round')   renderDForm();
+  if (tab === 'history') renderDHistory();
+  if (tab === 'players') renderDPlayers();
+}
+
+document.querySelectorAll('[data-dtab]').forEach(btn =>
+  btn.addEventListener('click', () => switchDTab(btn.dataset.dtab))
+);
+
+document.getElementById('btn-delete-table').addEventListener('click', () => {
+  const t = tableById(currentId);
+  showConfirm(`Delete "${t.name}"?`, 'All scores and history will be permanently removed.', () => {
+    S.tables = S.tables.filter(x => x.id !== currentId);
+    saveState();
+    showMain();
+    toast(`${t.name} deleted.`);
+  });
+});
+
+/* ═══════════════════════════════════════
+   DETAIL — SCORES
+═══════════════════════════════════════ */
+function renderDScores() {
+  const t = tableById(currentId);
+  if (!t) return;
+
+  const allScores = t.players.map(p => t.scores[p] || 0);
+  const totalPos  = allScores.filter(s => s > 0).reduce((a,b) => a+b, 0);
+  const totalNeg  = allScores.filter(s => s < 0).reduce((a,b) => a+b, 0);
+  document.getElementById('d-sum-pos').textContent = '+' + totalPos;
+  document.getElementById('d-sum-neg').textContent = fmt(totalNeg);
+
+  const sorted   = [...t.players].sort((a,b) => (t.scores[b]||0) - (t.scores[a]||0));
+  const topScore = t.scores[sorted[0]] || 0;
+
+  document.getElementById('d-players-grid').innerHTML = t.players.map(p => {
+    const sc   = t.scores[p] || 0;
     const rank = sorted.indexOf(p) + 1;
     const cls  = (sc === topScore && sc > 0) ? 'top' : sc < 0 ? 'losing' : '';
     return `
       <div class="player-card ${cls}">
         <span class="p-rank">#${rank}</span>
         <div class="p-name">${esc(p)}</div>
-        <div class="p-score ${sc < 0 ? 'neg' : ''}">${fmtScore(sc)}</div>
+        <div class="p-score ${sc < 0 ? 'neg' : ''}">${fmt(sc)}</div>
       </div>`;
   }).join('');
 }
 
 /* ═══════════════════════════════════════
-   ADD ROUND TAB
+   DETAIL — ADD ROUND FORM
 ═══════════════════════════════════════ */
 let F = { winner: null, discarder: null, winType: 'zimo' };
 
-function renderRoundForm() {
-  // Winner chips
-  document.getElementById('winner-chips').innerHTML =
-    S.players.map((p,i) =>
+function renderDForm() {
+  const t = tableById(currentId);
+  if (!t) return;
+
+  document.getElementById('d-winner-chips').innerHTML =
+    t.players.map((p,i) =>
       `<div class="chip${F.winner === i ? ' on' : ''}" data-role="winner" data-idx="${i}">${esc(p)}</div>`
     ).join('');
 
-  // Discarder chips (exclude winner)
-  const discHtml = S.players.map((p,i) => {
-    if (i === F.winner) return '';
-    return `<div class="chip${F.discarder === i ? ' red' : ''}" data-role="discarder" data-idx="${i}">${esc(p)}</div>`;
-  }).join('');
-  document.getElementById('discard-chips').innerHTML = discHtml;
+  document.getElementById('d-discard-chips').innerHTML =
+    t.players.map((p,i) => {
+      if (i === F.winner) return '';
+      return `<div class="chip${F.discarder === i ? ' red' : ''}" data-role="discarder" data-idx="${i}">${esc(p)}</div>`;
+    }).join('');
 
-  calcPreview();
+  calcDPreview();
 }
 
-// Chip delegation
-document.getElementById('winner-chips').addEventListener('click', e => {
+document.getElementById('d-winner-chips').addEventListener('click', e => {
   const chip = e.target.closest('[data-role="winner"]');
   if (!chip) return;
   const idx = +chip.dataset.idx;
   F.winner = (F.winner === idx) ? null : idx;
   if (F.discarder === idx) F.discarder = null;
-  renderRoundForm();
+  renderDForm();
 });
 
-document.getElementById('discard-chips').addEventListener('click', e => {
+document.getElementById('d-discard-chips').addEventListener('click', e => {
   const chip = e.target.closest('[data-role="discarder"]');
   if (!chip) return;
   const idx = +chip.dataset.idx;
   F.discarder = (F.discarder === idx) ? null : idx;
-  renderRoundForm();
+  renderDForm();
 });
 
-// Win type toggle
-document.getElementById('btn-zimo').addEventListener('click', () => {
+document.getElementById('d-btn-zimo').addEventListener('click', () => {
   F.winType = 'zimo';
   F.discarder = null;
-  document.getElementById('btn-zimo').classList.add('on');
-  document.getElementById('btn-discard').classList.remove('on');
-  document.getElementById('discard-card').style.display = 'none';
-  renderRoundForm();
+  document.getElementById('d-btn-zimo').classList.add('on');
+  document.getElementById('d-btn-discard').classList.remove('on');
+  document.getElementById('d-discard-card').style.display = 'none';
+  renderDForm();
 });
-document.getElementById('btn-discard').addEventListener('click', () => {
+document.getElementById('d-btn-discard').addEventListener('click', () => {
   F.winType = 'discard';
-  document.getElementById('btn-discard').classList.add('on');
-  document.getElementById('btn-zimo').classList.remove('on');
-  document.getElementById('discard-card').style.display = 'block';
-  renderRoundForm();
+  document.getElementById('d-btn-discard').classList.add('on');
+  document.getElementById('d-btn-zimo').classList.remove('on');
+  document.getElementById('d-discard-card').style.display = 'block';
+  renderDForm();
 });
 
-document.getElementById('pts-input').addEventListener('input', calcPreview);
+document.getElementById('d-pts-input').addEventListener('input', calcDPreview);
 
-function calcChanges() {
-  const pts = parseInt(document.getElementById('pts-input').value) || 0;
+function calcDChanges() {
+  const t   = tableById(currentId);
+  if (!t) return null;
+  const pts = parseInt(document.getElementById('d-pts-input').value) || 0;
   if (F.winner === null || pts <= 0) return null;
   if (F.winType === 'discard' && F.discarder === null) return null;
 
   const changes = {};
-  S.players.forEach((p,i) => changes[i] = 0);
-  const losers = S.players.map((_,i) => i).filter(i => i !== F.winner);
+  t.players.forEach((_,i) => changes[i] = 0);
+  const losers = t.players.map((_,i) => i).filter(i => i !== F.winner);
 
   if (F.winType === 'zimo') {
-    // Each loser pays pts; winner collects from all
     changes[F.winner] = pts * losers.length;
     losers.forEach(i => changes[i] = -pts);
   } else {
-    // Discarder pays as if all 3 paid (standard HK rule)
     const total = pts * losers.length;
     changes[F.winner]    =  total;
     changes[F.discarder] = -total;
-    // other losers pay 0
   }
   return changes;
 }
 
-function calcPreview() {
-  const changes = calcChanges();
-  const previewBox = document.getElementById('preview-box');
-  const submitBtn  = document.getElementById('submit-btn');
-  submitBtn.disabled = !changes;
+function calcDPreview() {
+  const t       = tableById(currentId);
+  if (!t) return;
+  const changes = calcDChanges();
+  const previewBox = document.getElementById('d-preview-box');
+  document.getElementById('d-submit-btn').disabled = !changes;
 
   if (!changes) { previewBox.style.display = 'none'; return; }
 
   previewBox.style.display = 'block';
-  document.getElementById('preview-rows').innerHTML =
-    S.players.map((p,i) => {
+  document.getElementById('d-preview-rows').innerHTML =
+    t.players.map((p,i) => {
       const c = changes[i];
       const cls = c > 0 ? 'pos' : c < 0 ? 'neg' : 'zero';
       return `
         <div class="preview-row">
           <span>${esc(p)}</span>
-          <span class="chg ${cls}">${fmtScore(c)}</span>
+          <span class="chg ${cls}">${fmt(c)}</span>
         </div>`;
     }).join('');
 }
 
-document.getElementById('submit-btn').addEventListener('click', () => {
-  const changes = calcChanges();
+document.getElementById('d-submit-btn').addEventListener('click', () => {
+  const t       = tableById(currentId);
+  if (!t) return;
+  const changes = calcDChanges();
   if (!changes) return;
-  const pts = parseInt(document.getElementById('pts-input').value);
-  const winnerName   = S.players[F.winner];
-  const discarderName = F.discarder !== null ? S.players[F.discarder] : null;
+  const pts          = parseInt(document.getElementById('d-pts-input').value);
+  const winnerName   = t.players[F.winner];
+  const discarderName = F.discarder !== null ? t.players[F.discarder] : null;
 
   // Apply
-  Object.entries(changes).forEach(([idx, delta]) => {
-    S.scores[S.players[+idx]] = (S.scores[S.players[+idx]] || 0) + delta;
-  });
+  t.players.forEach((p,i) => { t.scores[p] = (t.scores[p] || 0) + changes[i]; });
 
   // Record
   const record = {
     id: Date.now(),
-    round: S.nextRound++,
+    round: t.nextRound++,
     winner: winnerName,
     winType: F.winType,
     discarder: discarderName,
     pts,
-    changes: {}
+    changes: Object.fromEntries(t.players.map((p,i) => [p, changes[i]]))
   };
-  S.players.forEach((p,i) => record.changes[p] = changes[i]);
-  S.history.push(record);
-
+  t.history.push(record);
   saveState();
 
   const roundNum = record.round;
-  // Reset form
   F = { winner: null, discarder: null, winType: 'zimo' };
-  document.getElementById('pts-input').value = '';
-  document.getElementById('btn-zimo').classList.add('on');
-  document.getElementById('btn-discard').classList.remove('on');
-  document.getElementById('discard-card').style.display = 'none';
-  document.getElementById('preview-box').style.display = 'none';
-  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('d-pts-input').value = '';
+  document.getElementById('d-btn-zimo').classList.add('on');
+  document.getElementById('d-btn-discard').classList.remove('on');
+  document.getElementById('d-discard-card').style.display = 'none';
+  document.getElementById('d-preview-box').style.display = 'none';
+  document.getElementById('d-submit-btn').disabled = true;
 
-  switchTab('scores');
-  toast(`Round ${roundNum} recorded — ${esc(winnerName)} wins! 🎉`);
+  switchDTab('scores');
+  toast(`Round ${roundNum} — ${esc(winnerName)} wins! 🎉`);
 });
 
 /* ═══════════════════════════════════════
-   HISTORY TAB
+   DETAIL — HISTORY
 ═══════════════════════════════════════ */
-function renderHistory() {
-  const list = document.getElementById('history-list');
-  if (!S.history.length) {
-    list.innerHTML = '<div class="empty">No rounds yet.<br>Add a round to get started.</div>';
+function renderDHistory() {
+  const t    = tableById(currentId);
+  const list = document.getElementById('d-history-list');
+  if (!t || !t.history.length) {
+    list.innerHTML = '<div class="empty">No rounds yet for this table.</div>';
     return;
   }
 
-  list.innerHTML = [...S.history].reverse().map(h => {
+  list.innerHTML = [...t.history].reverse().map(h => {
     const typeLabel = h.winType === 'zimo'
       ? '🀄 Zimo (Self-draw)'
       : `🎴 Discard — ${esc(h.discarder)} discarded`;
-
-    const chips = S.players
-      .filter(p => p in h.changes)
-      .map(p => {
-        const c = h.changes[p];
-        const cls = c > 0 ? 'pos' : c < 0 ? 'neg' : 'zero';
-        return `<span class="chip-sm ${cls}">${esc(p)}: ${fmtScore(c)}</span>`;
-      }).join('');
-
-    // Also show any players no longer in the game who have entries
-    const extra = Object.entries(h.changes)
-      .filter(([p]) => !S.players.includes(p))
-      .map(([p,c]) => {
-        const cls = c > 0 ? 'pos' : c < 0 ? 'neg' : 'zero';
-        return `<span class="chip-sm ${cls}" style="opacity:.6">${esc(p)}: ${fmtScore(c)}</span>`;
-      }).join('');
-
+    const chips = Object.entries(h.changes).map(([p, c]) => {
+      const cls = c > 0 ? 'pos' : c < 0 ? 'neg' : 'zero';
+      return `<span class="chip-sm ${cls}">${esc(p)}: ${fmt(c)}</span>`;
+    }).join('');
     return `
       <div class="history-card">
         <div class="history-head">
           <span class="round-badge">Round ${h.round}</span>
           <span class="win-label">🏆 ${esc(h.winner)}</span>
-          <button class="del-btn" data-id="${h.id}" title="Delete round">✕</button>
+          <button class="del-btn" data-hid="${h.id}">✕</button>
         </div>
         <div class="win-sub">${typeLabel} · ${h.pts} pts/payer</div>
-        <div class="chip-list">${chips}${extra}</div>
+        <div class="chip-list">${chips}</div>
       </div>`;
   }).join('');
 
-  // Delete round buttons
-  document.getElementById('history-list').querySelectorAll('.del-btn').forEach(btn => {
+  list.querySelectorAll('.del-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const id = +btn.dataset.id;
-      const h  = S.history.find(x => x.id === id);
+      const t = tableById(currentId);
+      const h = t.history.find(x => x.id === +btn.dataset.hid);
       if (!h) return;
-      confirm('Delete Round', `Delete Round ${h.round}? The scores will be reversed.`, () => {
+      showConfirm('Delete Round', `Delete Round ${h.round}? Scores will be reversed.`, () => {
         Object.entries(h.changes).forEach(([p, delta]) => {
-          if (p in S.scores) S.scores[p] -= delta;
+          if (p in t.scores) t.scores[p] -= delta;
         });
-        S.history = S.history.filter(x => x.id !== id);
+        t.history = t.history.filter(x => x.id !== h.id);
         saveState();
-        renderHistory();
-        renderScores();
+        renderDHistory();
         toast('Round deleted — scores reversed.');
       });
     });
@@ -809,87 +1107,79 @@ function renderHistory() {
 }
 
 /* ═══════════════════════════════════════
-   PLAYERS TAB
+   DETAIL — PLAYERS
 ═══════════════════════════════════════ */
-function renderPlayers() {
-  const list = document.getElementById('player-list');
-  if (!S.players.length) {
-    list.innerHTML = '<div class="empty" style="padding:20px 0">No players. Add one below.</div>';
-    return;
-  }
-  list.innerHTML = S.players.map((p,i) => {
-    const sc = S.scores[p] || 0;
-    const scColor = sc >= 0 ? 'var(--accent2)' : 'var(--red)';
+function renderDPlayers() {
+  const t    = tableById(currentId);
+  const list = document.getElementById('d-player-list');
+  if (!t) return;
+
+  list.innerHTML = t.players.map((p,i) => {
+    const sc  = t.scores[p] || 0;
+    const col = sc >= 0 ? 'var(--accent2)' : 'var(--red)';
     return `
       <div class="player-row">
         <span class="player-row-name">${esc(p)}</span>
         <div class="player-row-right">
-          <span class="player-row-score" style="color:${scColor}">${fmtScore(sc)}</span>
-          <button class="remove-btn" data-idx="${i}">Remove</button>
+          <span class="player-row-score" style="color:${col}">${fmt(sc)}</span>
+          <button class="remove-btn" data-pidx="${i}">Remove</button>
         </div>
       </div>`;
   }).join('');
 
   list.querySelectorAll('.remove-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const idx = +btn.dataset.idx;
-      const name = S.players[idx];
-      confirm('Remove Player', `Remove "${name}"? Their score will be deleted (history entries are kept).`, () => {
-        S.players.splice(idx, 1);
-        delete S.scores[name];
+      const t    = tableById(currentId);
+      const pidx = +btn.dataset.pidx;
+      const name = t.players[pidx];
+      if (t.players.length <= 2) { toast('Need at least 2 players.'); return; }
+      showConfirm('Remove Player', `Remove "${name}" from this table?`, () => {
+        t.players.splice(pidx, 1);
+        delete t.scores[name];
         saveState();
-        renderPlayers();
-        renderScores();
+        renderDPlayers();
         toast(`${name} removed.`);
       });
     });
   });
 }
 
-function addPlayer() {
-  const input = document.getElementById('new-name');
+document.getElementById('d-add-player-btn').addEventListener('click', dAddPlayer);
+document.getElementById('d-new-name').addEventListener('keydown', e => { if (e.key === 'Enter') dAddPlayer(); });
+
+function dAddPlayer() {
+  const t     = tableById(currentId);
+  const input = document.getElementById('d-new-name');
   const name  = input.value.trim();
   if (!name) return;
-  if (S.players.includes(name)) { toast('Player name already exists!'); return; }
-  S.players.push(name);
-  S.scores[name] = 0;
+  if (t.players.includes(name)) { toast('Player already in this table!'); return; }
+  t.players.push(name);
+  t.scores[name] = 0;
   input.value = '';
   saveState();
-  renderPlayers();
-  renderScores();
+  renderDPlayers();
   toast(`${name} added!`);
 }
 
-document.getElementById('add-player-btn').addEventListener('click', addPlayer);
-document.getElementById('new-name').addEventListener('keydown', e => { if (e.key === 'Enter') addPlayer(); });
+document.getElementById('d-btn-reset-scores').addEventListener('click', () => {
+  showConfirm('Reset Scores', 'Reset all scores in this table to 0? History is kept.', () => {
+    const t = tableById(currentId);
+    t.players.forEach(p => t.scores[p] = 0);
+    saveState();
+    renderDPlayers();
+    renderDScores();
+    toast('Scores reset to 0.');
+  });
+});
 
-// Danger zone buttons
-document.getElementById('btn-reset-scores').addEventListener('click', () => {
-  confirm('Reset Scores', 'Reset all scores to 0? History is kept intact.', () => {
-    S.players.forEach(p => S.scores[p] = 0);
+document.getElementById('d-btn-clear-history').addEventListener('click', () => {
+  showConfirm('Clear History', 'Delete all round history for this table? Scores will not change.', () => {
+    const t = tableById(currentId);
+    t.history   = [];
+    t.nextRound = 1;
     saveState();
-    renderPlayers();
-    renderScores();
-    toast('All scores reset to 0.');
-  });
-});
-document.getElementById('btn-clear-history').addEventListener('click', () => {
-  confirm('Clear History', 'Delete all round history? Scores will NOT change.', () => {
-    S.history = [];
-    S.nextRound = 1;
-    saveState();
+    renderDHistory();
     toast('History cleared.');
-  });
-});
-document.getElementById('btn-reset-all').addEventListener('click', () => {
-  confirm('Full Reset', 'Reset everything — scores and history will be erased. Players are kept.', () => {
-    S.players.forEach(p => S.scores[p] = 0);
-    S.history = [];
-    S.nextRound = 1;
-    saveState();
-    renderPlayers();
-    renderScores();
-    toast('Full reset done!');
   });
 });
 
@@ -897,11 +1187,7 @@ document.getElementById('btn-reset-all').addEventListener('click', () => {
    INIT
 ═══════════════════════════════════════ */
 loadState();
-if (S.players.length > 0) {
-  switchTab('scores');
-} else {
-  renderPlayers();
-}
+showMain();
 </script>
 </body>
 </html>
