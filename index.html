@@ -107,11 +107,19 @@
        MAIN VIEW — TABLE CARDS
     ════════════════════════════ */
 
-    /* Sticky bar containing New Table button + global totals */
-    .main-sticky-bar {
+    /* Single sticky wrapper: header + New Table bar freeze together */
+    #main-top {
       position: sticky;
-      top: 52px;          /* sits just below the .app-header */
-      z-index: 99;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+    }
+    /* Header inside #main-top must NOT be independently sticky */
+    #main-top .app-header {
+      position: relative;
+    }
+
+    .main-sticky-bar {
       background: var(--bg);
       padding: 10px 14px 0;
       border-bottom: 1px solid var(--border);
@@ -133,6 +141,7 @@
     }
     .gt-item .lbl { color: var(--dim); display: block; margin-bottom: 2px; }
     .gt-item .val { font-weight: 700; font-size: 15px; display: block; }
+    .gt-item .gt-money { font-size: 11px; color: var(--gold); display: block; margin-top: 1px; }
     .gt-item.pos-sum .val { color: var(--accent2); }
     .gt-item.neg-sum .val { color: var(--red); }
 
@@ -892,23 +901,33 @@
      MAIN VIEW  (Tables list)
 ═══════════════════════════════════ -->
 <div id="view-main">
-  <div class="app-header">
-    <div class="title">
-      <h1>🀄 Mahjong Scoreboard</h1>
-      <p>Hong Kong Style</p>
+  <div id="main-top">
+    <div class="app-header">
+      <div class="title">
+        <h1>🀄 Mahjong Scoreboard</h1>
+        <p>Hong Kong Style</p>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="spin-open-btn" id="btn-open-combined">📊 All Scores</button>
+        <button class="spin-open-btn" id="btn-open-spinner">🎲 Spin</button>
+        <button class="help-open-btn" id="btn-help">❓ Help</button>
+      </div>
     </div>
-    <div style="display:flex;gap:6px;flex-shrink:0">
-      <button class="spin-open-btn" id="btn-open-combined">📊 All Scores</button>
-      <button class="spin-open-btn" id="btn-open-spinner">🎲 Spin</button>
-      <button class="help-open-btn" id="btn-help">❓ Help</button>
-    </div>
-  </div>
 
-  <div class="main-sticky-bar">
-    <button class="add-table-btn" id="btn-new-table">＋ New Table</button>
-    <div id="global-totals" class="global-totals" style="display:none">
-      <div class="gt-item pos-sum"><span class="lbl">All Positive</span><span class="val" id="gt-pos">+0</span></div>
-      <div class="gt-item neg-sum"><span class="lbl">All Negative</span><span class="val" id="gt-neg">0</span></div>
+    <div class="main-sticky-bar">
+      <button class="add-table-btn" id="btn-new-table">＋ New Table</button>
+      <div id="global-totals" class="global-totals" style="display:none">
+        <div class="gt-item pos-sum">
+          <span class="lbl">All Positive</span>
+          <span class="val" id="gt-pos">+0</span>
+          <span class="gt-money" id="gt-pos-money"></span>
+        </div>
+        <div class="gt-item neg-sum">
+          <span class="lbl">All Negative</span>
+          <span class="val" id="gt-neg">0</span>
+          <span class="gt-money" id="gt-neg-money"></span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1699,15 +1718,20 @@ function renderMain() {
   // Update global totals strip
   const globalTotals = document.getElementById('global-totals');
   if (S.tables.length) {
-    let gPos = 0, gNeg = 0;
+    let gPos = 0, gNeg = 0, gMoneyPos = 0, gMoneyNeg = 0;
     S.tables.forEach(t => {
+      const stake = t.stake || 1;
       t.players.forEach(p => {
         const sc = t.scores[p] || 0;
-        if (sc > 0) gPos += sc; else gNeg += sc;
+        if (sc > 0) { gPos += sc; gMoneyPos += sc * stake; }
+        else if (sc < 0) { gNeg += sc; gMoneyNeg += sc * stake; }
       });
     });
     document.getElementById('gt-pos').textContent = '+' + gPos;
     document.getElementById('gt-neg').textContent = fmt(gNeg);
+    const fmtAbs = v => { const a = Math.abs(v); return a % 1 === 0 ? String(a) : a.toFixed(2); };
+    document.getElementById('gt-pos-money').textContent = gMoneyPos ? '+$' + fmtAbs(gMoneyPos) : '';
+    document.getElementById('gt-neg-money').textContent = gMoneyNeg ? '-$' + fmtAbs(gMoneyNeg) : '';
     globalTotals.style.display = 'flex';
   } else {
     globalTotals.style.display = 'none';
