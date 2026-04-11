@@ -549,6 +549,138 @@
       flex-shrink: 0;
     }
 
+    /* ═══ SPINNER BUTTON ═══ */
+    .spin-open-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--accent2);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ═══ SPINNER VIEW ═══ */
+    #view-spinner { display: none; }
+
+    .spinner-body {
+      padding: 20px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .spinner-subtitle {
+      font-size: 13px;
+      color: var(--dim);
+      text-align: center;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .wheel-wrap {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .wheel-arrow {
+      width: 0;
+      height: 0;
+      border-left: 13px solid transparent;
+      border-right: 13px solid transparent;
+      border-top: 22px solid var(--gold);
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,.6));
+      position: relative;
+      z-index: 2;
+      margin-bottom: -3px;
+    }
+    #wheel-canvas {
+      display: block;
+      border-radius: 50%;
+      box-shadow: 0 4px 20px rgba(0,0,0,.6), 0 0 0 3px var(--gold);
+    }
+    .spin-btn {
+      width: 100%;
+      max-width: 260px;
+      padding: 16px;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--gold);
+      color: #000;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+      letter-spacing: 2px;
+      transition: transform .1s, opacity .1s;
+      box-shadow: 0 4px 12px rgba(255,213,79,.35);
+    }
+    .spin-btn:active { transform: scale(.96); }
+    .spin-btn:disabled { opacity: .4; cursor: default; transform: none; }
+
+    .spin-result-wrap {
+      margin: 20px 0;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+    .spin-result-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      text-align: center;
+      width: 100%;
+      max-width: 260px;
+    }
+    .spin-result-card .res-wind {
+      font-size: 52px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .spin-result-card .res-name {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .spin-result-card .res-sub {
+      font-size: 13px;
+      color: var(--dim);
+      margin-top: 4px;
+    }
+    .spin-result-card.east  { border-color: #e74c3c; }
+    .spin-result-card.south { border-color: #e67e22; }
+    .spin-result-card.west  { border-color: #27ae60; }
+    .spin-result-card.north { border-color: #2980b9; }
+
+    .wind-legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      width: 100%;
+      max-width: 280px;
+      margin-top: 8px;
+    }
+    .wind-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+    .wind-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
     /* ═══ HELP VIEW ═══ */
     #view-help { display: none; }
 
@@ -709,7 +841,10 @@
       <h1>🀄 Mahjong Scoreboard</h1>
       <p>Hong Kong Style</p>
     </div>
-    <button class="help-open-btn" id="btn-help">❓ Help</button>
+    <div style="display:flex;gap:6px;flex-shrink:0">
+      <button class="spin-open-btn" id="btn-open-spinner">🎲 Spin</button>
+      <button class="help-open-btn" id="btn-help">❓ Help</button>
+    </div>
   </div>
 
   <div id="main-body">
@@ -812,6 +947,44 @@
     <button class="tab-btn"        data-dtab="history"> <span>📜</span>History</button>
     <button class="tab-btn"        data-dtab="players"> <span>👥</span>Players</button>
   </nav>
+</div>
+
+<!-- ═══════════════════════════════════
+     SPINNER VIEW
+═══════════════════════════════════ -->
+<div id="view-spinner">
+  <div class="app-header">
+    <button class="back-btn" id="btn-spinner-back">← Back</button>
+    <div class="title"><h1>🎲 Wind Spinner</h1></div>
+    <div style="width:60px"></div>
+  </div>
+
+  <div class="spinner-body">
+    <p class="spinner-subtitle">Press <strong>SPIN</strong> to randomly decide<br>which wind direction starts the game.</p>
+
+    <div class="wheel-wrap">
+      <div class="wheel-arrow"></div>
+      <canvas id="wheel-canvas" width="280" height="280"></canvas>
+    </div>
+
+    <div class="spin-result-wrap">
+      <div id="spin-result-card" class="spin-result-card" style="display:none">
+        <div class="res-wind" id="res-wind-tile"></div>
+        <div class="res-name" id="res-wind-name"></div>
+        <div class="res-sub"  id="res-wind-sub"></div>
+      </div>
+      <div id="spin-placeholder" style="font-size:13px;color:var(--dim)">Spin to pick a starting wind!</div>
+    </div>
+
+    <button class="spin-btn" id="btn-spin">🎲  S P I N !</button>
+
+    <div class="wind-legend">
+      <div class="wind-legend-item"><div class="wind-dot" style="background:#e74c3c"></div><span>東 East</span></div>
+      <div class="wind-legend-item"><div class="wind-dot" style="background:#e67e22"></div><span>南 South</span></div>
+      <div class="wind-legend-item"><div class="wind-dot" style="background:#27ae60"></div><span>西 West</span></div>
+      <div class="wind-legend-item"><div class="wind-dot" style="background:#2980b9"></div><span>北 North</span></div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════
@@ -1413,8 +1586,10 @@ document.getElementById('modal-confirm').addEventListener('click', e => {
    VIEWS
 ═══════════════════════════════════════ */
 function showMain() {
-  document.getElementById('view-main').style.display   = 'block';
-  document.getElementById('view-detail').style.display = 'none';
+  document.getElementById('view-main').style.display    = 'block';
+  document.getElementById('view-detail').style.display  = 'none';
+  document.getElementById('view-help').style.display    = 'none';
+  document.getElementById('view-spinner').style.display = 'none';
   currentId = null;
   renderMain();
 }
@@ -1924,12 +2099,186 @@ document.getElementById('d-btn-clear-history').addEventListener('click', () => {
 });
 
 /* ═══════════════════════════════════════
+   SPINNER
+═══════════════════════════════════════ */
+const WINDS = [
+  { name: '東', eng: 'East',  sub: 'starts first!', color: '#c0392b', cls: 'east'  },
+  { name: '南', eng: 'South', sub: 'starts first!', color: '#d68910', cls: 'south' },
+  { name: '西', eng: 'West',  sub: 'starts first!', color: '#1e8449', cls: 'west'  },
+  { name: '北', eng: 'North', sub: 'starts first!', color: '#1a5276', cls: 'north' },
+];
+// Brighter versions for drawing on canvas
+const WIND_COLORS = ['#e74c3c', '#e67e22', '#27ae60', '#2980b9'];
+
+let wheelRot    = 0;   // current canvas rotation in radians
+let isSpinning  = false;
+
+function drawWheel(rot) {
+  const canvas = document.getElementById('wheel-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const size = canvas.width;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r  = cx - 6;
+
+  ctx.clearRect(0, 0, size, size);
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rot);
+
+  // Draw 4 sectors — segment i starts at -π/2 so East (i=0) is at top initially
+  for (let i = 0; i < 4; i++) {
+    const start = -Math.PI / 2 + i * (Math.PI / 2);
+    const end   = start + Math.PI / 2;
+
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, r, start, end);
+    ctx.closePath();
+    ctx.fillStyle = WIND_COLORS[i];
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,.25)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Text label
+    const mid = start + Math.PI / 4;
+    const tr  = r * 0.60;
+    const tx  = Math.cos(mid) * tr;
+    const ty  = Math.sin(mid) * tr;
+
+    ctx.save();
+    ctx.translate(tx, ty);
+    ctx.fillStyle = 'rgba(255,255,255,.95)';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 34px sans-serif';
+    ctx.shadowColor = 'rgba(0,0,0,.4)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(WINDS[i].name, 0, -10);
+    ctx.shadowBlur = 0;
+    ctx.font = '13px sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,.8)';
+    ctx.fillText(WINDS[i].eng, 0, 14);
+    ctx.restore();
+  }
+
+  // Divider lines
+  for (let i = 0; i < 4; i++) {
+    const a = -Math.PI / 2 + i * (Math.PI / 2);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+    ctx.strokeStyle = 'rgba(255,255,255,.5)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // Center hub
+  ctx.beginPath();
+  ctx.arc(0, 0, 20, 0, Math.PI * 2);
+  ctx.fillStyle = '#0c1a0c';
+  ctx.fill();
+  ctx.strokeStyle = '#ffd54f';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Center dot
+  ctx.beginPath();
+  ctx.arc(0, 0, 5, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffd54f';
+  ctx.fill();
+
+  ctx.restore();
+
+  // Outer ring (fixed, not rotating)
+  ctx.beginPath();
+  ctx.arc(cx, cy, r + 3, 0, Math.PI * 2);
+  ctx.strokeStyle = '#ffd54f';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+}
+
+function showSpinResult(index) {
+  const w    = WINDS[index];
+  const card = document.getElementById('spin-result-card');
+  document.getElementById('spin-placeholder').style.display = 'none';
+  card.style.display  = 'block';
+  card.className      = 'spin-result-card ' + w.cls;
+  document.getElementById('res-wind-tile').textContent = w.name;
+  document.getElementById('res-wind-name').textContent = w.eng + ' Wind ('+w.name+')';
+  document.getElementById('res-wind-sub').textContent  = w.sub;
+}
+
+function spinWheel() {
+  if (isSpinning) return;
+  isSpinning = true;
+  document.getElementById('btn-spin').disabled = true;
+  document.getElementById('spin-result-card').style.display = 'none';
+  document.getElementById('spin-placeholder').style.display = 'block';
+  document.getElementById('spin-placeholder').textContent   = 'Spinning…';
+
+  const winnerIndex   = Math.floor(Math.random() * 4);
+  const numFullSpins  = 5 + Math.floor(Math.random() * 4); // 5–8 full rotations
+
+  // Rotation needed to bring segment winnerIndex to top:
+  // East (0) is at top when rot=0. Each 90° CW rotation advances to next wind.
+  // For segment i to be at top: rot = ((4-i) % 4) * π/2
+  const baseTarget    = ((4 - winnerIndex) % 4) * (Math.PI / 2);
+  // Wobble: land anywhere in the middle 60% of the segment
+  const wobble        = (Math.random() - 0.5) * (Math.PI / 2 * 0.5);
+
+  // Normalise current rotation to [0, 2π)
+  const normalised    = ((wheelRot % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+  let   delta         = baseTarget + wobble - normalised;
+  if (delta <= 0) delta += 2 * Math.PI;
+  delta += numFullSpins * 2 * Math.PI;
+
+  const startRot   = wheelRot;
+  const endRot     = wheelRot + delta;
+  const duration   = 3200 + Math.random() * 900;
+  const startTime  = performance.now();
+
+  function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+
+  function frame(now) {
+    const t       = Math.min((now - startTime) / duration, 1);
+    wheelRot      = startRot + delta * easeOut(t);
+    drawWheel(wheelRot);
+    if (t < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      wheelRot    = endRot;
+      isSpinning  = false;
+      document.getElementById('btn-spin').disabled = false;
+      showSpinResult(winnerIndex);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+function showSpinner() {
+  document.getElementById('view-main').style.display    = 'none';
+  document.getElementById('view-detail').style.display  = 'none';
+  document.getElementById('view-help').style.display    = 'none';
+  document.getElementById('view-spinner').style.display = 'block';
+  drawWheel(wheelRot);
+}
+
+document.getElementById('btn-open-spinner').addEventListener('click', showSpinner);
+document.getElementById('btn-spinner-back').addEventListener('click', showMain);
+document.getElementById('btn-spin').addEventListener('click', spinWheel);
+
+/* ═══════════════════════════════════════
    HELP VIEW
 ═══════════════════════════════════════ */
 function showHelp() {
-  document.getElementById('view-main').style.display   = 'none';
-  document.getElementById('view-detail').style.display = 'none';
-  document.getElementById('view-help').style.display   = 'block';
+  document.getElementById('view-main').style.display    = 'none';
+  document.getElementById('view-detail').style.display  = 'none';
+  document.getElementById('view-spinner').style.display = 'none';
+  document.getElementById('view-help').style.display    = 'block';
   switchHTab('tiles');
 }
 
