@@ -381,7 +381,7 @@
 </header>
 
 <!-- ── SCORES ── -->
-<div id="pane-scores" class="tab-pane active">
+<div id="pane-scores" class="tab-pane">
   <div class="score-summary">
     <div class="summary-box pos-box">
       <div class="summary-label">Total Positive</div>
@@ -435,7 +435,7 @@
 </div>
 
 <!-- ── PLAYERS ── -->
-<div id="pane-players" class="tab-pane">
+<div id="pane-players" class="tab-pane active">
   <div class="section-label">Players</div>
   <div id="player-list"></div>
 
@@ -454,10 +454,10 @@
 
 <!-- ── BOTTOM TAB BAR ── -->
 <nav class="tab-bar">
-  <button class="tab-btn active" data-tab="scores">  <span>📊</span>Scores</button>
+  <button class="tab-btn"        data-tab="scores">  <span>📊</span>Scores</button>
   <button class="tab-btn"        data-tab="round">   <span>✏️</span>Add Round</button>
   <button class="tab-btn"        data-tab="history"> <span>📜</span>History</button>
-  <button class="tab-btn"        data-tab="players"> <span>👥</span>Players</button>
+  <button class="tab-btn active" data-tab="players"> <span>👥</span>Players</button>
 </nav>
 
 <!-- ── MODAL ── -->
@@ -480,7 +480,7 @@
 /* ═══════════════════════════════════════
    STATE
 ═══════════════════════════════════════ */
-const DEFAULT_PLAYERS = ['QA', 'Dev', 'UX/UI', 'Scrum Master', 'Project Manager'];
+const DEFAULT_PLAYERS = [];
 
 let S = {
   players: [...DEFAULT_PLAYERS],
@@ -897,7 +897,11 @@ document.getElementById('btn-reset-all').addEventListener('click', () => {
    INIT
 ═══════════════════════════════════════ */
 loadState();
-renderScores();
+if (S.players.length > 0) {
+  switchTab('scores');
+} else {
+  renderPlayers();
+}
 </script>
 </body>
 </html>
