@@ -2848,7 +2848,7 @@ function buildWinsPane() {
     ${combo('藍一色 All Blue','All tiles from the Circle (筒) suit only','10 Fan','','Every tile is a circle tile. No honor or other suit tiles.',`${d(1)}${d(2)}${d(3)}${P}${d(4)}${d(5)}${d(6)}${P}${d(7)}${d(8)}${d(9)}${P}${d(1)}${d(1)}${d(1)}${P}${d(5)}${d(5)}`)}
     ${combo('紅一色 All Red','All tiles from the Character (萬) suit only','10 Fan','','Every tile is a character tile. No honor or other suit tiles.',`${w(1)}${w(2)}${w(3)}${P}${w(4)}${w(5)}${w(6)}${P}${w(7)}${w(8)}${w(9)}${P}${w(1)}${w(1)}${w(1)}${P}${w(5)}${w(5)}`)}
     ${combo('十三幺 Thirteen Orphans','Shísān yāo — One of every terminal and honor + one duplicate','13 Fan','limit','One each of 1m 9m 1b 9b 1c 9c East South West North Red Green White, plus any duplicate.',`${w(1)}${w(9)}${b(1)}${b(9)}${d(1)}${d(9)}${E}${S}${W}${N}${CR}${CG}${CW}${PLUS}${qTile('dup')}`)}
-    ${combo('十八羅漢 Eighteen Arhats','Sì gàng zĭ — Four kongs + pair','1 Fan','','Four kongs and a pair. Each kong draws a replacement tile.',`${w(1)}${w(1)}${w(1)}${w(1)}${P}${b(5)}${b(5)}${b(5)}${b(5)}${P}${d(9)}${d(9)}${d(9)}${d(9)}${P}${E}${E}${E}${E}${P}${CR}${CR}`)}
+    ${combo('十八羅漢 Eighteen Arhats','Sì gàng zĭ — Four kongs + pair','18 Fan','','Four kongs and a pair. Each kong draws a replacement tile.',`${w(1)}${w(1)}${w(1)}${w(1)}${P}${b(5)}${b(5)}${b(5)}${b(5)}${P}${d(9)}${d(9)}${d(9)}${d(9)}${P}${E}${E}${E}${E}${P}${CR}${CR}`)}
     ${combo('花牌 Bonus Tiles','Each flower or season tile drawn adds fan to your hand','+1 Fan each','bonus','Bonus tiles are not part of your hand. Each adds 1 fan to your total score.','')}
   `;
 }
@@ -3016,7 +3016,7 @@ const CALC_GROUPS = [
       ex:['w1','w2','w3','|','w4','w5','w6','|','w7','w8','w9','|','w1','w1','w1','|','w5','w5'] },
     { id:'c_t13',    name:'十三幺 Thirteen Orphans',     desc:'One each of all 13 terminals & honors + any duplicate.', fan:13,
       ex:['w1','w9','t1','t9','s1','s9','fe','fs','fw','fn','dr','dg','dw','|','w1'] },
-    { id:'c_4k',     name:'十八羅漢 Eighteen Arhats',    desc:'Four kongs and a pair (all kongs in one hand).',         fan:1,
+    { id:'c_4k',     name:'十八羅漢 Eighteen Arhats',    desc:'Four kongs and a pair (all kongs in one hand).',         fan:18,
       ex:['w1','w1','w1','w1','|','t5','t5','t5','t5','|','s9','s9','s9','s9','|','w9','w9','w9','w9','|','s1','s1'] },
   ]},
 ];
