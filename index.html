@@ -1116,7 +1116,7 @@
     </div>
     <div id="d-stake-row" class="stake-row">
       <label>💰 Bet per point</label>
-      <input id="d-stake-input" type="number" class="stake-input" min="0.01" step="0.01" inputmode="decimal" value="1">
+      <input id="d-stake-input" type="number" class="stake-input" min="0.25" step="0.25" inputmode="decimal" value="0.25">
       <span id="d-stake-saved" style="font-size:11px;color:var(--dim);min-width:32px;text-align:right"></span>
     </div>
     <div id="d-players-grid" class="players-grid"></div>
@@ -1753,7 +1753,7 @@
     <!-- Stake -->
     <div class="stake-row" style="margin-bottom:10px">
       <label>💰 Bet per point ($)</label>
-      <input id="calc-stake" type="number" class="stake-input" min="0.01" step="0.01" inputmode="decimal" value="1">
+      <input id="calc-stake" type="number" class="stake-input" min="0.25" step="0.25" inputmode="decimal" value="0.25">
     </div>
     <!-- Calc groups injected by JS -->
   </div>
@@ -1796,7 +1796,7 @@
     </div>
     <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
       <span style="font-size:12px;color:var(--dim);flex:1">Bet per point ($)</span>
-      <input id="nt-stake" type="number" class="modal-input" style="width:90px;text-align:center;color:var(--gold)" placeholder="1" min="0.01" step="0.01" inputmode="decimal">
+      <input id="nt-stake" type="number" class="modal-input" style="width:90px;text-align:center;color:var(--gold)" placeholder="0.25" min="0.25" step="0.25" inputmode="decimal">
     </div>
     <div class="modal-input-grid">
       <input id="nt-p1" class="modal-input" placeholder="Player 1" maxlength="20">
@@ -1844,7 +1844,7 @@ function loadState() {
     const raw = localStorage.getItem('hk-mahjong-v3');
     if (raw) S = JSON.parse(raw);
     // Migrate older tables that don't have a stake field
-    S.tables.forEach(t => { if (!t.stake) t.stake = 1; });
+    S.tables.forEach(t => { if (!t.stake) t.stake = 0.25; });
   } catch (_) {}
 }
 function saveState() {
@@ -2103,7 +2103,7 @@ document.getElementById('nt-create').addEventListener('click', createTable);
 
 function createTable() {
   const name  = document.getElementById('nt-name').value.trim();
-  const stake = parseFloat(document.getElementById('nt-stake').value) || 1;
+  const stake = parseFloat(document.getElementById('nt-stake').value) || 0.25;
   const p1    = document.getElementById('nt-p1').value.trim();
   const p2    = document.getElementById('nt-p2').value.trim();
   const p3    = document.getElementById('nt-p3').value.trim();
