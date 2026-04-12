@@ -6,6 +6,7 @@
   <title>Mahjong Scoreboard</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    button, input, select { touch-action: manipulation; }
 
     :root {
       --bg:       #0c1a0c;
@@ -852,19 +853,20 @@
     .picker-group-lbl { font-size: 10px; color: var(--dim); margin-bottom: 3px; font-weight: 600; letter-spacing: .3px; }
     .picker-row { display: flex; flex-wrap: wrap; gap: 3px; }
     .picker-btn {
-      position: relative; width: 30px; height: 40px;
+      position: relative; width: 36px; height: 46px;
       background: var(--surface2); border: 1.5px solid var(--border);
-      border-radius: 4px; padding: 0; cursor: pointer; opacity: .5;
+      border-radius: 5px; padding: 0; cursor: pointer; opacity: .5;
       display: inline-flex; align-items: center; justify-content: center;
+      touch-action: manipulation;
     }
-    .picker-btn img { width: 28px; height: 38px; object-fit: contain; pointer-events: none; }
+    .picker-btn img { width: 30px; height: 40px; object-fit: contain; pointer-events: none; }
     .picker-btn.has-cnt { opacity: 1; border-color: var(--accent); }
     .p-cnt {
-      position: absolute; top: -6px; right: -6px;
+      position: absolute; top: 2px; right: 2px;
       background: var(--accent); color: #000;
-      font-size: 9px; font-weight: 900; min-width: 14px; height: 14px;
+      font-size: 8px; font-weight: 900; min-width: 13px; height: 13px;
       border-radius: 7px; display: none; align-items: center;
-      justify-content: center; padding: 0 2px; pointer-events: none;
+      justify-content: center; padding: 0 2px; pointer-events: none; line-height: 1;
     }
     .picker-btn.has-cnt .p-cnt { display: flex; }
     .hand-display {
@@ -1183,6 +1185,7 @@
       <div id="d-preview-rows"></div>
     </div>
 
+    <div id="d-fan-hint" style="display:none;font-size:11px;color:var(--dim);text-align:center;padding:6px 0 0"></div>
     <button id="d-submit-btn" class="submit-btn" disabled>Confirm Round ✓</button>
   </div>
 
@@ -2312,6 +2315,8 @@ document.getElementById('d-submit-btn').addEventListener('click', () => {
   document.getElementById('d-discard-card').style.display = 'none';
   document.getElementById('d-preview-box').style.display = 'none';
   document.getElementById('d-submit-btn').disabled = true;
+  updateHandDisplay();
+  renderFanUI();
 
   switchDTab('scores');
   toast(`Round ${roundNum} — ${esc(winnerName)} wins! 🎉`);
@@ -3240,6 +3245,20 @@ function updateHandDisplay() {
   display.innerHTML = html;
 }
 
+// Greedy chow solver: checks if `cnt` tiles can form `n` chows (no pungs)
+function canFormChows(cnt, n) {
+  if (n === 0) return Object.values(cnt).every(v => v <= 0);
+  const first = Object.keys(cnt).filter(k => (cnt[k]||0) > 0).sort()[0];
+  if (!first) return false;
+  const suit = first[0], val = parseInt(first[1]);
+  if (!'wst'.includes(suit) || val > 7) return false;
+  const k2 = suit+(val+1), k3 = suit+(val+2);
+  if ((cnt[k2]||0) < 1 || (cnt[k3]||0) < 1) return false;
+  const nc = Object.assign({}, cnt);
+  nc[first]--; nc[k2]--; nc[k3]--;
+  return canFormChows(nc, n - 1);
+}
+
 function detectFanFromHand(hand, bonusTiles) {
   const det = {};
   const tiles = Object.entries(hand).flatMap(([k, n]) => Array(n).fill(k));
@@ -3251,48 +3270,62 @@ function detectFanFromHand(hand, bonusTiles) {
   const cnt     = {};
   tiles.forEach(k => cnt[k] = (cnt[k] || 0) + 1);
 
-  if (!suitT.length && honorT.length)                                         det.c_hon  = true;
-  if (!honorT.length && suits.size === 1 && suitT.length)                     det.c_full = true;
-  if (suits.size === 1 && honorT.length && suitT.length)                      det.c_half = true;
-  if (suitT.length && !honorT.length && suitT.every(k => k[1]==='1'||k[1]==='9')) det.c_term = true;
-
+  // Dragon / wind pungs — detectable at any count
   if ((cnt.dr||0)>=3) det.c_dred = true;
   if ((cnt.dg||0)>=3) det.c_dgrn = true;
   if ((cnt.dw||0)>=3) det.c_dwht = true;
   const dp = ['dr','dg','dw'].filter(d=>(cnt[d]||0)>=3).length;
   const dpr= ['dr','dg','dw'].filter(d=>(cnt[d]||0)===2).length;
   if (dp===3) det.c_b3d=true; else if (dp===2&&dpr>=1) det.c_s3d=true;
-
   const wp = ['fe','fs','fw','fn'].filter(w=>(cnt[w]||0)>=3).length;
   const wpr= ['fe','fs','fw','fn'].filter(w=>(cnt[w]||0)===2).length;
   if (wp===4) det.c_b4w=true; else if (wp===3&&wpr>=1) det.c_s4w=true;
   if (wp>=1) det.c_sw=true;
 
-  if (tiles.length===14) {
-    const vals=Object.values(cnt);
+  // Pattern detections only meaningful with a full 14-tile hand
+  if (tiles.length === 14) {
+    if (!suitT.length && honorT.length)                                          det.c_hon  = true;
+    if (!honorT.length && suits.size === 1)                                      det.c_full = true;
+    if (suits.size === 1 && honorT.length && suitT.length)                       det.c_half = true;
+    if (suitT.length && !honorT.length && suitT.every(k=>k[1]==='1'||k[1]==='9')) det.c_term = true;
+
+    const vals = Object.values(cnt);
+    // Seven Pairs
     if (Object.keys(cnt).length===7 && vals.every(v=>v===2)) det.c_7p=true;
+    // Thirteen Orphans
     const orphans=['w1','w9','t1','t9','s1','s9','fe','fs','fw','fn','dr','dg','dw'];
     if (orphans.every(k=>(cnt[k]||0)>=1)) det.c_t13=true;
-    if (suits.size===1&&!honorT.length) {
+    // Nine Gates
+    if (suits.size===1 && !honorT.length) {
       const su=[...suits][0];
       const base={[su+'1']:3,[su+'2']:1,[su+'3']:1,[su+'4']:1,[su+'5']:1,[su+'6']:1,[su+'7']:1,[su+'8']:1,[su+'9']:3};
       if (Object.entries(base).every(([k,v])=>(cnt[k]||0)>=v)) det.c_9g=true;
     }
-  }
-  if (tiles.length>=2) {
-    const entries=Object.entries(cnt);
-    const pairs =entries.filter(([,n])=>n===2).length;
-    const trips =entries.filter(([,n])=>n>=3).length;
-    const kongs =entries.filter(([,n])=>n===4).length;
-    if (pairs===1&&trips===4&&entries.length===5) { det.c_pung=true; det.c_4p=true; }
-    if (pairs===1&&kongs===4&&entries.length===5)   det.c_4k=true;
+    // All Pungs / Four Concealed Pungs / All Kongs
+    const entries = Object.entries(cnt);
+    const pairCnt = entries.filter(([,n])=>n===2).length;
+    const tripCnt = entries.filter(([,n])=>n>=3).length;
+    const kongCnt = entries.filter(([,n])=>n===4).length;
+    if (pairCnt===1 && tripCnt===4 && entries.length===5) { det.c_pung=true; det.c_4p=true; }
+    if (pairCnt===1 && kongCnt===4 && entries.length===5)   det.c_4k=true;
+
+    // Common Hand (平糊): 4 chows + 1 pair, no honor tiles
+    if (!honorT.length && !det.c_7p && !det.c_pung) {
+      for (const [pk, pv] of Object.entries(cnt)) {
+        if (pv < 2) continue;
+        const rem = Object.assign({}, cnt);
+        rem[pk] -= 2;
+        if (canFormChows(rem, 4)) { det.c_chow = true; break; }
+      }
+    }
   }
 
-  const bt=bonusTiles||{};
-  const sc=['h1','h2','h3','h4'].reduce((s,k)=>s+(bt[k]||0),0);
+  // Bonus tiles (any count)
+  const bt = bonusTiles||{};
+  const sc = ['h1','h2','h3','h4'].reduce((s,k)=>s+(bt[k]||0),0);
   if (sc>=4) det.c_as=true;
   if (sc>0)  det.c_os=true;
-  if (tiles.length>0&&sc===0) det.c_nof=true;
+  if (tiles.length>0 && sc===0) det.c_nof=true;
   return det;
 }
 
@@ -3317,9 +3350,23 @@ function renderFanUI() {
 
   document.getElementById('d-fan-count-badge').textContent = fan + ' fan';
   const ptsEl = document.getElementById('d-base-pts-label');
-  if (fan === 0)      { ptsEl.textContent='—';                    ptsEl.className='fan-pts-val'; }
-  else if (fan < 3)   { ptsEl.textContent=`Need ${3-fan} more fan`; ptsEl.className='fan-pts-warn'; }
-  else                { ptsEl.textContent=basePts+' pts/payer';   ptsEl.className='fan-pts-val'; }
+  if (fan === 0)    { ptsEl.textContent='—';                      ptsEl.className='fan-pts-val'; }
+  else if (fan < 3) { ptsEl.textContent=`Need ${3-fan} more fan`; ptsEl.className='fan-pts-warn'; }
+  else              { ptsEl.textContent=basePts+' pts/payer';     ptsEl.className='fan-pts-val'; }
+
+  // Fan hint near submit button
+  const hint = document.getElementById('d-fan-hint');
+  if (hint) {
+    const handSize = Object.values(F.hand).reduce((a,b)=>a+b,0);
+    if (fan === 0 && handSize === 0) {
+      hint.style.display = 'none';
+    } else if (fan < 3) {
+      hint.style.display = 'block';
+      hint.textContent = `${fan}/3 fan — tap "＋ Edit combinations" to add more`;
+    } else {
+      hint.style.display = 'none';
+    }
+  }
 
   const activeList = ALL_COMBOS_FLAT.filter(c => F.fanSel.has(c.id));
   const chipsEl = document.getElementById('d-active-combo-chips');
