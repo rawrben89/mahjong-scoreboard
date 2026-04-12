@@ -322,9 +322,10 @@
     .summary-box.pos-box { border-color: var(--accent2); }
     .summary-box.neg-box { border-color: var(--red); }
     .summary-label { font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 3px; }
-    .summary-val   { font-size: 20px; font-weight: 700; }
+    .summary-val   { font-size: 20px; font-weight: 700; line-height: 1.2; }
     .summary-val.pos { color: var(--accent2); }
     .summary-val.neg { color: var(--red); }
+    .sum-money { font-size: 13px; font-weight: 600; opacity: .85; margin-top: 2px; }
 
     /* Player score grid */
     .players-grid {
@@ -1107,11 +1108,11 @@
     <div class="score-summary">
       <div class="summary-box pos-box">
         <div class="summary-label">Total Positive</div>
-        <div id="d-sum-pos" class="summary-val pos">+0</div>
+        <div class="summary-val pos"><div id="d-sum-pos-pts">+0</div><div id="d-sum-pos-money" class="sum-money"></div></div>
       </div>
       <div class="summary-box neg-box">
         <div class="summary-label">Total Negative</div>
-        <div id="d-sum-neg" class="summary-val neg">0</div>
+        <div class="summary-val neg"><div id="d-sum-neg-pts">0</div><div id="d-sum-neg-money" class="sum-money"></div></div>
       </div>
     </div>
     <div id="d-stake-row" class="stake-row">
@@ -2173,8 +2174,10 @@ function renderDScores() {
   const allScores = t.players.map(p => t.scores[p] || 0);
   const totalPos  = allScores.filter(s => s > 0).reduce((a,b) => a+b, 0);
   const totalNeg  = allScores.filter(s => s < 0).reduce((a,b) => a+b, 0);
-  document.getElementById('d-sum-pos').textContent = '+' + totalPos + (stake ? '  ' + fmtMoney(totalPos, stake) : '');
-  document.getElementById('d-sum-neg').textContent = fmt(totalNeg)  + (stake ? '  ' + fmtMoney(totalNeg, stake)  : '');
+  document.getElementById('d-sum-pos-pts').textContent   = '+' + totalPos;
+  document.getElementById('d-sum-pos-money').textContent = stake ? fmtMoney(totalPos, stake) : '';
+  document.getElementById('d-sum-neg-pts').textContent   = fmt(totalNeg);
+  document.getElementById('d-sum-neg-money').textContent = stake ? fmtMoney(totalNeg, stake) : '';
 
   // Sync stake input
   document.getElementById('d-stake-input').value = stake;
@@ -2835,7 +2838,7 @@ function buildWinsPane() {
 
     <div class="help-cat-label">Legendary Limit Hands</div>
     ${combo('清么九 All Terminals','Qīng yāo jiǔ — Only 1s and 9s, no honors','10 Fan','','All tiles are 1s and 9s from any suit. No honor tiles.',`${w(1)}${w(1)}${w(1)}${P}${w(9)}${w(9)}${w(9)}${P}${d(1)}${d(1)}${d(1)}${P}${b(9)}${b(9)}${b(9)}${P}${d(9)}${d(9)}`)}
-    ${combo('綠一色 All Green','Lǜ yī sè — Only green-colored bamboo tiles','Limit','limit','Only bamboo 2,3,4,6,8 and Green Dragon (發). All tiles are green!',`${b(2)}${b(3)}${b(4)}${P}${b(2)}${b(3)}${b(4)}${P}${b(6)}${b(6)}${b(6)}${P}${CG}${CG}${CG}${P}${b(8)}${b(8)}`)}
+    ${combo('綠一色 All Green','Lǜ yī sè — Only green-colored bamboo tiles','13 Fan','limit','Only bamboo 2,3,4,6,8 and Green Dragon (發). All tiles are green!',`${b(2)}${b(3)}${b(4)}${P}${b(2)}${b(3)}${b(4)}${P}${b(6)}${b(6)}${b(6)}${P}${CG}${CG}${CG}${P}${b(8)}${b(8)}`)}
     ${combo('九蓮寶燈 Nine Gates','Jiǔ lián bǎo dēng — 1112345678999 of one suit (concealed)','10 Fan','','Hold 1-1-1-2-3-4-5-6-7-8-9-9-9 of one suit; 14th tile = any of that suit.',`${w(1)}${w(1)}${w(1)}${w(2)}${w(3)}${w(4)}${w(5)}${w(6)}${w(7)}${w(8)}${w(9)}${w(9)}${w(9)}${PLUS}${qTile('?萬')}`)}
     ${combo('十三么 Thirteen Orphans','Shísān yāo — One of every terminal and honor + one duplicate','13 Fan','limit','One each of 1m 9m 1b 9b 1c 9c East South West North Red Green White, plus any duplicate.',`${w(1)}${w(9)}${b(1)}${b(9)}${d(1)}${d(9)}${E}${S}${W}${N}${CR}${CG}${CW}${PLUS}${qTile('dup')}`)}
     ${combo('四暗刻 Four Concealed Pungs','Sì àn kè — 4 self-drawn triplets','10 Fan','','All four triplets must be self-drawn (no called sets). Win by self-draw only.',`${w(2)}${w(2)}${w(2)}${P}${d(5)}${d(5)}${d(5)}${P}${b(8)}${b(8)}${b(8)}${P}${E}${E}${E}${P}${CG}${CG}<div style="font-size:11px;color:var(--dim);margin-top:8px;width:100%">⚠️ All sets must be concealed</div>`)}
@@ -3016,15 +3019,17 @@ const CALC_GROUPS = [
       ex:['h1','h2','h3','h4'] },
   ]},
   { label: 'Limit Hands', items: [
-    { id:'c_term',  name:'清么九 All Terminals',          desc:'Only 1s and 9s from any suit. No honor tiles.',           fan:10,
+    { id:'c_term',   name:'清么九 All Terminals',          desc:'Only 1s and 9s from any suit. No honor tiles.',           fan:10,
       ex:['w1','w1','w1','|','w9','w9','w9','|','t1','t1','t1','|','t9','t9','t9','|','s1','s1'] },
-    { id:'c_9g',    name:'九蓮寶燈 Nine Gates',           desc:'1112345678999 of one suit (fully concealed).',            fan:10,
+    { id:'c_agreen', name:'綠一色 All Green',              desc:'Only bamboo 2,3,4,6,8 and Green Dragon (發). All tiles are green!', fan:13,
+      ex:['s2','s3','s4','|','s2','s3','s4','|','s6','s6','s6','|','dg','dg','dg','|','s8','s8'] },
+    { id:'c_9g',     name:'九蓮寶燈 Nine Gates',           desc:'1112345678999 of one suit (fully concealed).',            fan:10,
       ex:['w1','w1','w1','w2','w3','w4','w5','w6','w7','w8','w9','w9','w9','|','w5'] },
-    { id:'c_4p',    name:'四暗刻 Four Concealed Pungs',   desc:'All 4 triplets concealed (not called from discards).',    fan:10,
+    { id:'c_4p',     name:'四暗刻 Four Concealed Pungs',   desc:'All 4 triplets concealed (not called from discards).',    fan:10,
       ex:['w1','w1','w1','|','t5','t5','t5','|','s9','s9','s9','|','fe','fe','fe','|','w9','w9'] },
-    { id:'c_4k',    name:'四槓子 All Kongs',              desc:'Four kongs and a pair.',                                   fan:13,
+    { id:'c_4k',     name:'四槓子 All Kongs',              desc:'Four kongs and a pair.',                                   fan:13,
       ex:['w1','w1','w1','w1','|','t5','t5','t5','t5','|','s9','s9','s9','s9','|','w9','w9','w9','w9','|','s1','s1'] },
-    { id:'c_t13',   name:'十三么 Thirteen Orphans',       desc:'One each of all 13 terminals & honors + any duplicate.',  fan:13,
+    { id:'c_t13',    name:'十三么 Thirteen Orphans',       desc:'One each of all 13 terminals & honors + any duplicate.',  fan:13,
       ex:['w1','w9','t1','t9','s1','s9','fe','fs','fw','fn','dr','dg','dw','|','w1'] },
   ]},
 ];
