@@ -3364,10 +3364,24 @@ function detectFanFromHand(hand, bonusTiles) {
 
 function autoDetectFan() {
   const det = detectFanFromHand(F.hand, F.bonusTiles);
+
   // Zimo auto-toggle based on win type
   if (!F.fanManual.has('c_zimo')) {
     if (F.winType==='zimo') det.c_zimo=true; else det.c_zimo=false;
   }
+
+  // 四暗刻 requires ALL pungs to be concealed — only valid on self-draw (Zimo)
+  if (F.winType !== 'zimo') det.c_4p = false;
+
+  // 四暗刻 subsumes 對對糊 (more specific combination replaces the general one)
+  if (det.c_4p) det.c_pung = false;
+
+  // 小三元 includes the dragon triplet fan scores — don't double-count individual dragon pungs
+  if (det.c_s3d) { det.c_dred = false; det.c_dgrn = false; det.c_dwht = false; }
+
+  // 大三元 includes all three dragon triplet fans
+  if (det.c_b3d) { det.c_dred = false; det.c_dgrn = false; det.c_dwht = false; }
+
   ALL_COMBOS_FLAT.forEach(({id}) => {
     if (F.fanManual.has(id)) return;
     if (det[id]) F.fanSel.add(id); else F.fanSel.delete(id);
