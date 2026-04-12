@@ -1931,14 +1931,46 @@ function showMain() {
   renderMain();
 }
 
+function resetRoundForm() {
+  F.hand = {};
+  F.bonusTiles = {};
+  F.fanSel = new Set();
+  F.fanManual = new Set();
+  F.basePts = 0;
+  // Reset picker button visuals if picker is already rendered
+  document.querySelectorAll('#d-tile-picker .picker-btn').forEach(b => {
+    b.classList.remove('has-cnt');
+    const badge = b.querySelector('.p-cnt');
+    if (badge) badge.textContent = '';
+  });
+  // Reset hand display
+  const display = document.getElementById('d-hand-display');
+  if (display) display.innerHTML = '<span class="hand-count-lbl">Tap tiles below to build hand…</span>';
+  const countEl = document.getElementById('d-tile-count');
+  if (countEl) countEl.textContent = '0 / 14';
+  // Reset fan UI
+  const chipsEl = document.getElementById('d-active-combo-chips');
+  if (chipsEl) chipsEl.innerHTML = '<span class="combo-empty-hint">No combinations selected yet</span>';
+  const badge = document.getElementById('d-fan-count-badge');
+  if (badge) badge.textContent = '0 fan';
+  const ptsEl = document.getElementById('d-base-pts-label');
+  if (ptsEl) { ptsEl.textContent = '—'; ptsEl.className = 'fan-pts-val'; }
+  const hint = document.getElementById('d-fan-hint');
+  if (hint) hint.style.display = 'none';
+  const fullList = document.getElementById('d-full-combo-list');
+  if (fullList) fullList.style.display = 'none';
+  const expandBtn = document.getElementById('d-expand-combos');
+  if (expandBtn) expandBtn.textContent = '＋ Edit combinations';
+}
+
 function showDetail(id) {
   currentId = id;
   const t = tableById(id);
   document.getElementById('view-main').style.display   = 'none';
   document.getElementById('view-detail').style.display = 'block';
   document.getElementById('detail-title').textContent  = t.name;
-  // Reset form state
-  F = { winner: null, discarder: null, winType: 'zimo' };
+  // Reset full form state
+  F = { winner: null, discarder: null, winType: 'zimo', hand: {}, bonusTiles: {}, fanSel: new Set(), fanManual: new Set(), basePts: 0 };
   document.getElementById('d-pts-input').value = '';
   document.getElementById('d-preview-box').style.display = 'none';
   document.getElementById('d-submit-btn').disabled = true;
@@ -2121,7 +2153,7 @@ function switchDTab(tab) {
   document.getElementById(DPANES[tab]).classList.add('active');
   document.querySelector(`[data-dtab="${tab}"]`).classList.add('active');
   if (tab === 'scores')  renderDScores();
-  if (tab === 'round')   renderDForm();
+  if (tab === 'round')   { resetRoundForm(); renderDForm(); }
   if (tab === 'history') renderDHistory();
   if (tab === 'players') renderDPlayers();
 }
@@ -3179,6 +3211,7 @@ function initRoundTilePicker() {
   document.getElementById('d-clear-hand').addEventListener('click', () => {
     F.hand = {};
     F.bonusTiles = {};
+    F.fanManual = new Set();
     document.querySelectorAll('#d-tile-picker .picker-btn').forEach(b => {
       b.classList.remove('has-cnt');
       b.querySelector('.p-cnt').textContent = '';
