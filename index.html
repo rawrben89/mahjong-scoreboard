@@ -239,16 +239,6 @@
     .stake-input::-webkit-inner-spin-button,
     .stake-input::-webkit-outer-spin-button { display: none; }
     .stake-input:focus { border-color: var(--gold); }
-    .stake-save-btn {
-      padding: 6px 12px;
-      border-radius: 8px;
-      border: none;
-      background: var(--accent);
-      color: #000;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-    }
     .persist-note {
       font-size: 11px;
       color: var(--dim);
@@ -1127,7 +1117,7 @@
     <div id="d-stake-row" class="stake-row">
       <label>💰 Bet per point</label>
       <input id="d-stake-input" type="number" class="stake-input" min="0.01" step="0.01" inputmode="decimal" value="1">
-      <button class="stake-save-btn" id="d-stake-save">Save</button>
+      <span id="d-stake-saved" style="font-size:11px;color:var(--dim);min-width:32px;text-align:right"></span>
     </div>
     <div id="d-players-grid" class="players-grid"></div>
   </div>
@@ -2466,18 +2456,21 @@ function dAddPlayer() {
   toast(`${name} added!`);
 }
 
-document.getElementById('d-stake-save').addEventListener('click', () => {
+function saveStakeInput() {
   const t = tableById(currentId);
   if (!t) return;
   const val = parseFloat(document.getElementById('d-stake-input').value);
-  if (!val || val <= 0) { toast('Enter a valid bet amount.'); return; }
+  if (!val || val <= 0) return;
   t.stake = val;
   saveState();
   renderDScores();
-  toast(`Bet set to $${val} per point.`);
-});
+  const lbl = document.getElementById('d-stake-saved');
+  if (lbl) { lbl.textContent = 'Saved'; setTimeout(() => { lbl.textContent = ''; }, 1200); }
+}
+document.getElementById('d-stake-input').addEventListener('change', saveStakeInput);
+document.getElementById('d-stake-input').addEventListener('blur',   saveStakeInput);
 document.getElementById('d-stake-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('d-stake-save').click();
+  if (e.key === 'Enter') { saveStakeInput(); e.target.blur(); }
 });
 
 document.getElementById('d-btn-reset-scores').addEventListener('click', () => {
