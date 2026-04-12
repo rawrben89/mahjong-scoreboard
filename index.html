@@ -846,6 +846,55 @@
     .calc-ex .tile.special .t-c { font-size: 7px; }
     .calc-ex .tile-sep { font-size: 12px; color: var(--border); margin: 0 2px; align-self: center; }
     .calc-ex-none { font-size: 10px; color: var(--dim); margin-top: 6px; padding-top: 5px; border-top: 1px dashed var(--border); }
+
+    /* ═══ ROUND FORM — TILE PICKER ═══ */
+    .picker-group { margin-bottom: 8px; }
+    .picker-group-lbl { font-size: 10px; color: var(--dim); margin-bottom: 3px; font-weight: 600; letter-spacing: .3px; }
+    .picker-row { display: flex; flex-wrap: wrap; gap: 3px; }
+    .picker-btn {
+      position: relative; width: 30px; height: 40px;
+      background: var(--surface2); border: 1.5px solid var(--border);
+      border-radius: 4px; padding: 0; cursor: pointer; opacity: .5;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .picker-btn img { width: 28px; height: 38px; object-fit: contain; pointer-events: none; }
+    .picker-btn.has-cnt { opacity: 1; border-color: var(--accent); }
+    .p-cnt {
+      position: absolute; top: -6px; right: -6px;
+      background: var(--accent); color: #000;
+      font-size: 9px; font-weight: 900; min-width: 14px; height: 14px;
+      border-radius: 7px; display: none; align-items: center;
+      justify-content: center; padding: 0 2px; pointer-events: none;
+    }
+    .picker-btn.has-cnt .p-cnt { display: flex; }
+    .hand-display {
+      display: flex; flex-wrap: wrap; gap: 2px; align-items: center;
+      min-height: 34px; padding: 4px 6px;
+      background: var(--bg); border: 1px dashed var(--border);
+      border-radius: 8px; margin-bottom: 8px;
+    }
+    .hand-tile { width: 21px; height: 29px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .hand-tile img { width: 100%; height: 100%; object-fit: contain; }
+    .hand-tile.bonus { opacity: .7; }
+    .hand-count-lbl { font-size: 11px; color: var(--dim); }
+    .clear-hand-btn { font-size: 11px; padding: 3px 10px; background: none; border: 1px solid var(--border); color: var(--dim); border-radius: 6px; cursor: pointer; margin-top: 4px; }
+    /* Fan combo section */
+    .active-combo-chips { display: flex; flex-wrap: wrap; gap: 5px; padding: 4px 0 6px; min-height: 28px; }
+    .combo-chip { display: flex; align-items: center; gap: 3px; background: var(--surface2); border: 1px solid var(--accent2); border-radius: 12px; padding: 3px 8px; font-size: 11px; color: var(--accent2); cursor: pointer; user-select: none; }
+    .combo-chip .chip-fan { font-weight: 700; font-size: 10px; color: var(--gold); margin-left: 1px; }
+    .combo-chip .chip-rm { color: var(--dim); font-size: 12px; margin-left: 2px; }
+    .combo-empty-hint { font-size: 11px; color: var(--dim); padding: 4px 0; }
+    .fan-pts-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0 2px; border-top: 1px solid var(--border); margin-top: 4px; font-size: 12px; }
+    .fan-pts-val { font-weight: 700; color: var(--gold); font-size: 15px; }
+    .fan-pts-warn { font-size: 11px; color: var(--red); }
+    .expand-combos-btn { font-size: 12px; padding: 6px 12px; background: none; border: 1px solid var(--border); color: var(--accent2); border-radius: 8px; cursor: pointer; margin-top: 8px; width: 100%; }
+    .full-combo-grp-hdr { font-size: 10px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .5px; padding: 8px 0 2px; }
+    .full-combo-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 12px; cursor: pointer; border-bottom: 1px solid var(--border); user-select: none; }
+    .full-combo-item:last-child { border-bottom: none; }
+    .full-combo-item.on { color: var(--accent2); }
+    .full-combo-check { font-size: 14px; color: var(--dim); flex-shrink: 0; }
+    .full-combo-item.on .full-combo-check { color: var(--accent); }
+    .full-combo-fan { font-size: 12px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
     .calc-result-bar {
       position: fixed;
       bottom: 0; left: 50%;
@@ -1089,11 +1138,6 @@
     </div>
 
     <div class="form-card">
-      <div class="section-label">Base Points <span style="color:var(--dim);font-size:10px;text-transform:none;letter-spacing:0">(amount each payer contributes)</span></div>
-      <input id="d-pts-input" type="number" class="points-input" placeholder="0" min="1" inputmode="numeric">
-    </div>
-
-    <div class="form-card">
       <div class="section-label">Win Type</div>
       <div class="win-type-row">
         <div id="d-btn-zimo"    class="win-type-btn on" >🀄 Zimo<br><small style="font-size:10px;opacity:.7">All 3 pay</small></div>
@@ -1104,6 +1148,34 @@
     <div id="d-discard-card" class="form-card" style="display:none">
       <div class="section-label">Who Discarded? 🃏</div>
       <div id="d-discard-chips" class="chip-row"></div>
+    </div>
+
+    <div class="form-card">
+      <div class="section-label" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Hand Tiles 🀄</span>
+        <span id="d-tile-count" style="font-size:10px;color:var(--dim)">0 / 14</span>
+      </div>
+      <div id="d-hand-display" class="hand-display">
+        <span class="hand-count-lbl">Tap tiles below to build hand…</span>
+      </div>
+      <div id="d-tile-picker"></div>
+      <button class="clear-hand-btn" id="d-clear-hand">✕ Clear Hand</button>
+    </div>
+
+    <div class="form-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span class="section-label" style="margin-bottom:0">Fan Combinations</span>
+        <span id="d-fan-count-badge" style="font-size:12px;color:var(--gold);font-weight:700">0 fan</span>
+      </div>
+      <div id="d-active-combo-chips" class="active-combo-chips">
+        <span class="combo-empty-hint">No combinations selected yet</span>
+      </div>
+      <div class="fan-pts-row">
+        <span style="color:var(--dim)">Base pts / payer:</span>
+        <span id="d-base-pts-label" class="fan-pts-val">—</span>
+      </div>
+      <button id="d-expand-combos" class="expand-combos-btn">＋ Edit combinations</button>
+      <div id="d-full-combo-list" style="display:none;margin-top:6px"></div>
     </div>
 
     <div id="d-preview-box" class="preview-box" style="display:none">
@@ -2103,7 +2175,7 @@ function renderDScores() {
 /* ═══════════════════════════════════════
    DETAIL — ADD ROUND FORM
 ═══════════════════════════════════════ */
-let F = { winner: null, discarder: null, winType: 'zimo' };
+let F = { winner: null, discarder: null, winType: 'zimo', hand: {}, bonusTiles: {}, fanSel: new Set(), fanManual: new Set(), basePts: 0 };
 
 function renderDForm() {
   const t = tableById(currentId);
@@ -2147,6 +2219,7 @@ document.getElementById('d-btn-zimo').addEventListener('click', () => {
   document.getElementById('d-btn-discard').classList.remove('on');
   document.getElementById('d-discard-card').style.display = 'none';
   renderDForm();
+  autoDetectFan();
 });
 document.getElementById('d-btn-discard').addEventListener('click', () => {
   F.winType = 'discard';
@@ -2154,14 +2227,13 @@ document.getElementById('d-btn-discard').addEventListener('click', () => {
   document.getElementById('d-btn-zimo').classList.remove('on');
   document.getElementById('d-discard-card').style.display = 'block';
   renderDForm();
+  autoDetectFan();
 });
-
-document.getElementById('d-pts-input').addEventListener('input', calcDPreview);
 
 function calcDChanges() {
   const t   = tableById(currentId);
   if (!t) return null;
-  const pts = parseInt(document.getElementById('d-pts-input').value) || 0;
+  const pts = F.basePts || 0;
   if (F.winner === null || pts <= 0) return null;
   if (F.winType === 'discard' && F.discarder === null) return null;
 
@@ -2207,7 +2279,8 @@ document.getElementById('d-submit-btn').addEventListener('click', () => {
   if (!t) return;
   const changes = calcDChanges();
   if (!changes) return;
-  const pts          = parseInt(document.getElementById('d-pts-input').value);
+  const pts          = F.basePts;
+  const fan          = getFanTotal();
   const winnerName   = t.players[F.winner];
   const discarderName = F.discarder !== null ? t.players[F.discarder] : null;
 
@@ -2221,15 +2294,19 @@ document.getElementById('d-submit-btn').addEventListener('click', () => {
     winner: winnerName,
     winType: F.winType,
     discarder: discarderName,
-    pts,
+    pts, fan,
     changes: Object.fromEntries(t.players.map((p,i) => [p, changes[i]]))
   };
   t.history.push(record);
   saveState();
 
   const roundNum = record.round;
-  F = { winner: null, discarder: null, winType: 'zimo' };
-  document.getElementById('d-pts-input').value = '';
+  F = { winner: null, discarder: null, winType: 'zimo', hand: {}, bonusTiles: {}, fanSel: new Set(), fanManual: new Set(), basePts: 0 };
+  // Reset tile picker badges
+  document.querySelectorAll('#d-tile-picker .picker-btn').forEach(b => {
+    b.classList.remove('has-cnt');
+    b.querySelector('.p-cnt').textContent = '';
+  });
   document.getElementById('d-btn-zimo').classList.add('on');
   document.getElementById('d-btn-discard').classList.remove('on');
   document.getElementById('d-discard-card').style.display = 'none';
@@ -2313,6 +2390,10 @@ function renderDPlayers() {
       </div>`;
   }).join('');
 
+  // Hide add row when at max
+  const addRow = document.querySelector('#dpane-players .add-row');
+  if (addRow) addRow.style.display = t.players.length >= 4 ? 'none' : 'flex';
+
   list.querySelectorAll('.remove-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const t    = tableById(currentId);
@@ -2338,6 +2419,7 @@ function dAddPlayer() {
   const input = document.getElementById('d-new-name');
   const name  = input.value.trim();
   if (!name) return;
+  if (t.players.length >= 4) { toast('Maximum 4 players (standard mahjong).'); return; }
   if (t.players.includes(name)) { toast('Player already in this table!'); return; }
   t.players.push(name);
   t.scores[name] = 0;
@@ -3033,12 +3115,253 @@ document.getElementById('calc-win-type').addEventListener('click', e => {
 });
 
 /* ═══════════════════════════════════════
+   ROUND FORM — TILE PICKER & FAN CALC
+═══════════════════════════════════════ */
+const ALL_COMBOS_FLAT = CALC_GROUPS.flatMap(g => g.items);
+
+function getFanTotal() {
+  return ALL_COMBOS_FLAT.reduce((s, item) => s + (F.fanSel.has(item.id) ? item.fan : 0), 0);
+}
+
+function initRoundTilePicker() {
+  const SUIT_GROUPS = [
+    { lbl: '萬 Characters', keys: ['w1','w2','w3','w4','w5','w6','w7','w8','w9'] },
+    { lbl: '竹 Bamboo',     keys: ['s1','s2','s3','s4','s5','s6','s7','s8','s9'] },
+    { lbl: '筒 Circles',    keys: ['t1','t2','t3','t4','t5','t6','t7','t8','t9'] },
+    { lbl: '風 Winds + 龍 Dragons', keys: ['fe','fs','fw','fn','dr','dg','dw'] },
+    { lbl: '花 Bonus Tiles (not part of hand)', keys: ['h1','h2','h3','h4'], bonus: true },
+  ];
+  const picker = document.getElementById('d-tile-picker');
+  picker.innerHTML = SUIT_GROUPS.map(grp =>
+    `<div class="picker-group">
+      <div class="picker-group-lbl">${grp.lbl}</div>
+      <div class="picker-row">
+        ${grp.keys.map(k => {
+          const url = TILE_IMG[k];
+          const inner = url
+            ? `<img src="${url}" alt="${k}" loading="lazy">`
+            : `<span style="font-size:8px;color:var(--dim)">${k}</span>`;
+          return `<button class="picker-btn" data-key="${k}" data-bonus="${grp.bonus ? 1 : 0}">${inner}<span class="p-cnt"></span></button>`;
+        }).join('')}
+      </div>
+    </div>`
+  ).join('');
+
+  picker.addEventListener('click', e => {
+    const btn = e.target.closest('.picker-btn');
+    if (!btn) return;
+    const key = btn.dataset.key;
+    const isBonus = btn.dataset.bonus === '1';
+    const dict = isBonus ? F.bonusTiles : F.hand;
+    const cur = dict[key] || 0;
+    if (cur >= 4) {
+      delete dict[key];
+    } else {
+      if (!isBonus) {
+        const total = Object.values(F.hand).reduce((a, b) => a + b, 0);
+        if (total >= 14) { toast('Hand full — max 14 tiles'); return; }
+      }
+      dict[key] = cur + 1;
+    }
+    const newVal = dict[key] || 0;
+    btn.classList.toggle('has-cnt', newVal > 0);
+    const badge = btn.querySelector('.p-cnt');
+    badge.textContent = newVal > 0 ? newVal : '';
+    updateHandDisplay();
+    autoDetectFan();
+  });
+
+  document.getElementById('d-clear-hand').addEventListener('click', () => {
+    F.hand = {};
+    F.bonusTiles = {};
+    document.querySelectorAll('#d-tile-picker .picker-btn').forEach(b => {
+      b.classList.remove('has-cnt');
+      b.querySelector('.p-cnt').textContent = '';
+    });
+    updateHandDisplay();
+    autoDetectFan();
+  });
+
+  document.getElementById('d-expand-combos').addEventListener('click', () => {
+    const list = document.getElementById('d-full-combo-list');
+    const open = list.style.display !== 'none';
+    list.style.display = open ? 'none' : 'block';
+    document.getElementById('d-expand-combos').textContent = open ? '＋ Edit combinations' : '－ Hide combinations';
+    if (!open) renderFullComboList();
+  });
+
+  document.getElementById('d-active-combo-chips').addEventListener('click', e => {
+    const chip = e.target.closest('.combo-chip');
+    if (!chip) return;
+    const id = chip.dataset.chipId;
+    F.fanSel.delete(id);
+    F.fanManual.add(id);
+    renderFanUI();
+    calcDPreview();
+  });
+
+  document.getElementById('d-full-combo-list').addEventListener('click', e => {
+    const item = e.target.closest('.full-combo-item');
+    if (!item) return;
+    const cid = item.dataset.cid;
+    if (F.fanSel.has(cid)) F.fanSel.delete(cid); else F.fanSel.add(cid);
+    F.fanManual.add(cid);
+    renderFanUI();
+    renderFullComboList();
+    calcDPreview();
+  });
+}
+
+function updateHandDisplay() {
+  const total = Object.values(F.hand).reduce((a, b) => a + b, 0);
+  document.getElementById('d-tile-count').textContent = total + ' / 14';
+  const display = document.getElementById('d-hand-display');
+  if (total === 0 && !Object.keys(F.bonusTiles).length) {
+    display.innerHTML = '<span class="hand-count-lbl">Tap tiles below to build hand…</span>';
+    return;
+  }
+  let html = '';
+  Object.entries(F.hand).forEach(([k, n]) => {
+    const url = TILE_IMG[k];
+    for (let i = 0; i < n; i++) {
+      html += url
+        ? `<div class="hand-tile"><img src="${url}" alt="${k}" loading="lazy"></div>`
+        : `<div class="hand-tile" style="background:var(--surface2);font-size:7px;color:var(--dim)">${k}</div>`;
+    }
+  });
+  Object.entries(F.bonusTiles).forEach(([k, n]) => {
+    const url = TILE_IMG[k];
+    for (let i = 0; i < n; i++) {
+      html += url
+        ? `<div class="hand-tile bonus"><img src="${url}" alt="${k}" loading="lazy"></div>`
+        : `<div class="hand-tile bonus">${k}</div>`;
+    }
+  });
+  display.innerHTML = html;
+}
+
+function detectFanFromHand(hand, bonusTiles) {
+  const det = {};
+  const tiles = Object.entries(hand).flatMap(([k, n]) => Array(n).fill(k));
+  const isHonor = k => ['fe','fs','fw','fn','dr','dg','dw'].includes(k);
+  const isSuit  = k => ['w','s','t'].includes(k[0]);
+  const suitT   = tiles.filter(isSuit);
+  const honorT  = tiles.filter(isHonor);
+  const suits   = new Set(['w','s','t'].filter(p => tiles.some(k => k[0] === p)));
+  const cnt     = {};
+  tiles.forEach(k => cnt[k] = (cnt[k] || 0) + 1);
+
+  if (!suitT.length && honorT.length)                                         det.c_hon  = true;
+  if (!honorT.length && suits.size === 1 && suitT.length)                     det.c_full = true;
+  if (suits.size === 1 && honorT.length && suitT.length)                      det.c_half = true;
+  if (suitT.length && !honorT.length && suitT.every(k => k[1]==='1'||k[1]==='9')) det.c_term = true;
+
+  if ((cnt.dr||0)>=3) det.c_dred = true;
+  if ((cnt.dg||0)>=3) det.c_dgrn = true;
+  if ((cnt.dw||0)>=3) det.c_dwht = true;
+  const dp = ['dr','dg','dw'].filter(d=>(cnt[d]||0)>=3).length;
+  const dpr= ['dr','dg','dw'].filter(d=>(cnt[d]||0)===2).length;
+  if (dp===3) det.c_b3d=true; else if (dp===2&&dpr>=1) det.c_s3d=true;
+
+  const wp = ['fe','fs','fw','fn'].filter(w=>(cnt[w]||0)>=3).length;
+  const wpr= ['fe','fs','fw','fn'].filter(w=>(cnt[w]||0)===2).length;
+  if (wp===4) det.c_b4w=true; else if (wp===3&&wpr>=1) det.c_s4w=true;
+  if (wp>=1) det.c_sw=true;
+
+  if (tiles.length===14) {
+    const vals=Object.values(cnt);
+    if (Object.keys(cnt).length===7 && vals.every(v=>v===2)) det.c_7p=true;
+    const orphans=['w1','w9','t1','t9','s1','s9','fe','fs','fw','fn','dr','dg','dw'];
+    if (orphans.every(k=>(cnt[k]||0)>=1)) det.c_t13=true;
+    if (suits.size===1&&!honorT.length) {
+      const su=[...suits][0];
+      const base={[su+'1']:3,[su+'2']:1,[su+'3']:1,[su+'4']:1,[su+'5']:1,[su+'6']:1,[su+'7']:1,[su+'8']:1,[su+'9']:3};
+      if (Object.entries(base).every(([k,v])=>(cnt[k]||0)>=v)) det.c_9g=true;
+    }
+  }
+  if (tiles.length>=2) {
+    const entries=Object.entries(cnt);
+    const pairs =entries.filter(([,n])=>n===2).length;
+    const trips =entries.filter(([,n])=>n>=3).length;
+    const kongs =entries.filter(([,n])=>n===4).length;
+    if (pairs===1&&trips===4&&entries.length===5) { det.c_pung=true; det.c_4p=true; }
+    if (pairs===1&&kongs===4&&entries.length===5)   det.c_4k=true;
+  }
+
+  const bt=bonusTiles||{};
+  const sc=['h1','h2','h3','h4'].reduce((s,k)=>s+(bt[k]||0),0);
+  if (sc>=4) det.c_as=true;
+  if (sc>0)  det.c_os=true;
+  if (tiles.length>0&&sc===0) det.c_nof=true;
+  return det;
+}
+
+function autoDetectFan() {
+  const det = detectFanFromHand(F.hand, F.bonusTiles);
+  // Zimo auto-toggle based on win type
+  if (!F.fanManual.has('c_zimo')) {
+    if (F.winType==='zimo') det.c_zimo=true; else det.c_zimo=false;
+  }
+  ALL_COMBOS_FLAT.forEach(({id}) => {
+    if (F.fanManual.has(id)) return;
+    if (det[id]) F.fanSel.add(id); else F.fanSel.delete(id);
+  });
+  renderFanUI();
+  calcDPreview();
+}
+
+function renderFanUI() {
+  const fan     = getFanTotal();
+  const basePts = fan < 3 ? 0 : (fan >= 13 ? 8192 : Math.pow(2, fan));
+  F.basePts     = basePts;
+
+  document.getElementById('d-fan-count-badge').textContent = fan + ' fan';
+  const ptsEl = document.getElementById('d-base-pts-label');
+  if (fan === 0)      { ptsEl.textContent='—';                    ptsEl.className='fan-pts-val'; }
+  else if (fan < 3)   { ptsEl.textContent=`Need ${3-fan} more fan`; ptsEl.className='fan-pts-warn'; }
+  else                { ptsEl.textContent=basePts+' pts/payer';   ptsEl.className='fan-pts-val'; }
+
+  const activeList = ALL_COMBOS_FLAT.filter(c => F.fanSel.has(c.id));
+  const chipsEl = document.getElementById('d-active-combo-chips');
+  if (!activeList.length) {
+    chipsEl.innerHTML = '<span class="combo-empty-hint">No combinations selected yet</span>';
+  } else {
+    chipsEl.innerHTML = activeList.map(c =>
+      `<div class="combo-chip" data-chip-id="${c.id}">
+        <span>${c.name.split(' ')[0]}</span>
+        <span class="chip-fan">+${c.fan}</span>
+        <span class="chip-rm">✕</span>
+      </div>`
+    ).join('');
+  }
+
+  const fullList = document.getElementById('d-full-combo-list');
+  if (fullList.style.display !== 'none') renderFullComboList();
+}
+
+function renderFullComboList() {
+  document.getElementById('d-full-combo-list').innerHTML = CALC_GROUPS.map(grp =>
+    `<div>
+      <div class="full-combo-grp-hdr">${grp.label}</div>
+      ${grp.items.map(item =>
+        `<div class="full-combo-item ${F.fanSel.has(item.id)?'on':''}" data-cid="${item.id}">
+          <span class="full-combo-check">${F.fanSel.has(item.id)?'☑':'☐'}</span>
+          <span style="flex:1">${item.name}</span>
+          <span class="full-combo-fan">+${item.fan}</span>
+        </div>`
+      ).join('')}
+    </div>`
+  ).join('');
+}
+
+/* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
 loadState();
 showMain();
 initHelpPanes();
 initCalcItems();
+initRoundTilePicker();
 </script>
 </body>
 </html>
