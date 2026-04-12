@@ -27,9 +27,17 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      max-width: 500px;
+      max-width: 540px;
       margin: 0 auto;
       overflow-x: hidden;
+    }
+    @media (min-width: 700px) {
+      html { background: #0a1208; }
+      body { max-width: 680px; box-shadow: 0 0 40px rgba(0,0,0,.6); }
+      .players-grid { grid-template-columns: repeat(4, 1fr) !important; }
+      .summary-val  { font-size: 22px; }
+      .combo-card   { break-inside: avoid; }
+      #hpane-wins, #hpane-calc { columns: 2; column-gap: 14px; }
     }
 
     /* ── Shared Header ── */
@@ -1764,7 +1772,7 @@
     <div class="calc-result-content">
       <div>
         <span id="calc-fan-num" class="calc-fan-num">0</span>
-        <span class="calc-fan-lbl"> fan</span>
+        <span class="calc-fan-lbl"> pts</span>
       </div>
       <div id="calc-result-detail" class="calc-result-detail">
         <span class="calc-warn" style="color:var(--dim)">Select combinations above</span>
@@ -2262,7 +2270,7 @@ function calcDChanges() {
   const t   = tableById(currentId);
   if (!t) return null;
   const pts = F.basePts || 0;
-  if (F.winner === null || pts <= 0) return null;
+  if (F.winner === null || pts < 1) return null;
   if (F.winType === 'discard' && F.discarder === null) return null;
 
   const changes = {};
@@ -2953,84 +2961,66 @@ document.getElementById('btn-roll-dice').addEventListener('click', rollDice);
 /* ═══════════════════════════════════════
    FAN CALCULATOR
 ═══════════════════════════════════════ */
+// WMT (World Mahjong Tour) — Guangdong scoring system
+// Values are direct base points (no exponentiation). Base pts = sum of selected combos.
 const CALC_GROUPS = [
-  { label: 'Win Method', items: [
-    { id:'c_zimo',  name:'自摸 Zimo — Self Draw',         desc:'Draw winning tile from the wall. All 3 losers pay.',        fan:1,
-      ex:['w1','w2','w3','|','t4','t5','t6','|','s7','s8','s9','|','w5','w5','w5','|','t9','t9'] },
-    { id:'c_gate',  name:'門清 Concealed Gate',           desc:'Win by discard with a fully concealed hand.',               fan:1,
+  { label: 'Win Method Bonuses', items: [
+    { id:'c_gate',   name:'門清 Concealed Hand',          desc:'Win by discard with a fully concealed hand.',              fan:1,
       ex:['w1','w2','w3','|','w4','w5','w6','|','s7','s8','s9','|','t1','t2','t3','|','s5','s5'] },
-    { id:'c_kong',  name:'槓上開花 Win by Kong',          desc:'Winning tile from supplement wall after a kong.',           fan:2,
+    { id:'c_kong',   name:'槓上花 Kong Bloom',            desc:'Win on the supplement tile drawn after declaring a kong.',  fan:4,
       ex:['t7','t7','t7','t7','|','w1','w2','w3','|','s4','s5','s6','|','t2','t2','t2','|','s9','s9'] },
-    { id:'c_dkong', name:'槓上槓 Double-Kong',            desc:'Kong declared with replacement tile from prior kong.',      fan:9,
-      ex:['t7','t7','t7','t7','|','s3','s3','s3','s3','|','w2','w3','w4','|','t1','t1','t1','|','s5','s5'] },
-    { id:'c_last',  name:'海底撈月 Last Tile',            desc:'Win on the very last drawable tile in the wall.',          fan:1,
+    { id:'c_last',   name:'海底撈月 Fishing the Moon',    desc:'Win on the very last drawable tile from the wall.',        fan:4,
       ex:['w1','w2','w3','|','t4','t5','t6','|','s4','s5','s6','|','w7','w7','w7','|','w9'] },
-    { id:'c_rob',   name:'搶槓 Robbing the Kong',         desc:"Steal an opponent's added kong tile to win.",               fan:1,
+    { id:'c_rob',    name:'搶槓 Robbing a Kong',          desc:"Steal the tile an opponent adds to an existing pung.",     fan:4,
       ex:['s5','s5','s5','s5','|','w1','w2','w3','|','t6','t7','t8','|','w4','w4','w4','|','t9','t9'] },
-    { id:'c_hv',    name:'天糊 Heavenly Hand',            desc:'East wins with initial 13 tiles + first self-draw.',       fan:13,
+    { id:'c_hv',     name:'天糊 Heavenly Hand',           desc:'East wins with the initial draw before anyone discards.',  fan:64,
       ex:['w1','w1','w1','|','w2','w3','w4','|','w5','w6','w7','|','w8','w9','w9','w9','|','w5','w5'] },
-    { id:'c_ea',    name:'地糊 Earthly Hand',             desc:"Non-East wins on East's very first discard.",               fan:13,
+    { id:'c_ea',     name:'地糊 Earthly Hand',            desc:"Non-East wins on East's very first discard.",              fan:64,
       ex:['fe','fe','fe','|','t1','t2','t3','|','s4','s5','s6','|','w7','w8','w9','|','t9','t9'] },
   ]},
   { label: 'Hand Pattern', items: [
-    { id:'c_chow',  name:'平糊 Common Hand',              desc:'Every meld is a Chow (sequence). No pungs/kongs.',         fan:1,
+    { id:'c_chow',   name:'平糊 Peace Hand',              desc:'All 4 melds are sequences (chows). No pungs or kongs.',    fan:2,
       ex:['w1','w2','w3','|','w4','w5','w6','|','s7','s8','s9','|','t1','t2','t3','|','w9','w9'] },
-    { id:'c_pung',  name:'對對糊 All Pungs',              desc:'Every meld is a Triplet or Kong. No sequences.',           fan:3,
+    { id:'c_pung',   name:'碰碰糊 All Triplets',          desc:'Every meld is a triplet or kong. No sequences.',           fan:4,
       ex:['w1','w1','w1','|','w5','w5','w5','|','t9','t9','t9','|','s3','s3','s3','|','t6','t6'] },
-    { id:'c_7p',    name:'七對子 Seven Pairs',            desc:'Hand consists of seven different pairs.',                  fan:4,
-      ex:['w1','w1','|','w3','w3','|','w5','w5','|','w7','w7','|','w9','w9','|','t2','t2','|','t4','t4'] },
-    { id:'c_half',  name:'混一色 Half Flush',             desc:'One suit only + honor tiles (winds/dragons).',            fan:3,
+    { id:'c_half',   name:'混一色 Mixed One Suit',        desc:'One suit only, combined with honor tiles.',               fan:4,
       ex:['w1','w2','w3','|','w4','w5','w6','|','w7','w8','w9','|','dr','dr','dr','|','fe','fe'] },
-    { id:'c_full',  name:'清一色 Full Flush',             desc:'All tiles from one suit. No winds or dragons.',           fan:7,
+    { id:'c_full',   name:'清一色 Pure Suit',             desc:'All tiles from a single suit. No honor tiles.',           fan:8,
       ex:['s1','s2','s3','|','s4','s5','s6','|','s7','s8','s9','|','s1','s2','s3','|','s5','s5'] },
-    { id:'c_hon',   name:'字一色 All Honors',             desc:'Only wind and dragon tiles — no number tiles.',           fan:10,
-      ex:['fe','fe','fe','|','fs','fs','fs','|','fw','fw','fw','|','dr','dr','dr','|','dg','dg'] },
+    { id:'c_7p',     name:'七對子 Seven Pairs',           desc:'Seven pairs — all 7 tile types are different.',           fan:8,
+      ex:['w1','w1','|','w3','w3','|','w5','w5','|','w7','w7','|','w9','w9','|','t2','t2','|','t4','t4'] },
+    { id:'c_7plux',  name:'豪華七對 Luxury Seven Pairs',  desc:'Seven pairs with one quad (4-of-a-kind counts as 2 pairs).', fan:16,
+      ex:['w1','w1','w1','w1','|','w3','w3','|','w5','w5','|','w7','w7','|','w9','w9','|','t2','t2'] },
+    { id:'c_7pdlux', name:'雙豪七對 Double Luxury Pairs', desc:'Seven pairs with two quads.',                              fan:32,
+      ex:['w1','w1','w1','w1','|','w3','w3','w3','w3','|','w5','w5','|','w7','w7','|','w9','w9'] },
+    { id:'c_7ptlux', name:'三豪七對 Triple Luxury Pairs', desc:'Seven pairs with three quads.',                            fan:64,
+      ex:['w1','w1','w1','w1','|','w3','w3','w3','w3','|','w5','w5','w5','w5','|','w7','w7'] },
+    { id:'c_joker',  name:'四龍 Four Jokers Win',         desc:'Win with all four joker tiles in hand.',                   fan:12,
+      ex:null },
   ]},
-  { label: 'Dragon & Wind Melds', items: [
-    { id:'c_dred',  name:'紅中 Red Dragon Pung',          desc:'A triplet (or kong) of the Red Dragon (中).',              fan:1,
-      ex:['dr','dr','dr'] },
-    { id:'c_dgrn',  name:'發財 Green Dragon Pung',        desc:'A triplet of the Green Dragon (發).',                      fan:1,
-      ex:['dg','dg','dg'] },
-    { id:'c_dwht',  name:'白板 White Dragon Pung',        desc:'A triplet of the White Dragon (白).',                      fan:1,
-      ex:['dw','dw','dw'] },
-    { id:'c_sw',    name:'門風 Seat Wind Pung',           desc:"A triplet of the winner's own seat wind.",                 fan:1,
-      ex:['fe','fe','fe'] },
-    { id:'c_rw',    name:'圈風 Round Wind Pung',          desc:'A triplet of the prevailing (round) wind.',               fan:1,
-      ex:['fs','fs','fs'] },
-    { id:'c_s3d',   name:'小三元 Small Three Dragons',    desc:'Pungs of 2 dragons + pair of the 3rd.',                   fan:5,
+  { label: 'Dragon & Wind', items: [
+    { id:'c_s3d',    name:'小三元 Small Three Dragons',   desc:'Pungs of 2 dragons + pair of the 3rd dragon.',            fan:48,
       ex:['dr','dr','dr','|','dg','dg','dg','|','dw','dw'] },
-    { id:'c_b3d',   name:'大三元 Big Three Dragons',      desc:'Triplets of all three dragons.',                           fan:8,
+    { id:'c_b3d',    name:'大三元 Big Three Dragons',     desc:'Triplets of all three dragons.',                           fan:88,
       ex:['dr','dr','dr','|','dg','dg','dg','|','dw','dw','dw'] },
-    { id:'c_s4w',   name:'小四喜 Small Four Winds',       desc:'Pungs of 3 winds + pair of the 4th.',                     fan:6,
+    { id:'c_s4w',    name:'小四喜 Small Four Winds',      desc:'Pungs of 3 winds + pair of the 4th wind.',                fan:48,
       ex:['fe','fe','fe','|','fs','fs','fs','|','fw','fw','fw','|','fn','fn'] },
-    { id:'c_b4w',   name:'大四喜 Big Four Winds',         desc:'Triplets of all four winds.',                              fan:13,
+    { id:'c_b4w',    name:'大四喜 Big Four Winds',        desc:'Triplets of all four winds.',                              fan:88,
       ex:['fe','fe','fe','|','fs','fs','fs','|','fw','fw','fw','|','fn','fn','fn'] },
   ]},
-  { label: 'Bonus Tiles', items: [
-    { id:'c_nof',   name:'无花 No Flowers/Seasons',       desc:'No bonus tiles drawn at all.',                             fan:1,
-      ex:null },
-    { id:'c_of',    name:'正花 Own Wind Flower',          desc:"Bonus flower matches winner's seat wind number.",          fan:1,
-      ex:['fe'] },
-    { id:'c_os',    name:'正花 Own Wind Season',          desc:"Bonus season matches winner's seat wind number.",          fan:1,
-      ex:['h1'] },
-    { id:'c_af',    name:'一台花 All Flowers',            desc:'All four flower bonus tiles drawn.',                       fan:2,
-      ex:['fe','fs','fw','fn'] },
-    { id:'c_as',    name:'一台花 All Seasons',            desc:'All four season bonus tiles drawn.',                       fan:2,
-      ex:['h1','h2','h3','h4'] },
-  ]},
   { label: 'Limit Hands', items: [
-    { id:'c_term',   name:'清么九 All Terminals',          desc:'Only 1s and 9s from any suit. No honor tiles.',           fan:10,
-      ex:['w1','w1','w1','|','w9','w9','w9','|','t1','t1','t1','|','t9','t9','t9','|','s1','s1'] },
-    { id:'c_agreen', name:'綠一色 All Green',              desc:'Only bamboo 2,3,4,6,8 and Green Dragon (發). All tiles are green!', fan:13,
+    { id:'c_term',   name:'么九刻 Terminals and Honors',  desc:'Every set is a terminal (1s/9s) or honor tile pung.',     fan:32,
+      ex:['w1','w1','w1','|','w9','w9','w9','|','fe','fe','fe','|','dr','dr','dr','|','t9','t9'] },
+    { id:'c_hon',    name:'字一色 All Honors',            desc:'Only wind and dragon tiles — no number tiles.',           fan:64,
+      ex:['fe','fe','fe','|','fs','fs','fs','|','fw','fw','fw','|','dr','dr','dr','|','dg','dg'] },
+    { id:'c_agreen', name:'綠一色 All Green',             desc:'Only bamboo 2,3,4,6,8 and Green Dragon (發).',            fan:64,
       ex:['s2','s3','s4','|','s2','s3','s4','|','s6','s6','s6','|','dg','dg','dg','|','s8','s8'] },
-    { id:'c_9g',     name:'九蓮寶燈 Nine Gates',           desc:'1112345678999 of one suit (fully concealed).',            fan:10,
+    { id:'c_9g',     name:'九蓮寶燈 Nine Gates',          desc:'1-1-1-2-3-4-5-6-7-8-9-9-9 of one suit (concealed).',     fan:16,
       ex:['w1','w1','w1','w2','w3','w4','w5','w6','w7','w8','w9','w9','w9','|','w5'] },
-    { id:'c_4p',     name:'四暗刻 Four Concealed Pungs',   desc:'All 4 triplets concealed (not called from discards).',    fan:10,
-      ex:['w1','w1','w1','|','t5','t5','t5','|','s9','s9','s9','|','fe','fe','fe','|','w9','w9'] },
-    { id:'c_4k',     name:'四槓子 All Kongs',              desc:'Four kongs and a pair.',                                   fan:13,
-      ex:['w1','w1','w1','w1','|','t5','t5','t5','t5','|','s9','s9','s9','s9','|','w9','w9','w9','w9','|','s1','s1'] },
-    { id:'c_t13',    name:'十三么 Thirteen Orphans',       desc:'One each of all 13 terminals & honors + any duplicate.',  fan:13,
+    { id:'c_t13',    name:'十三么 Thirteen Orphans',      desc:'One each of all 13 terminals & honors + any duplicate.',  fan:16,
       ex:['w1','w9','t1','t9','s1','s9','fe','fs','fw','fn','dr','dg','dw','|','w1'] },
+    { id:'c_4k',     name:'十八羅漢 Eighteen Arhats',     desc:'Four kongs and a pair (all kongs in one hand).',          fan:88,
+      ex:['w1','w1','w1','w1','|','t5','t5','t5','t5','|','s9','s9','s9','s9','|','w9','w9','w9','w9','|','s1','s1'] },
   ]},
 ];
 
@@ -3092,21 +3082,10 @@ function updateCalcResult() {
     detail.innerHTML = `<span style="color:var(--dim);font-size:12px">Select combinations above</span>`;
     return;
   }
-  if (fan < 3) {
-    detail.innerHTML = `<div class="calc-warn">Need ${3 - fan} more fan (minimum 3 to win)</div>`;
-    return;
-  }
-
-  // HK standard: base points = 2^(fan-3), minimum hand (3 fan) = 1 pt
-  const basePts = fan >= 13 ? 1024 : Math.pow(2, fan - 3);
+  // WMT: base pts = direct sum, no exponentiation
+  const basePts = fan;
   const money   = n => { const a = n * stake; return (a % 1 === 0 ? a : a.toFixed(2)); };
-  const isLimit = fan >= 13;
-  let html = '';
-  if (isLimit) {
-    html += `<div class="calc-result-row"><span class="lbl">Score: </span><span class="val gold">LIMIT (${fan} fan)</span></div>`;
-  } else {
-    html += `<div class="calc-result-row"><span class="lbl">Base pts: </span><span class="val gold">${basePts} pts/payer</span></div>`;
-  }
+  let html = `<div class="calc-result-row"><span class="lbl">Base pts: </span><span class="val gold">${basePts} pts/payer</span></div>`;
   if (calcWinType === 'zimo') {
     html += `<div class="calc-result-row"><span class="lbl">Zimo — each pays: </span><span class="val pos">+$${money(basePts)}</span></div>`;
     html += `<div class="calc-result-row"><span class="lbl">Winner gets: </span><span class="val gold">+$${money(basePts * 3)}</span></div>`;
@@ -3290,8 +3269,8 @@ function canFormChows(cnt, n) {
   return canFormChows(nc, n - 1);
 }
 
-function detectFanFromHand(hand, bonusTiles) {
-  const det = {};
+function detectFanFromHand(hand) {
+  const det  = {};
   const tiles = Object.entries(hand).flatMap(([k, n]) => Array(n).fill(k));
   const isHonor = k => ['fe','fs','fw','fn','dr','dg','dw'].includes(k);
   const isSuit  = k => ['w','s','t'].includes(k[0]);
@@ -3301,47 +3280,60 @@ function detectFanFromHand(hand, bonusTiles) {
   const cnt     = {};
   tiles.forEach(k => cnt[k] = (cnt[k] || 0) + 1);
 
-  // Dragon / wind pungs — detectable at any count
-  if ((cnt.dr||0)>=3) det.c_dred = true;
-  if ((cnt.dg||0)>=3) det.c_dgrn = true;
-  if ((cnt.dw||0)>=3) det.c_dwht = true;
-  const dp = ['dr','dg','dw'].filter(d=>(cnt[d]||0)>=3).length;
-  const dpr= ['dr','dg','dw'].filter(d=>(cnt[d]||0)===2).length;
-  if (dp===3) det.c_b3d=true; else if (dp===2&&dpr>=1) det.c_s3d=true;
-  const wp = ['fe','fs','fw','fn'].filter(w=>(cnt[w]||0)>=3).length;
-  const wpr= ['fe','fs','fw','fn'].filter(w=>(cnt[w]||0)===2).length;
-  if (wp===4) det.c_b4w=true; else if (wp===3&&wpr>=1) det.c_s4w=true;
-  if (wp>=1) det.c_sw=true;
+  // Dragon pungs — detectable at any count (for s3d/b3d)
+  const dp  = ['dr','dg','dw'].filter(d => (cnt[d]||0) >= 3).length;
+  const dpr = ['dr','dg','dw'].filter(d => (cnt[d]||0) === 2).length;
+  if (dp === 3) det.c_b3d = true;
+  else if (dp === 2 && dpr >= 1) det.c_s3d = true;
 
-  // Pattern detections only meaningful with a full 14-tile hand
+  // Wind pungs (for s4w/b4w)
+  const wp  = ['fe','fs','fw','fn'].filter(w => (cnt[w]||0) >= 3).length;
+  const wpr = ['fe','fs','fw','fn'].filter(w => (cnt[w]||0) === 2).length;
+  if (wp === 4) det.c_b4w = true;
+  else if (wp === 3 && wpr >= 1) det.c_s4w = true;
+
+  // Full 14-tile pattern checks
   if (tiles.length === 14) {
-    if (!suitT.length && honorT.length)                                          det.c_hon  = true;
-    if (!honorT.length && suits.size === 1)                                      det.c_full = true;
-    if (suits.size === 1 && honorT.length && suitT.length)                       det.c_half = true;
-    if (suitT.length && !honorT.length && suitT.every(k=>k[1]==='1'||k[1]==='9')) det.c_term = true;
+    const entries  = Object.entries(cnt);
+    const pairCnt  = entries.filter(([,n]) => n === 2).length;
+    const tripCnt  = entries.filter(([,n]) => n >= 3).length;
+    const kongCnt  = entries.filter(([,n]) => n === 4).length;
 
-    const vals = Object.values(cnt);
-    // Seven Pairs
-    if (Object.keys(cnt).length===7 && vals.every(v=>v===2)) det.c_7p=true;
+    // Suit / flush patterns
+    if (!suitT.length && honorT.length)                                            det.c_hon  = true;
+    if (!honorT.length && suits.size === 1)                                        det.c_full = true;
+    if (suits.size === 1 && honorT.length && suitT.length)                         det.c_half = true;
+
+    // Terminals and Honors: all tiles are 1s, 9s, or honors — must have BOTH
+    const isTermHonor = k => ['fe','fs','fw','fn','dr','dg','dw'].includes(k) || k[1]==='1' || k[1]==='9';
+    if (tiles.every(isTermHonor) && honorT.length > 0 && suitT.some(k => k[1]==='1' || k[1]==='9'))
+      det.c_term = true;
+
+    // Seven Pairs variants (mutually exclusive)
+    if (pairCnt === 7 && entries.length === 7)               det.c_7p     = true; // all pairs, 7 distinct
+    else if (kongCnt === 1 && pairCnt === 5 && entries.length === 6) det.c_7plux  = true; // 1 quad + 5 pairs
+    else if (kongCnt === 2 && pairCnt === 3 && entries.length === 5) det.c_7pdlux = true; // 2 quads + 3 pairs
+    else if (kongCnt === 3 && pairCnt === 1 && entries.length === 4) det.c_7ptlux = true; // 3 quads + 1 pair
+
     // Thirteen Orphans
-    const orphans=['w1','w9','t1','t9','s1','s9','fe','fs','fw','fn','dr','dg','dw'];
-    if (orphans.every(k=>(cnt[k]||0)>=1)) det.c_t13=true;
-    // Nine Gates
-    if (suits.size===1 && !honorT.length) {
-      const su=[...suits][0];
-      const base={[su+'1']:3,[su+'2']:1,[su+'3']:1,[su+'4']:1,[su+'5']:1,[su+'6']:1,[su+'7']:1,[su+'8']:1,[su+'9']:3};
-      if (Object.entries(base).every(([k,v])=>(cnt[k]||0)>=v)) det.c_9g=true;
-    }
-    // All Pungs / Four Concealed Pungs / All Kongs
-    const entries = Object.entries(cnt);
-    const pairCnt = entries.filter(([,n])=>n===2).length;
-    const tripCnt = entries.filter(([,n])=>n>=3).length;
-    const kongCnt = entries.filter(([,n])=>n===4).length;
-    if (pairCnt===1 && tripCnt===4 && entries.length===5) { det.c_pung=true; det.c_4p=true; }
-    if (pairCnt===1 && kongCnt===4 && entries.length===5)   det.c_4k=true;
+    const orphans = ['w1','w9','t1','t9','s1','s9','fe','fs','fw','fn','dr','dg','dw'];
+    if (orphans.every(k => (cnt[k]||0) >= 1)) det.c_t13 = true;
 
-    // Common Hand (平糊): 4 chows + 1 pair, no honor tiles
-    if (!honorT.length && !det.c_7p && !det.c_pung) {
+    // Nine Gates: 1112345678999 + one extra of that suit
+    if (suits.size === 1 && !honorT.length) {
+      const su = [...suits][0];
+      const base = {[su+'1']:3,[su+'2']:1,[su+'3']:1,[su+'4']:1,[su+'5']:1,[su+'6']:1,[su+'7']:1,[su+'8']:1,[su+'9']:3};
+      if (Object.entries(base).every(([k,v]) => (cnt[k]||0) >= v)) det.c_9g = true;
+    }
+
+    // All Triplets
+    if (pairCnt === 1 && tripCnt === 4 && entries.length === 5) det.c_pung = true;
+
+    // Eighteen Arhats (All Kongs): 4 kongs + pair
+    if (pairCnt === 1 && kongCnt === 4 && entries.length === 5) det.c_4k = true;
+
+    // Peace Hand (平糊): 4 chows + 1 pair, no honor tiles
+    if (!honorT.length && !det.c_7p && !det.c_7plux && !det.c_7pdlux && !det.c_7ptlux && !det.c_pung) {
       for (const [pk, pv] of Object.entries(cnt)) {
         if (pv < 2) continue;
         const rem = Object.assign({}, cnt);
@@ -3350,35 +3342,20 @@ function detectFanFromHand(hand, bonusTiles) {
       }
     }
   }
-
-  // Bonus tiles (any count)
-  const bt = bonusTiles||{};
-  const sc = ['h1','h2','h3','h4'].reduce((s,k)=>s+(bt[k]||0),0);
-  if (sc>=4) det.c_as=true;
-  if (sc>0)  det.c_os=true;
-  if (tiles.length>0 && sc===0) det.c_nof=true;
   return det;
 }
 
 function autoDetectFan() {
-  const det = detectFanFromHand(F.hand, F.bonusTiles);
+  const det = detectFanFromHand(F.hand);
 
-  // Zimo auto-toggle based on win type
-  if (!F.fanManual.has('c_zimo')) {
-    if (F.winType==='zimo') det.c_zimo=true; else det.c_zimo=false;
-  }
+  // Seven Pairs variants are mutually exclusive — keep only the highest tier
+  const spTiers = ['c_7ptlux','c_7pdlux','c_7plux','c_7p'];
+  const topTier = spTiers.find(id => det[id]);
+  spTiers.forEach(id => { if (id !== topTier) det[id] = false; });
 
-  // 四暗刻 requires ALL pungs to be concealed — only valid on self-draw (Zimo)
-  if (F.winType !== 'zimo') det.c_4p = false;
-
-  // 四暗刻 subsumes 對對糊 (more specific combination replaces the general one)
-  if (det.c_4p) det.c_pung = false;
-
-  // 小三元 includes the dragon triplet fan scores — don't double-count individual dragon pungs
-  if (det.c_s3d) { det.c_dred = false; det.c_dgrn = false; det.c_dwht = false; }
-
-  // 大三元 includes all three dragon triplet fans
-  if (det.c_b3d) { det.c_dred = false; det.c_dgrn = false; det.c_dwht = false; }
+  // 大三元 subsumes 小三元; 大四喜 subsumes 小四喜
+  if (det.c_b3d) det.c_s3d = false;
+  if (det.c_b4w) det.c_s4w = false;
 
   ALL_COMBOS_FLAT.forEach(({id}) => {
     if (F.fanManual.has(id)) return;
@@ -3390,28 +3367,18 @@ function autoDetectFan() {
 
 function renderFanUI() {
   const fan     = getFanTotal();
-  const basePts = fan < 3 ? 0 : (fan >= 13 ? 1024 : Math.pow(2, fan - 3));
+  // WMT: base pts = direct sum of selected combination values (no exponentiation)
+  const basePts = fan;
   F.basePts     = basePts;
 
-  document.getElementById('d-fan-count-badge').textContent = fan + ' fan';
+  document.getElementById('d-fan-count-badge').textContent = fan + ' pts';
   const ptsEl = document.getElementById('d-base-pts-label');
-  if (fan === 0)    { ptsEl.textContent='—';                      ptsEl.className='fan-pts-val'; }
-  else if (fan < 3) { ptsEl.textContent=`Need ${3-fan} more fan`; ptsEl.className='fan-pts-warn'; }
-  else              { ptsEl.textContent=basePts+' pts/payer';     ptsEl.className='fan-pts-val'; }
+  if (fan === 0) { ptsEl.textContent='—';               ptsEl.className='fan-pts-val'; }
+  else           { ptsEl.textContent=basePts+' pts/payer'; ptsEl.className='fan-pts-val'; }
 
-  // Fan hint near submit button
+  // Hide fan hint (WMT has no minimum fan requirement)
   const hint = document.getElementById('d-fan-hint');
-  if (hint) {
-    const handSize = Object.values(F.hand).reduce((a,b)=>a+b,0);
-    if (fan === 0 && handSize === 0) {
-      hint.style.display = 'none';
-    } else if (fan < 3) {
-      hint.style.display = 'block';
-      hint.textContent = `${fan}/3 fan — tap "＋ Edit combinations" to add more`;
-    } else {
-      hint.style.display = 'none';
-    }
-  }
+  if (hint) hint.style.display = 'none';
 
   const activeList = ALL_COMBOS_FLAT.filter(c => F.fanSel.has(c.id));
   const chipsEl = document.getElementById('d-active-combo-chips');
