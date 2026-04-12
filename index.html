@@ -3092,8 +3092,8 @@ function updateCalcResult() {
     return;
   }
 
-  // HK standard: base points = 2^fan, cap at 13 fan
-  const basePts = fan >= 13 ? 8192 : Math.pow(2, fan);
+  // HK standard: base points = 2^(fan-3), minimum hand (3 fan) = 1 pt
+  const basePts = fan >= 13 ? 1024 : Math.pow(2, fan - 3);
   const money   = n => { const a = n * stake; return (a % 1 === 0 ? a : a.toFixed(2)); };
   const isLimit = fan >= 13;
   let html = '';
@@ -3385,7 +3385,7 @@ function autoDetectFan() {
 
 function renderFanUI() {
   const fan     = getFanTotal();
-  const basePts = fan < 3 ? 0 : (fan >= 13 ? 8192 : Math.pow(2, fan));
+  const basePts = fan < 3 ? 0 : (fan >= 13 ? 1024 : Math.pow(2, fan - 3));
   F.basePts     = basePts;
 
   document.getElementById('d-fan-count-badge').textContent = fan + ' fan';
