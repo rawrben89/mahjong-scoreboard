@@ -1961,7 +1961,7 @@ function showDetail(id) {
   document.getElementById('detail-title').textContent  = t.name;
   // Reset full form state
   F = { winner: null, discarder: null, winType: 'zimo', hand: {}, bonusTiles: {}, fanSel: new Set(), fanManual: new Set(), basePts: 0 };
-  document.getElementById('d-pts-input').value = '';
+
   document.getElementById('d-preview-box').style.display = 'none';
   document.getElementById('d-submit-btn').disabled = true;
   document.getElementById('d-btn-zimo').classList.add('on');
