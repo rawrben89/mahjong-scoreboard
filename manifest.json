@@ -1,0 +1,17 @@
+{
+  "name": "Mahjong Scoreboard",
+  "short_name": "Mahjong",
+  "description": "Hong Kong Mahjong score tracker",
+  "start_url": "/mahjong-scoreboard/",
+  "display": "standalone",
+  "background_color": "#0c1a0c",
+  "theme_color": "#0c1a0c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%230c1a0c'/><text x='96' y='130' font-size='120' text-anchor='middle'>🀄</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
