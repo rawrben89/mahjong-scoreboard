@@ -1219,7 +1219,10 @@
     <div class="form-card">
       <div class="section-label" style="display:flex;justify-content:space-between;align-items:center">
         <span>Hand Tiles 🀄</span>
-        <span id="d-tile-count" style="font-size:10px;color:var(--dim)">0 / 14</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="scan-tile-btn" id="d-scan-btn">📷 Scan</button>
+          <span id="d-tile-count" style="font-size:10px;color:var(--dim)">0 / 14</span>
+        </div>
       </div>
       <div id="d-hand-display" class="hand-display">
         <span class="hand-count-lbl">Tap tiles below to build hand…</span>
@@ -1881,6 +1884,36 @@
     <div class="modal-btns">
       <button class="m-cancel"  id="nt-cancel">Cancel</button>
       <button class="m-confirm" id="nt-create">Create Table</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     MODAL — Camera Scan
+═══════════════════════════════════ -->
+<div id="modal-camera" class="modal-bg">
+  <div class="modal-box" style="max-width:400px">
+    <div class="modal-drag"></div>
+    <h3 style="margin-bottom:10px">📷 Scan Tiles</h3>
+    <div class="camera-preview-wrap">
+      <video id="camera-video" autoplay playsinline muted></video>
+    </div>
+    <canvas id="camera-canvas"></canvas>
+    <div id="camera-status">Position your tiles clearly in the frame</div>
+    <div class="camera-btns">
+      <button class="camera-capture-btn" id="camera-capture">📸 Capture &amp; Analyse</button>
+      <label class="camera-upload-btn" style="text-align:center;cursor:pointer">
+        📂 Upload
+        <input type="file" id="camera-file" accept="image/*" style="display:none">
+      </label>
+    </div>
+    <div class="camera-apikey-row">
+      <span>Gemini key:</span>
+      <input type="password" id="camera-apikey" placeholder="Paste your free Gemini API key">
+      <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent);white-space:nowrap;font-size:11px">Get key ↗</a>
+    </div>
+    <div class="modal-btns" style="margin-top:10px">
+      <button class="m-cancel" id="camera-cancel">Cancel</button>
     </div>
   </div>
 </div>
@@ -3478,6 +3511,105 @@ function renderFullComboList() {
     </div>`
   ).join('');
 }
+
+/* ═══════════════════════════════════════
+   CAMERA SCAN
+═══════════════════════════════════════ */
+let cameraStream = null;
+
+function setCameraStatus(msg, cls) {
+  const el = document.getElementById('camera-status');
+  el.innerHTML = msg;
+  el.className = cls || '';
+}
+
+function stopCamera() {
+  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+}
+
+async function openCameraModal() {
+  document.getElementById('camera-apikey').value = localStorage.getItem('gemini-key') || '';
+  setCameraStatus('Starting camera\u2026');
+  document.getElementById('modal-camera').classList.add('show');
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 } }
+    });
+    document.getElementById('camera-video').srcObject = cameraStream;
+    setCameraStatus('Position your tiles clearly in the frame');
+  } catch (e) {
+    setCameraStatus('Camera unavailable \u2014 use Upload instead', 'err');
+  }
+}
+
+function closeCameraModal() {
+  stopCamera();
+  document.getElementById('modal-camera').classList.remove('show');
+}
+
+async function analyseImage(dataUrl) {
+  const key = document.getElementById('camera-apikey').value.trim();
+  if (!key) { setCameraStatus('Enter your Gemini API key below', 'err'); return; }
+  localStorage.setItem('gemini-key', key);
+  setCameraStatus('Analysing tiles\u2026');
+  document.getElementById('camera-capture').disabled = true;
+
+  const base64   = dataUrl.split(',')[1];
+  const mimeType = dataUrl.match(/data:(image\/[^;]+)/)?.[1] || 'image/jpeg';
+  const prompt   = 'You are a mahjong tile expert. Identify every tile visible in this image.\n\nUse these exact codes:\nCharacters/\u842c: w1 w2 w3 w4 w5 w6 w7 w8 w9\nBamboo/\u7af9: s1 s2 s3 s4 s5 s6 s7 s8 s9\nCircles/\u7b52: t1 t2 t3 t4 t5 t6 t7 t8 t9\nEast/\u6771: fe  South/\u5357: fs  West/\u897f: fw  North/\u5317: fn\nRed Dragon/\u4e2d: dr  Green Dragon/\u767c: dg  White Dragon/\u767d: dw\nBonus tiles: h1 h2 h3 h4\n\nCount each tile you see clearly. Return ONLY a raw JSON object, no markdown. Example: {"w1":2,"s3":1,"t5":3}';
+
+  try {
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ contents:[{ parts:[{text:prompt},{inline_data:{mime_type:mimeType,data:base64}}]}],
+          generationConfig:{temperature:0,maxOutputTokens:200} }) }
+    );
+    if (!resp.ok) { const e=await resp.json().catch(()=>({})); throw new Error(e?.error?.message||'API error '+resp.status); }
+    const data = await resp.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const m    = text.match(/\{[^}]+\}/);
+    if (!m) throw new Error('No tiles detected in response');
+    applyScannedTiles(JSON.parse(m[0]));
+  } catch(e) {
+    setCameraStatus('Error: ' + e.message, 'err');
+  } finally {
+    document.getElementById('camera-capture').disabled = false;
+  }
+}
+
+function applyScannedTiles(tileMap) {
+  const BONUS  = new Set(['h1','h2','h3','h4']);
+  const VALID  = new Set(['w1','w2','w3','w4','w5','w6','w7','w8','w9','s1','s2','s3','s4','s5','s6','s7','s8','s9','t1','t2','t3','t4','t5','t6','t7','t8','t9','fe','fs','fw','fn','dr','dg','dw','h1','h2','h3','h4']);
+  F.hand = {}; F.bonusTiles = {}; F.fanManual = new Set();
+  document.querySelectorAll('#d-tile-picker .picker-btn').forEach(b => { b.classList.remove('has-cnt'); b.querySelector('.p-cnt').textContent = ''; });
+  let total = 0;
+  Object.entries(tileMap).forEach(([k, v]) => {
+    if (!VALID.has(k)) return;
+    const n = Math.min(4, Math.max(1, parseInt(v)||1));
+    if (BONUS.has(k)) { F.bonusTiles[k] = n; }
+    else { if (total + n > 14) return; F.hand[k] = n; total += n; }
+    const btn = document.querySelector(`#d-tile-picker .picker-btn[data-key="${k}"]`);
+    if (btn) { btn.classList.add('has-cnt'); btn.querySelector('.p-cnt').textContent = n > 1 ? n : ''; }
+  });
+  setCameraStatus(`\u2705 Detected ${total} tiles \u2014 review below`, 'ok');
+  updateHandDisplay(); autoDetectFan();
+  setTimeout(closeCameraModal, 1200);
+}
+
+document.getElementById('d-scan-btn').addEventListener('click', openCameraModal);
+document.getElementById('camera-cancel').addEventListener('click', closeCameraModal);
+document.getElementById('modal-camera').addEventListener('click', e => { if (e.target===document.getElementById('modal-camera')) closeCameraModal(); });
+document.getElementById('camera-capture').addEventListener('click', () => {
+  const v=document.getElementById('camera-video'), cv=document.getElementById('camera-canvas');
+  cv.width=v.videoWidth||640; cv.height=v.videoHeight||480;
+  cv.getContext('2d').drawImage(v,0,0);
+  analyseImage(cv.toDataURL('image/jpeg',0.85));
+});
+document.getElementById('camera-file').addEventListener('change', e => {
+  const f=e.target.files?.[0]; if(!f) return;
+  const r=new FileReader(); r.onload=ev=>analyseImage(ev.target.result); r.readAsDataURL(f); e.target.value='';
+});
 
 /* ═══════════════════════════════════════
    INIT
