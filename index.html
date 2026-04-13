@@ -73,10 +73,11 @@
     .archive-wrap .archive-card { margin:0; width:100%; box-sizing:border-box; border-radius:var(--radius); transition:transform .2s; cursor:default; position:relative; z-index:1; }
     .archive-del-reveal { position:absolute; top:0; right:0; bottom:0; width:80px; display:flex; align-items:center; justify-content:center; background:var(--red); border-radius:0 var(--radius) var(--radius) 0; }
     .archive-del-reveal button { background:none; border:none; color:#fff; font-size:13px; font-weight:700; cursor:pointer; padding:8px; }
-    /* Desktop inline delete button — hidden on touch devices */
-    .archive-del-btn { display:none; background:none; border:1px solid var(--red); color:var(--red); border-radius:7px; font-size:11px; font-weight:700; cursor:pointer; padding:3px 9px; white-space:nowrap; }
+    /* Desktop: always show red delete reveal, hide the inline outlined button */
+    .archive-del-btn { display:none; }
     @media (hover:hover) and (pointer:fine) {
-      .archive-del-btn { display:inline-block; }
+      .archive-wrap .archive-card { margin-right:80px; border-radius:var(--radius) 0 0 var(--radius); transition:none; }
+      .archive-del-reveal { border-radius:0 var(--radius) var(--radius) 0; }
     }
 
     /* ── Archive cards ── */
@@ -3623,7 +3624,6 @@ function renderArchives() {
           <div class="archive-card-head">
             <span class="archive-card-name">${esc(a.name)}</span>
             <span class="archive-card-date">${a.date} · ${a.rounds} rounds</span>
-            <button class="archive-del-btn" data-del-aidx="${idx}">Delete</button>
           </div>
           <div class="archive-scores">${chips}</div>
         </div>
