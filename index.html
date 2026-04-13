@@ -1124,7 +1124,7 @@
       </div>
     </div>
     <div id="d-stake-row" class="stake-row">
-      <label>💰 Bet per point</label>
+      <label>💰 Bet per fan</label>
       <input id="d-stake-input" type="number" class="stake-input" min="0.25" step="0.25" inputmode="decimal" value="0.25">
       <span id="d-stake-saved" style="font-size:11px;color:var(--dim);min-width:32px;text-align:right"></span>
     </div>
@@ -1761,7 +1761,7 @@
     </div>
     <!-- Stake -->
     <div class="stake-row" style="margin-bottom:10px">
-      <label>💰 Bet per point ($)</label>
+      <label>💰 Bet per fan ($)</label>
       <input id="calc-stake" type="number" class="stake-input" min="0.25" step="0.25" inputmode="decimal" value="0.25">
     </div>
     <!-- Calc groups injected by JS -->
@@ -1804,7 +1804,7 @@
       <input id="nt-name" class="modal-input full" placeholder="Table name (e.g. Table 1)" maxlength="30">
     </div>
     <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
-      <span style="font-size:12px;color:var(--dim);flex:1">Bet per point ($)</span>
+      <span style="font-size:12px;color:var(--dim);flex:1">Bet per fan ($)</span>
       <input id="nt-stake" type="number" class="modal-input" style="width:90px;text-align:center;color:var(--gold)" placeholder="0.25" min="0.25" step="0.25" inputmode="decimal">
     </div>
     <div class="modal-input-grid">
@@ -3079,13 +3079,9 @@ function updateCalcResult() {
     detail.innerHTML = `<span style="color:var(--dim);font-size:12px">Select combinations above</span>`;
     return;
   }
-  if (fan < 3) {
-    detail.innerHTML = `<span style="color:var(--red);font-size:12px">Minimum 3 fan required to win</span>`;
-    return;
-  }
-  const basePts = Math.pow(2, fan - 3);
+  const basePts = fan;
   const money   = n => { const a = n * stake; return (a % 1 === 0 ? a : a.toFixed(2)); };
-  let html = `<div class="calc-result-row"><span class="lbl">Base pts: </span><span class="val gold">${basePts} pts/payer</span></div>`;
+  let html = `<div class="calc-result-row"><span class="lbl">Base: </span><span class="val gold">${basePts} fan/payer</span></div>`;
   if (calcWinType === 'zimo') {
     html += `<div class="calc-result-row"><span class="lbl">Zimo — each pays: </span><span class="val pos">+$${money(basePts)}</span></div>`;
     html += `<div class="calc-result-row"><span class="lbl">Winner gets: </span><span class="val gold">+$${money(basePts * 3)}</span></div>`;
@@ -3371,18 +3367,16 @@ function renderFanUI() {
   const comboFan   = getFanTotal();
   const bonusCount = Object.values(F.bonusTiles).reduce((a, b) => a + b, 0);
   const fan        = comboFan + bonusCount;
-  const basePts    = fan < 3 ? 0 : Math.pow(2, fan - 3);
+  const basePts    = fan;
   F.basePts        = basePts;
 
   document.getElementById('d-fan-count-badge').textContent = fan + ' fan';
   const ptsEl = document.getElementById('d-base-pts-label');
-  if (fan === 0)      { ptsEl.textContent = '—';                  ptsEl.className = 'fan-pts-val'; }
-  else if (fan < 3)   { ptsEl.textContent = 'Need 3+ fan to win'; ptsEl.className = 'fan-pts-val'; }
-  else                { ptsEl.textContent = basePts + ' pts/payer'; ptsEl.className = 'fan-pts-val pos'; }
+  if (fan === 0) { ptsEl.textContent = '—';                 ptsEl.className = 'fan-pts-val'; }
+  else           { ptsEl.textContent = fan + ' fan/payer';  ptsEl.className = 'fan-pts-val pos'; }
 
-  // Min 3 fan hint
   const hint = document.getElementById('d-fan-hint');
-  if (hint) hint.style.display = (fan > 0 && fan < 3) ? '' : 'none';
+  if (hint) hint.style.display = 'none';
 
   const activeList = ALL_COMBOS_FLAT.filter(c => F.fanSel.has(c.id));
   const chipsEl = document.getElementById('d-active-combo-chips');
