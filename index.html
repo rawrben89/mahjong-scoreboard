@@ -68,24 +68,30 @@
     .wind-west  { background:#4a3200; color:#ffd54f; }
     .wind-north { background:#1a2e5a; color:#90caf9; }
 
-    /* ── Archive swipe-delete ── */
-    .archive-wrap { position:relative; overflow:hidden; margin:0 12px 10px; border-radius:var(--radius); }
-    .archive-wrap .archive-card { margin:0; width:100%; box-sizing:border-box; border-radius:var(--radius); transition:transform .2s; cursor:default; position:relative; z-index:1; }
-    .archive-del-reveal { position:absolute; top:0; right:0; bottom:0; width:80px; display:flex; align-items:center; justify-content:center; background:var(--red); border-radius:0 var(--radius) var(--radius) 0; }
-    .archive-del-reveal button { background:none; border:none; color:#fff; font-size:13px; font-weight:700; cursor:pointer; padding:8px; }
-    /* Desktop: always show red delete reveal, hide the inline outlined button */
-    .archive-del-btn { display:none; }
-    @media (hover:hover) and (pointer:fine) {
-      .archive-wrap .archive-card { margin-right:80px; border-radius:var(--radius) 0 0 var(--radius); transition:none; }
-      .archive-del-reveal { border-radius:0 var(--radius) var(--radius) 0; }
-    }
-
     /* ── Archive cards ── */
     .archive-section-lbl { font-size:11px; color:var(--dim); padding:12px 14px 6px; letter-spacing:.5px; text-transform:uppercase; }
-    .archive-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); margin:0 12px 10px; padding:12px 14px; opacity:.8; }
-    .archive-card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+    .archive-card { border:1px solid var(--border); border-radius:var(--radius); margin:0 12px 10px; padding:12px 14px; }
+    .archive-card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; gap:8px; }
     .archive-card-name { font-size:14px; font-weight:700; color:var(--text); }
-    .archive-card-date { font-size:11px; color:var(--dim); }
+    .archive-card-date { font-size:11px; color:var(--dim); flex:1; text-align:right; }
+
+    /* Desktop: red Delete button always visible, no swipe */
+    .archive-del-btn { display:none; background:var(--red); border:none; color:#fff; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; padding:5px 12px; white-space:nowrap; }
+
+    /* Mobile: darker card background + swipe-to-delete */
+    .archive-wrap { position:relative; overflow:hidden; margin:0 12px 10px; border-radius:var(--radius); }
+    .archive-wrap .archive-card { margin:0; width:100%; box-sizing:border-box; border-radius:var(--radius); transition:transform .2s; cursor:default; position:relative; z-index:1; background:#0a1208; border-color:#1e321e; }
+    .archive-del-reveal { position:absolute; top:0; right:0; bottom:0; width:80px; display:flex; align-items:center; justify-content:center; background:var(--red); border-radius:0 var(--radius) var(--radius) 0; }
+    .archive-del-reveal button { background:none; border:none; color:#fff; font-size:13px; font-weight:700; cursor:pointer; padding:8px; }
+
+    @media (hover:hover) and (pointer:fine) {
+      /* Desktop overrides */
+      .archive-del-btn { display:inline-block; }
+      .archive-wrap { overflow:visible; position:static; margin:0 12px 10px; border-radius:var(--radius); }
+      .archive-wrap .archive-card { background:var(--surface); border-color:var(--border); transform:none !important; transition:none; z-index:auto; position:static; width:auto; }
+      .archive-del-reveal { display:none !important; }
+      .archive-card { margin:0; }
+    }
     .archive-scores { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
     .archive-score-chip { font-size:12px; background:var(--surface2); border-radius:6px; padding:3px 8px; }
 
@@ -3624,6 +3630,7 @@ function renderArchives() {
           <div class="archive-card-head">
             <span class="archive-card-name">${esc(a.name)}</span>
             <span class="archive-card-date">${a.date} · ${a.rounds} rounds</span>
+            <button class="archive-del-btn" data-del-aidx="${idx}">Delete</button>
           </div>
           <div class="archive-scores">${chips}</div>
         </div>
