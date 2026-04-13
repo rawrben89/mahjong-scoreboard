@@ -101,6 +101,19 @@
     .history-hand-tiles .hand-tile { width:24px; height:32px; }
     .history-hand-tiles .hand-tile img { width:100%; height:100%; object-fit:contain; }
 
+    /* ── Player Stats view ── */
+    #view-stats { display:none; }
+    .stats-player-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); margin:0 0 12px; padding:14px; }
+    .stats-player-name { font-size:16px; font-weight:700; color:var(--text); margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+    .stats-row { display:flex; justify-content:space-between; align-items:baseline; padding:6px 0; border-bottom:1px solid var(--border); }
+    .stats-row:last-child { border-bottom:none; }
+    .stats-lbl { font-size:12px; color:var(--dim); }
+    .stats-val { font-size:13px; font-weight:600; color:var(--text); text-align:right; max-width:65%; }
+    .stats-val.hi { color:var(--accent); }
+    .stats-sub { font-size:11px; color:var(--dim); font-weight:400; margin-left:4px; }
+    .stats-empty { text-align:center; color:var(--dim); font-size:14px; padding:60px 20px; line-height:1.7; }
+    .stats-section-lbl { font-size:11px; color:var(--dim); padding:16px 0 8px; letter-spacing:.5px; text-transform:uppercase; }
+
     /* ── Shared Header ── */
     .app-header {
       background: var(--surface);
@@ -1134,6 +1147,7 @@
         <button class="spin-open-btn" id="btn-open-calc">🧮 Calc</button>
         <button class="spin-open-btn" id="btn-open-combined">📊 All Scores</button>
         <button class="spin-open-btn" id="btn-open-spinner">🌀🎲 Spin/Dice</button>
+        <button class="spin-open-btn" id="btn-open-stats">📈 Stats</button>
         <button class="help-open-btn" id="btn-help">❓ Help</button>
       </div>
     </div>
@@ -1285,6 +1299,18 @@
     <button class="tab-btn"        data-dtab="history"> <span>📜</span>History</button>
     <button class="tab-btn"        data-dtab="players"> <span>👥</span>Players</button>
   </nav>
+</div>
+
+<!-- ═══════════════════════════════════
+     STATS VIEW
+═══════════════════════════════════ -->
+<div id="view-stats">
+  <div class="app-header">
+    <button class="back-btn" id="btn-stats-back">← Back</button>
+    <div class="title"><h1>📈 Player Stats</h1></div>
+    <div style="width:60px"></div>
+  </div>
+  <div style="padding:14px 14px 80px" id="stats-body"></div>
 </div>
 
 <!-- ═══════════════════════════════════
@@ -2010,6 +2036,7 @@ function showMain() {
   document.getElementById('view-spinner').style.display  = 'none';
   document.getElementById('view-combined').style.display = 'none';
   document.getElementById('view-calc').style.display     = 'none';
+  document.getElementById('view-stats').style.display    = 'none';
   currentId = null;
   renderMain();
 }
@@ -3694,6 +3721,108 @@ document.getElementById('modal-wind').addEventListener('click', e => {
     document.getElementById('modal-wind').classList.remove('show');
 });
 document.getElementById('btn-set-winds').addEventListener('click', openWindModal);
+
+
+/* ═══════════════════════════════════════
+   PLAYER STATS VIEW
+═══════════════════════════════════════ */
+function computePlayerStats() {
+  // Gather all history records from active tables
+  const allRounds = [];
+  (S.tables || []).forEach(t => {
+    (t.history || []).forEach(r => {
+      allRounds.push({ r, tablePlayers: t.players });
+    });
+  });
+  if (!allRounds.length) return null;
+
+  // All unique players across active tables
+  const playerSet = new Set();
+  (S.tables || []).forEach(t => (t.players || []).forEach(p => playerSet.add(p)));
+
+  const stats = {};
+  playerSet.forEach(p => {
+    stats[p] = { wins: 0, totalRounds: 0, totalFan: 0, comboCount: {} };
+  });
+
+  allRounds.forEach(({ r, tablePlayers }) => {
+    // Every player in the table participated in this round
+    tablePlayers.forEach(p => { if (stats[p]) stats[p].totalRounds++; });
+    // Winner stats
+    const ws = stats[r.winner];
+    if (ws) {
+      ws.wins++;
+      ws.totalFan += (r.fan || 0);
+      (r.combos || []).forEach(cid => {
+        ws.comboCount[cid] = (ws.comboCount[cid] || 0) + 1;
+      });
+    }
+  });
+
+  return stats;
+}
+
+function renderStats() {
+  const stats = computePlayerStats();
+  const body  = document.getElementById('stats-body');
+
+  if (!stats || !Object.keys(stats).length) {
+    body.innerHTML = '<div class="stats-empty">No round history yet.<br>Play some rounds to see player stats!</div>';
+    return;
+  }
+
+  // Sort by win rate descending
+  const players = Object.keys(stats).sort((a, b) => {
+    const ra = stats[a].totalRounds > 0 ? stats[a].wins / stats[a].totalRounds : 0;
+    const rb = stats[b].totalRounds > 0 ? stats[b].wins / stats[b].totalRounds : 0;
+    return rb - ra;
+  });
+
+  body.innerHTML = '<div class="stats-section-lbl">All Active Tables · Combined</div>' +
+    players.map(p => {
+      const s = stats[p];
+      const winRate = s.totalRounds > 0
+        ? ((s.wins / s.totalRounds) * 100).toFixed(0)
+        : 0;
+      const avgFan = s.wins > 0 ? (s.totalFan / s.wins).toFixed(1) : null;
+
+      // Most common combo
+      let topCombo = '—';
+      const entries = Object.entries(s.comboCount);
+      if (entries.length) {
+        const topId  = entries.sort((a, b) => b[1] - a[1])[0][0];
+        const item   = ALL_COMBOS_FLAT.find(x => x.id === topId);
+        topCombo = item ? item.name : topId;
+      }
+
+      return `<div class="stats-player-card">
+        <div class="stats-player-name">${esc(p)}</div>
+        <div class="stats-row">
+          <span class="stats-lbl">Win Rate</span>
+          <span class="stats-val hi">${winRate}%<span class="stats-sub">${s.wins}/${s.totalRounds} rounds</span></span>
+        </div>
+        <div class="stats-row">
+          <span class="stats-lbl">Avg Fan per Win</span>
+          <span class="stats-val">${avgFan !== null ? avgFan + ' fan' : '—'}</span>
+        </div>
+        <div class="stats-row">
+          <span class="stats-lbl">Favourite Hand</span>
+          <span class="stats-val">${topCombo}</span>
+        </div>
+      </div>`;
+    }).join('');
+}
+
+function showStats() {
+  ['view-main','view-detail','view-help','view-spinner','view-combined','view-calc'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  document.getElementById('view-stats').style.display = 'block';
+  renderStats();
+}
+
+document.getElementById('btn-open-stats').addEventListener('click', showStats);
+document.getElementById('btn-stats-back').addEventListener('click', showMain);
 
 /* ═══════════════════════════════════════
    INIT
