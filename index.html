@@ -48,12 +48,31 @@
 
 
 
+    /* ── Wind assign modal ── */
+    #modal-wind .modal-box { max-width: 320px; }
+    .wind-assign-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); }
+    .wind-assign-row:last-child { border-bottom:none; }
+    .wind-assign-name { font-size:14px; flex:1; }
+    .wind-assign-sel { display:flex; gap:6px; }
+    .wind-assign-btn { width:34px; height:34px; border-radius:8px; border:1.5px solid var(--border); background:var(--surface2); font-size:14px; font-weight:700; cursor:pointer; }
+    .wind-assign-btn.on { border-color:transparent; }
+    .wind-assign-btn.on.wind-east  { background:#8B0000; color:#fff; }
+    .wind-assign-btn.on.wind-south { background:#1a5c1a; color:#fff; }
+    .wind-assign-btn.on.wind-west  { background:#4a3200; color:#ffd54f; }
+    .wind-assign-btn.on.wind-north { background:#1a2e5a; color:#90caf9; }
+
     /* ── Wind Badges ── */
     .wind-badge { display:inline-block; font-size:11px; font-weight:700; border-radius:5px; padding:1px 6px; margin-bottom:3px; }
     .wind-east  { background:#8B0000; color:#fff; }
     .wind-south { background:#1a5c1a; color:#fff; }
     .wind-west  { background:#4a3200; color:#ffd54f; }
     .wind-north { background:#1a2e5a; color:#90caf9; }
+
+    /* ── Archive swipe-delete ── */
+    .archive-wrap { position:relative; overflow:hidden; margin:0 12px 10px; border-radius:var(--radius); }
+    .archive-wrap .archive-card { margin:0; border-radius:var(--radius); transition:transform .2s; cursor:default; }
+    .archive-del-reveal { position:absolute; top:0; right:0; bottom:0; width:80px; display:flex; align-items:center; justify-content:center; background:var(--red); border-radius:0 var(--radius) var(--radius) 0; }
+    .archive-del-reveal button { background:none; border:none; color:#fff; font-size:13px; font-weight:700; cursor:pointer; padding:8px; }
 
     /* ── Archive cards ── */
     .archive-section-lbl { font-size:11px; color:var(--dim); padding:12px 14px 6px; letter-spacing:.5px; text-transform:uppercase; }
@@ -81,9 +100,6 @@
     .history-hand-tiles.open { display:flex; }
     .history-hand-tiles .hand-tile { width:24px; height:32px; }
     .history-hand-tiles .hand-tile img { width:100%; height:100%; object-fit:contain; }
-
-    /* ── Sound toggle ── */
-    #sound-toggle { position:fixed; bottom:70px; right:12px; background:var(--surface); border:1px solid var(--border); border-radius:50%; width:36px; height:36px; font-size:16px; cursor:pointer; z-index:90; display:flex; align-items:center; justify-content:center; }
 
     /* ── Shared Header ── */
     .app-header {
@@ -1176,7 +1192,8 @@
     </div>
     <div id="d-players-grid" class="players-grid"></div>
     <div class="scores-action-row" style="padding:0 0 4px">
-      <button class="score-action-btn" id="btn-share-scores">&#x1F4E4; Share Results</button>
+      <button class="score-action-btn" id="btn-set-winds">&#x1F9ED; Set Winds</button>
+      <button class="score-action-btn" id="btn-share-scores">&#x1F4E4; Share</button>
       <button class="score-action-btn danger" id="btn-end-game">&#x1F3C1; End Game</button>
     </div>
   </div>
@@ -1872,6 +1889,22 @@
 </div>
 
 <!-- ═══════════════════════════════════
+     MODAL — Wind Assignment
+═══════════════════════════════════ -->
+<div id="modal-wind" class="modal-bg">
+  <div class="modal-box">
+    <div class="modal-drag"></div>
+    <h3 style="margin-bottom:12px">&#x1F9ED; Assign Winds</h3>
+    <p style="font-size:12px;color:var(--dim);margin-bottom:12px">Tap a wind to assign it to a player. Each wind can only be held by one player.</p>
+    <div id="wind-assign-rows"></div>
+    <div class="modal-btns" style="margin-top:12px">
+      <button class="m-cancel" id="wind-cancel">Cancel</button>
+      <button class="m-confirm" id="wind-confirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
      MODAL — Confirm
 ═══════════════════════════════════ -->
 <div id="modal-confirm" class="modal-bg">
@@ -1886,7 +1919,6 @@
 </div>
 
 <div id="toast" class="toast"></div>
-<button id="sound-toggle" title="Toggle sound">🔊</button>
 
 <script>
 'use strict';
@@ -2418,7 +2450,6 @@ document.getElementById('d-submit-btn').addEventListener('click', () => {
     t.eastIdx = ((t.eastIdx || 0) + 1) % 4;
   }
   saveState();
-  playSound('win');
 
   const roundNum = record.round;
   F = { winner: null, discarder: null, winType: 'zimo', hand: {}, bonusTiles: {}, fanSel: new Set(), fanManual: new Set(), basePts: 0 };
@@ -3244,7 +3275,6 @@ function initRoundTilePicker() {
   picker.addEventListener('click', e => {
     const btn = e.target.closest('.picker-btn');
     if (!btn) return;
-    playSound('tile');
     const key = btn.dataset.key;
     const isBonus = btn.dataset.bonus === '1';
     const dict = isBonus ? F.bonusTiles : F.hand;
@@ -3548,60 +3578,123 @@ function renderArchives() {
   const container = document.getElementById('archives-container');
   if (!S.archives || !S.archives.length) { container.innerHTML = ''; return; }
   container.innerHTML = '<div class="archive-section-lbl">Past Games</div>' +
-    S.archives.map(a => {
+    S.archives.map((a, idx) => {
       const sorted = [...a.players].sort((x,y) => (a.scores[y]||0)-(a.scores[x]||0));
       const chips  = sorted.map(p => {
         const sc = a.scores[p]||0;
         const cls = sc>0?'color:var(--accent)':sc<0?'color:var(--red)':'';
         return `<span class="archive-score-chip" style="${cls}">${esc(p)}: ${sc>0?'+':''}${sc}</span>`;
       }).join('');
-      return `<div class="archive-card">
-        <div class="archive-card-head">
-          <span class="archive-card-name">${esc(a.name)}</span>
-          <span class="archive-card-date">${a.date} · ${a.rounds} rounds</span>
+      return `<div class="archive-wrap" data-aidx="${idx}">
+        <div class="archive-del-reveal"><button data-del-aidx="${idx}">Delete</button></div>
+        <div class="archive-card">
+          <div class="archive-card-head">
+            <span class="archive-card-name">${esc(a.name)}</span>
+            <span class="archive-card-date">${a.date} · ${a.rounds} rounds</span>
+          </div>
+          <div class="archive-scores">${chips}</div>
         </div>
-        <div class="archive-scores">${chips}</div>
       </div>`;
     }).join('');
+
+  // Swipe-to-delete touch logic
+  document.querySelectorAll('.archive-wrap').forEach(wrap => {
+    const card = wrap.querySelector('.archive-card');
+    let startX = 0, dx = 0, swiped = false;
+    wrap.addEventListener('touchstart', e => {
+      startX = e.touches[0].clientX; dx = 0; swiped = false;
+    }, { passive: true });
+    wrap.addEventListener('touchmove', e => {
+      dx = e.touches[0].clientX - startX;
+      if (dx < 0) { card.style.transform = `translateX(${Math.max(dx,-80)}px)`; card.style.transition='none'; }
+    }, { passive: true });
+    wrap.addEventListener('touchend', () => {
+      card.style.transition = 'transform .2s';
+      if (dx < -50) { card.style.transform = 'translateX(-80px)'; swiped = true; }
+      else { card.style.transform = ''; swiped = false; }
+    });
+  });
+
+  // Delete button click
+  document.getElementById('archives-container').addEventListener('click', e => {
+    const btn = e.target.closest('[data-del-aidx]');
+    if (!btn) return;
+    const idx = parseInt(btn.dataset.delAidx);
+    const a   = S.archives[idx];
+    if (!a) return;
+    showConfirm('Delete past game?', `"${a.name}" will be permanently removed from Past Games.`, () => {
+      S.archives.splice(idx, 1);
+      saveState();
+      renderArchives();
+      renderMain();
+    });
+  });
 }
 
-/* ── Sounds ── */
-let soundOn = localStorage.getItem('sound') !== '0';
-document.getElementById('sound-toggle').textContent = soundOn ? '🔊' : '🔇';
-document.getElementById('sound-toggle').addEventListener('click', () => {
-  soundOn = !soundOn;
-  localStorage.setItem('sound', soundOn ? '1' : '0');
-  document.getElementById('sound-toggle').textContent = soundOn ? '🔊' : '🔇';
+
+/* ── Wind Assignment ── */
+let windDraft = []; // windDraft[playerIdx] = windOffset (0=E,1=S,2=W,3=N)
+
+function openWindModal() {
+  const t = tableById(currentId);
+  if (!t) return;
+  const ei = t.eastIdx || 0;
+  windDraft = t.players.map((_, i) => (i - ei + 4) % 4);
+  renderWindAssignRows(t);
+  document.getElementById('modal-wind').classList.add('show');
+}
+
+function renderWindAssignRows(t) {
+  const WLBL = ['東','南','西','北'];
+  const WCLS = ['east','south','west','north'];
+  document.getElementById('wind-assign-rows').innerHTML = t.players.map((p, pi) => {
+    const btns = WLBL.map((lbl, wi) =>
+      `<button class="wind-assign-btn ${windDraft[pi]===wi?'on wind-'+WCLS[wi]:''}" data-pi="${pi}" data-wi="${wi}">${lbl}</button>`
+    ).join('');
+    return `<div class="wind-assign-row">
+      <span class="wind-assign-name">${esc(p)}</span>
+      <div class="wind-assign-sel">${btns}</div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('wind-assign-rows').addEventListener('click', e => {
+  const btn = e.target.closest('.wind-assign-btn');
+  if (!btn) return;
+  const t  = tableById(currentId);
+  const pi = parseInt(btn.dataset.pi);
+  const wi = parseInt(btn.dataset.wi);
+  // Swap: find who currently has this wind and give them pi's wind
+  const prevOwner = windDraft.indexOf(wi);
+  if (prevOwner >= 0 && prevOwner !== pi) {
+    windDraft[prevOwner] = windDraft[pi]; // give them the displaced wind
+  }
+  windDraft[pi] = wi;
+  renderWindAssignRows(t);
 });
 
-let _ac = null;
-function getAC() {
-  if (!_ac) _ac = new (window.AudioContext || window.webkitAudioContext)();
-  return _ac;
-}
-function playSound(type) {
-  if (!soundOn) return;
-  try {
-    const ac = getAC();
-    if (type === 'tile') {
-      const o = ac.createOscillator(), g = ac.createGain();
-      o.connect(g); g.connect(ac.destination);
-      o.type='sine'; o.frequency.setValueAtTime(900,ac.currentTime);
-      g.gain.setValueAtTime(.15,ac.currentTime); g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.06);
-      o.start(); o.stop(ac.currentTime+.06);
-    } else if (type === 'win') {
-      [[523,.0],[659,.12],[784,.24],[1047,.38]].forEach(([freq,t]) => {
-        const o=ac.createOscillator(), g=ac.createGain();
-        o.connect(g); g.connect(ac.destination);
-        o.type='sine'; o.frequency.value=freq;
-        g.gain.setValueAtTime(0,ac.currentTime+t);
-        g.gain.linearRampToValueAtTime(.25,ac.currentTime+t+.04);
-        g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+t+.35);
-        o.start(ac.currentTime+t); o.stop(ac.currentTime+t+.35);
-      });
-    }
-  } catch(e) {}
-}
+document.getElementById('wind-confirm').addEventListener('click', () => {
+  const t = tableById(currentId);
+  if (!t) return;
+  // eastIdx = index of player with windOffset 0 (East)
+  const eastPlayer = windDraft.indexOf(0);
+  if (eastPlayer >= 0) t.eastIdx = eastPlayer;
+  saveState();
+  document.getElementById('modal-wind').classList.remove('show');
+  renderDScores();
+  renderWindBar();
+  toast('Winds updated!');
+});
+
+document.getElementById('wind-cancel').addEventListener('click', () => {
+  document.getElementById('modal-wind').classList.remove('show');
+});
+document.getElementById('modal-wind').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-wind'))
+    document.getElementById('modal-wind').classList.remove('show');
+});
+document.getElementById('btn-set-winds').addEventListener('click', openWindModal);
+
 /* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
