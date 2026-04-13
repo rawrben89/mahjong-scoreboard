@@ -1853,7 +1853,10 @@ function loadState() {
     const raw = localStorage.getItem('hk-mahjong-v3');
     if (raw) S = JSON.parse(raw);
     // Migrate older tables that don't have a stake field
-    S.tables.forEach(t => { if (!t.stake) t.stake = 0.25; });
+    S.tables.forEach(t => {
+      if (!t.stake) t.stake = 0.25;
+      if (t.usePoints === undefined) t.usePoints = true;
+    });
   } catch (_) {}
 }
 function saveState() {
@@ -2096,6 +2099,14 @@ document.getElementById('btn-new-table').addEventListener('click', () => {
   document.getElementById('nt-stake').value = '1';
   document.getElementById('modal-newtable').classList.add('show');
   document.getElementById('nt-name').focus();
+});
+document.getElementById('nt-pts-toggle').addEventListener('click', e => {
+  const btn = e.target.closest('.pts-fan-btn');
+  if (!btn) return;
+  document.querySelectorAll('#nt-pts-toggle .pts-fan-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('nt-stake-lbl').textContent =
+    btn.dataset.mode === 'pts' ? 'Bet per point ($)' : 'Bet per fan ($)';
 });
 document.getElementById('nt-cancel').addEventListener('click', () => {
   document.getElementById('modal-newtable').classList.remove('show');
@@ -2478,6 +2489,19 @@ function saveStakeInput() {
   const lbl = document.getElementById('d-stake-saved');
   if (lbl) { lbl.textContent = 'Saved'; setTimeout(() => { lbl.textContent = ''; }, 1200); }
 }
+document.getElementById('d-pts-toggle').addEventListener('click', e => {
+  const btn = e.target.closest('.pts-fan-btn');
+  if (!btn) return;
+  const t = tableById(currentId);
+  if (!t) return;
+  t.usePoints = btn.dataset.mode !== 'fan';
+  saveState();
+  document.querySelectorAll('#d-pts-toggle .pts-fan-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('d-stake-lbl').textContent = t.usePoints ? '\u{1F4B0} Bet per point' : '\u{1F4B0} Bet per fan';
+  renderFanUI();
+  calcDPreview();
+});
 document.getElementById('d-stake-input').addEventListener('change', saveStakeInput);
 document.getElementById('d-stake-input').addEventListener('blur',   saveStakeInput);
 document.getElementById('d-stake-input').addEventListener('keydown', e => {
@@ -3116,6 +3140,17 @@ function showCalc() {
 }
 
 document.getElementById('btn-open-calc').addEventListener('click', showCalc);
+let calcUsePoints = true;
+document.getElementById('calc-pts-toggle').addEventListener('click', e => {
+  const btn = e.target.closest('.pts-fan-btn');
+  if (!btn) return;
+  calcUsePoints = btn.dataset.mode !== 'fan';
+  document.querySelectorAll('#calc-pts-toggle .pts-fan-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('calc-stake-lbl').textContent =
+    calcUsePoints ? '\u{1F4B0} Bet per point ($)' : '\u{1F4B0} Bet per fan ($)';
+  updateCalcResult();
+});
 document.getElementById('btn-calc-back').addEventListener('click', showMain);
 document.getElementById('btn-calc-reset').addEventListener('click', resetCalc);
 document.getElementById('calc-stake').addEventListener('input', updateCalcResult);
