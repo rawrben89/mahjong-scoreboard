@@ -70,7 +70,7 @@
 
     /* ── Archive swipe-delete ── */
     .archive-wrap { position:relative; overflow:hidden; margin:0 12px 10px; border-radius:var(--radius); }
-    .archive-wrap .archive-card { margin:0; border-radius:var(--radius); transition:transform .2s; cursor:default; }
+    .archive-wrap .archive-card { margin:0; width:100%; box-sizing:border-box; border-radius:var(--radius); transition:transform .2s; cursor:default; position:relative; z-index:1; }
     .archive-del-reveal { position:absolute; top:0; right:0; bottom:0; width:80px; display:flex; align-items:center; justify-content:center; background:var(--red); border-radius:0 var(--radius) var(--radius) 0; }
     .archive-del-reveal button { background:none; border:none; color:#fff; font-size:13px; font-weight:700; cursor:pointer; padding:8px; }
 
