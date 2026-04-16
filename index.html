@@ -152,7 +152,6 @@
     #ptr-indicator.visible  { top: 68px; }
     #ptr-indicator.spinning { top: 68px; animation: ptr-spin .55s linear infinite; }
     @keyframes ptr-spin     { to { transform: translateX(-50%) rotate(360deg); } }
-    @keyframes btn-spin     { to { transform: rotate(360deg); } }
 
     /* ── Player Stats view ── */
     #view-stats { display:none; }
@@ -851,6 +850,28 @@
     .spin-open-btn:hover { background: rgba(78,201,82,.13); border-color: rgba(78,201,82,.38); }
     .spin-open-btn:active { transform: scale(.96); }
 
+    /* ── Refresh icon button (circular, icon-only) ── */
+    .refresh-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(78,201,82,.2);
+      background: rgba(78,201,82,.07);
+      color: var(--accent2);
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s, border-color .15s;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .refresh-btn:hover  { background: rgba(78,201,82,.14); border-color: rgba(78,201,82,.38); }
+    .refresh-btn:active { transform: scale(.9); }
+    @keyframes btn-spin { to { transform: rotate(360deg); } }
+
     /* ═══ SPINNER VIEW ═══ */
     #view-spinner { display: none; }
 
@@ -1330,7 +1351,7 @@
         <button class="spin-open-btn" id="btn-open-spinner">🎲 Spin/Dice</button>
         <button class="spin-open-btn" id="btn-open-stats">📈 Stats</button>
         <button class="help-open-btn" id="btn-help">❓ Help</button>
-        <button class="spin-open-btn" id="btn-refresh" title="Refresh app">↻</button>
+        <button class="refresh-btn" id="btn-refresh" title="Refresh app"><span id="btn-refresh-icon">↻</span></button>
       </div>
     </div>
 
@@ -4116,9 +4137,10 @@ document.getElementById('btn-stats-back').addEventListener('click', showMain);
   });
 
   document.getElementById('btn-refresh').addEventListener('click', () => {
-    const btn = document.getElementById('btn-refresh');
-    btn.style.animation = 'btn-spin .5s linear';
-    setTimeout(() => location.reload(), 400);
+    const icon = document.getElementById('btn-refresh-icon');
+    icon.style.display = 'inline-block';
+    icon.style.animation = 'btn-spin .5s linear';
+    setTimeout(() => location.reload(), 500);
   });
 })();
 
