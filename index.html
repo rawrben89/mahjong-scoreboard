@@ -3217,8 +3217,8 @@ function buildWinsPane() {
     ${combo('海底撈月 Fishing Moon','Win on the very last drawable tile in the wall','+1 Fan','bonus','The final tile drawn completes your hand.','')}
     ${combo('搶橃 Robbing the Kong',"Steal an opponent's added kong tile to win",'+1 Fan','bonus','When an opponent extends a pung to a kong, steal it if it completes your hand.','')}
     ${combo('橃上橃 Double Kong','Win on the supplement tile from a second consecutive kong','+8 Fan','bonus','Extremely rare — must declare two consecutive kongs.',`${d(5)}${d(5)}${d(5)}${d(5)}${P}${b(9)}${b(9)}${b(9)}${b(9)}${P}${w(1)}${w(2)}${w(3)}${P}${w(7)}${w(8)}${w(9)}${P}${w(5)}${w(5)}`)}
-    ${combo('天糊 Heavenly Hand','East wins with the initial 13 tiles on first draw','10 Fan','limit','Instant win before anyone discards.',`${w(1)}${w(1)}${w(1)}${P}${w(2)}${w(3)}${w(4)}${P}${w(5)}${w(6)}${w(7)}${P}${w(8)}${w(9)}${w(9)}${w(9)}${P}${w(5)}${w(5)}`)}
-    ${combo('地糊 Earthly Hand',"Any non-East wins on East's very first discard",'10 Fan','limit','Instant win. No tiles may have been called.',`${E}${E}${E}${P}${d(1)}${d(2)}${d(3)}${P}${b(4)}${b(5)}${b(6)}${P}${w(7)}${w(8)}${w(9)}${P}${d(9)}${d(9)}`)}
+    ${combo('天糊 Heavenly Hand','East wins with the initial 13 tiles on first draw','13 Fan','limit','Instant win before anyone discards.',`${w(1)}${w(1)}${w(1)}${P}${w(2)}${w(3)}${w(4)}${P}${w(5)}${w(6)}${w(7)}${P}${w(8)}${w(9)}${w(9)}${w(9)}${P}${w(5)}${w(5)}`)}
+    ${combo('地糊 Earthly Hand',"Any non-East wins on East's very first discard",'13 Fan','limit','Instant win. No tiles may have been called.',`${E}${E}${E}${P}${d(1)}${d(2)}${d(3)}${P}${b(4)}${b(5)}${b(6)}${P}${w(7)}${w(8)}${w(9)}${P}${d(9)}${d(9)}`)}
 
     <div class="help-cat-label">Hand Pattern</div>
     ${combo('平糊 Peace Hand','Píng hú — Every meld is a Chow (sequence)','1 Fan','','No pungs or kongs — pure sequences only.',`${w(1)}${w(2)}${w(3)}${P}${b(4)}${b(5)}${b(6)}${P}${d(7)}${d(8)}${d(9)}${P}${w(5)}${w(6)}${w(7)}${P}${d(2)}${d(2)}`)}
@@ -3376,9 +3376,9 @@ const CALC_GROUPS = [
       ex:['s5','s5','s5','s5','|','w1','w2','w3','|','t6','t7','t8','|','w4','w4','w4','|','t9','t9'] },
     { id:'c_dkong', name:'橃上橃 Double Kong',        desc:'Win on the supplement tile from a second consecutive kong.', fan:8,
       ex:['t5','t5','t5','t5','|','s9','s9','s9','s9','|','w1','w2','w3','|','w7','w8','w9','|','w5','w5'] },
-    { id:'c_hv',    name:'天糊 Heavenly Hand',        desc:'East wins with the initial draw before anyone discards.',  fan:10,
+    { id:'c_hv',    name:'天糊 Heavenly Hand',        desc:'East wins with the initial draw before anyone discards.',  fan:13,
       ex:['w1','w1','w1','|','w2','w3','w4','|','w5','w6','w7','|','w8','w9','w9','w9','|','w5','w5'] },
-    { id:'c_ea',    name:'地糊 Earthly Hand',         desc:"Non-East wins on East's very first discard.",              fan:10,
+    { id:'c_ea',    name:'地糊 Earthly Hand',         desc:"Non-East wins on East's very first discard.",              fan:13,
       ex:['fe','fe','fe','|','t1','t2','t3','|','s4','s5','s6','|','w7','w8','w9','|','t9','t9'] },
   ]},
   { label: 'Hand Pattern', items: [
@@ -3512,7 +3512,7 @@ function calcTotalFan() {
 }
 
 function updateCalcResult() {
-  const fan     = calcTotalFan();
+  const fan     = calcTotalFan() + (calcWinType === 'zimo' ? 1 : 0); // +1 for self-draw
   const basePts = fan;
   const stake   = parseFloat(document.getElementById('calc-stake').value) || 0.25;
   document.getElementById('calc-fan-num').textContent = fan;
@@ -3840,7 +3840,8 @@ function renderFanUI() {
   const comboFan   = getFanTotal();
   const bonusCount = Object.values(F.bonusTiles).reduce((a, b) => a + b, 0);
   const kongCount  = Object.values(F.hand).filter(n => n === 4).length; // +1 fan per kong
-  const fan        = comboFan + bonusCount + kongCount;
+  const zimoBonus  = F.winType === 'zimo' ? 1 : 0; // 自摸 self-draw +1 fan
+  const fan        = comboFan + bonusCount + kongCount + zimoBonus;
   F.basePts = fan;
 
   document.getElementById('d-fan-count-badge').textContent = fan + ' fan';
@@ -3870,6 +3871,12 @@ function renderFanUI() {
     chipsHtml += `<div class="combo-chip" style="background:var(--surface2);border-color:#8B7355;cursor:default">
       <span>&#x82B1;&#x724C;</span>
       <span class="chip-fan">+${bonusCount}</span>
+    </div>`;
+  }
+  if (zimoBonus) {
+    chipsHtml += `<div class="combo-chip" style="background:var(--surface2);border-color:var(--accent);cursor:default">
+      <span>自摸</span>
+      <span class="chip-fan">+1</span>
     </div>`;
   }
   chipsEl.innerHTML = chipsHtml || '<span class="combo-empty-hint">No combinations selected yet</span>';
