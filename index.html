@@ -2069,7 +2069,7 @@ function resetRoundForm() {
   const display = document.getElementById('d-hand-display');
   if (display) display.innerHTML = '<span class="hand-count-lbl">Tap tiles below to build hand…</span>';
   const countEl = document.getElementById('d-tile-count');
-  if (countEl) countEl.textContent = '0 / 14';
+  if (countEl) countEl.textContent = '0 / 14'; // resets to base; kongs will update on next tap
   // Reset fan UI
   const chipsEl = document.getElementById('d-active-combo-chips');
   if (chipsEl) chipsEl.innerHTML = '<span class="combo-empty-hint">No combinations selected yet</span>';
@@ -3324,8 +3324,10 @@ function initRoundTilePicker() {
       delete dict[key];
     } else {
       if (!isBonus) {
-        const total = Object.values(F.hand).reduce((a, b) => a + b, 0);
-        if (total >= 14) { toast('Hand full — max 14 tiles'); return; }
+        const total    = Object.values(F.hand).reduce((a, b) => a + b, 0);
+        const kongs    = Object.values(F.hand).filter(n => n === 4).length;
+        const newMax   = 14 + kongs + (cur === 3 ? 1 : 0); // adding 4th tile creates a kong → max +1
+        if (total + 1 > newMax) { toast(`Hand full — max ${newMax} tiles`); return; }
       }
       dict[key] = cur + 1;
     }
@@ -3380,8 +3382,9 @@ function initRoundTilePicker() {
 }
 
 function updateHandDisplay() {
-  const total = Object.values(F.hand).reduce((a, b) => a + b, 0);
-  document.getElementById('d-tile-count').textContent = total + ' / 14';
+  const total  = Object.values(F.hand).reduce((a, b) => a + b, 0);
+  const kongs  = Object.values(F.hand).filter(n => n === 4).length;
+  document.getElementById('d-tile-count').textContent = total + ' / ' + (14 + kongs);
   const display = document.getElementById('d-hand-display');
   if (total === 0 && !Object.keys(F.bonusTiles).length) {
     display.innerHTML = '<span class="hand-count-lbl">Tap tiles below to build hand…</span>';
