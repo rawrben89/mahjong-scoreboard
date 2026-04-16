@@ -1216,6 +1216,17 @@
       <input id="d-stake-input" type="number" class="stake-input" min="0.25" step="0.25" inputmode="decimal" value="0.25">
       <span id="d-stake-saved" style="font-size:11px;color:var(--dim);min-width:32px;text-align:right"></span>
     </div>
+    <div class="stake-row" style="margin-top:4px">
+      <label>🎯 Min fan to win</label>
+      <select id="d-minfan-input" class="stake-input" style="color:var(--accent);text-align:center">
+        <option value="1">1 fan</option>
+        <option value="2">2 fan</option>
+        <option value="3">3 fan</option>
+        <option value="4">4 fan</option>
+        <option value="5">5 fan</option>
+      </select>
+      <span id="d-minfan-saved" style="font-size:11px;color:var(--dim);min-width:32px;text-align:right"></span>
+    </div>
     <div id="d-players-grid" class="players-grid"></div>
     <div class="scores-action-row" style="padding:12px 0 4px">
       <button class="score-action-btn" id="btn-set-winds">&#x1F9ED; Set Winds</button>
@@ -1913,6 +1924,16 @@
       <span style="font-size:12px;color:var(--dim);flex:1">Bet per fan ($)</span>
       <input id="nt-stake" type="number" class="modal-input" style="width:90px;text-align:center;color:var(--gold)" placeholder="0.25" min="0.25" step="0.25" inputmode="decimal">
     </div>
+    <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      <span style="font-size:12px;color:var(--dim);flex:1">Minimum fan to win</span>
+      <select id="nt-minfan" class="modal-input" style="width:90px;text-align:center;color:var(--accent)">
+        <option value="1">1 fan</option>
+        <option value="2">2 fan</option>
+        <option value="3" selected>3 fan</option>
+        <option value="4">4 fan</option>
+        <option value="5">5 fan</option>
+      </select>
+    </div>
     <div class="modal-input-grid">
       <input id="nt-p1" class="modal-input" placeholder="Player 1" maxlength="20">
       <input id="nt-p2" class="modal-input" placeholder="Player 2" maxlength="20">
@@ -2217,7 +2238,8 @@ function renderMain() {
 ═══════════════════════════════════════ */
 document.getElementById('btn-new-table').addEventListener('click', () => {
   ['nt-name','nt-p1','nt-p2','nt-p3','nt-p4'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('nt-stake').value = '1';
+  document.getElementById('nt-stake').value  = '1';
+  document.getElementById('nt-minfan').value = '3';
   document.getElementById('modal-newtable').classList.add('show');
   document.getElementById('nt-name').focus();
 });
@@ -2235,8 +2257,9 @@ document.getElementById('nt-create').addEventListener('click', createTable);
 });
 
 function createTable() {
-  const name  = document.getElementById('nt-name').value.trim();
-  const stake = parseFloat(document.getElementById('nt-stake').value) || 0.25;
+  const name   = document.getElementById('nt-name').value.trim();
+  const stake  = parseFloat(document.getElementById('nt-stake').value) || 0.25;
+  const minFan = parseInt(document.getElementById('nt-minfan').value) || 3;
   const p1    = document.getElementById('nt-p1').value.trim();
   const p2    = document.getElementById('nt-p2').value.trim();
   const p3    = document.getElementById('nt-p3').value.trim();
@@ -2253,6 +2276,7 @@ function createTable() {
     id: S.nextTableId++,
     name,
     stake,
+    minFan,
     players,
     scores:    Object.fromEntries(players.map(p => [p, 0])),
     history:   [],
@@ -2311,8 +2335,9 @@ function renderDScores() {
   document.getElementById('d-sum-neg-pts').textContent   = fmt(totalNeg);
   document.getElementById('d-sum-neg-money').textContent = stake ? fmtMoney(totalNeg, stake) : '';
 
-  // Sync stake input
-  document.getElementById('d-stake-input').value = stake;
+  // Sync stake + minFan inputs
+  document.getElementById('d-stake-input').value  = stake;
+  document.getElementById('d-minfan-input').value = t.minFan || 3;
 
   const sorted   = [...t.players].sort((a,b) => (t.scores[b]||0) - (t.scores[a]||0));
   const topScore = t.scores[sorted[0]] || 0;
@@ -2415,10 +2440,12 @@ document.getElementById('d-btn-discard').addEventListener('click', () => {
 });
 
 function calcDChanges() {
-  const t   = tableById(currentId);
+  const t      = tableById(currentId);
   if (!t) return null;
-  const pts = F.basePts || 0;
-  if (F.winner === null || pts < 1) return null;
+  const pts    = F.basePts || 0;
+  const minFan = t.minFan || 3;
+  if (F.winner === null) return null;
+  if (pts < minFan) { toast(`Minimum ${minFan} fan required to win`); return null; }
   if (F.winType === 'discard' && F.discarder === null) return null;
 
   const changes = {};
@@ -2639,6 +2666,17 @@ document.getElementById('d-stake-input').addEventListener('blur',   saveStakeInp
 document.getElementById('d-stake-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') { saveStakeInput(); e.target.blur(); }
 });
+
+function saveMinFanInput() {
+  const t = tableById(currentId);
+  if (!t) return;
+  const val = parseInt(document.getElementById('d-minfan-input').value) || 3;
+  t.minFan = val;
+  saveState();
+  const lbl = document.getElementById('d-minfan-saved');
+  if (lbl) { lbl.textContent = 'Saved'; setTimeout(() => { lbl.textContent = ''; }, 1200); }
+}
+document.getElementById('d-minfan-input').addEventListener('change', saveMinFanInput);
 
 document.getElementById('d-btn-reset-scores').addEventListener('click', () => {
   showConfirm('Reset Scores', 'Reset all scores in this table to 0? History is kept.', () => {
