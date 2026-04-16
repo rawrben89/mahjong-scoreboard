@@ -1217,7 +1217,7 @@
       <span id="d-stake-saved" style="font-size:11px;color:var(--dim);min-width:32px;text-align:right"></span>
     </div>
     <div id="d-players-grid" class="players-grid"></div>
-    <div class="scores-action-row" style="padding:0 0 4px">
+    <div class="scores-action-row" style="padding:12px 0 4px">
       <button class="score-action-btn" id="btn-set-winds">&#x1F9ED; Set Winds</button>
       <button class="score-action-btn" id="btn-share-scores">&#x1F4E4; Share</button>
       <button class="score-action-btn danger" id="btn-end-game">&#x1F3C1; End Game</button>
@@ -2317,8 +2317,9 @@ function renderDScores() {
   const sorted   = [...t.players].sort((a,b) => (t.scores[b]||0) - (t.scores[a]||0));
   const topScore = t.scores[sorted[0]] || 0;
 
-  const WLBL = ['東','南','西','北'];
-  const WCLS = ['east','south','west','north'];
+  const WLBL  = ['東','南','西','北'];
+  const WENGL = ['East','South','West','North'];
+  const WCLS  = ['east','south','west','north'];
   const ei = t.eastIdx || 0;
   document.getElementById('d-players-grid').innerHTML = t.players.map((p, i) => {
     const sc     = t.scores[p] || 0;
@@ -2326,7 +2327,7 @@ function renderDScores() {
     const cls    = (sc === topScore && sc > 0) ? 'top' : sc < 0 ? 'losing' : '';
     const money  = fmtMoney(sc, stake);
     const wOff   = (i - ei + 4) % 4;
-    const wBadge = `<span class="wind-badge wind-${WCLS[wOff]}">${WLBL[wOff]}</span>`;
+    const wBadge = `<span class="wind-badge wind-${WCLS[wOff]}">${WLBL[wOff]} ${WENGL[wOff]}</span>`;
     return `
       <div class="player-card ${cls}">
         <span class="p-rank">#${rank}</span>
@@ -2345,13 +2346,14 @@ function renderWindBar() {
   const t = tableById(currentId);
   const bar = document.getElementById('d-wind-bar');
   if (!t || !bar) return;
-  const WLBL = ['東','南','西','北'];
-  const WCLS = ['east','south','west','north'];
-  const ei   = t.eastIdx || 0;
+  const WLBL  = ['東','南','西','北'];
+  const WENGL = ['East','South','West','North'];
+  const WCLS  = ['east','south','west','north'];
+  const ei    = t.eastIdx || 0;
   bar.innerHTML = t.players.map((p, i) => {
     const wOff = (i - ei + 4) % 4;
     return `<div class="wind-info-item">
-      <span class="wi-badge wind-badge wind-${WCLS[wOff]}">${WLBL[wOff]}</span>
+      <span class="wi-badge wind-badge wind-${WCLS[wOff]}">${WLBL[wOff]} ${WENGL[wOff]}</span>
       <span class="wi-name">${esc(p)}</span>
     </div>`;
   }).join('');
