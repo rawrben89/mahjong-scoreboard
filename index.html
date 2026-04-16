@@ -2279,18 +2279,11 @@ function resetRoundForm() {
   const countEl = document.getElementById('d-tile-count');
   if (countEl) countEl.textContent = '0 / 14'; // resets to base; kongs will update on next tap
   // Reset fan UI
-  const chipsEl = document.getElementById('d-active-combo-chips');
-  if (chipsEl) chipsEl.innerHTML = '<span class="combo-empty-hint">No combinations selected yet</span>';
-  const badge = document.getElementById('d-fan-count-badge');
-  if (badge) badge.textContent = '0 fan';
-  const ptsEl = document.getElementById('d-base-pts-label');
-  if (ptsEl) { ptsEl.textContent = '—'; ptsEl.className = 'fan-pts-val'; }
-  const hint = document.getElementById('d-fan-hint');
-  if (hint) hint.style.display = 'none';
   const fullList = document.getElementById('d-full-combo-list');
   if (fullList) fullList.style.display = 'none';
   const expandBtn = document.getElementById('d-expand-combos');
   if (expandBtn) expandBtn.textContent = '＋ Edit combinations';
+  renderFanUI(); // recomputes with current winType (shows Zimo +1 immediately)
 }
 
 function showDetail(id) {
