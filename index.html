@@ -1399,7 +1399,7 @@
       </div>
     </div>
     <div id="d-stake-row" class="stake-row">
-      <label>💰 Bet per point</label>
+      <label>💰 Bet per fan</label>
       <input id="d-stake-input" type="number" class="stake-input" min="0.25" step="0.25" inputmode="decimal" value="0.25">
       <span id="d-stake-saved" style="font-size:11px;color:var(--dim);min-width:32px;text-align:right"></span>
     </div>
@@ -2065,7 +2065,7 @@
     </div>
     <!-- Stake -->
     <div class="stake-row" style="margin-bottom:10px">
-      <label>💰 Bet per point ($)</label>
+      <label>💰 Bet per fan ($)</label>
       <input id="calc-stake" type="number" class="stake-input" min="0.25" step="0.25" inputmode="decimal" value="0.25">
     </div>
     <!-- Calc groups injected by JS -->
@@ -2076,7 +2076,7 @@
     <div class="calc-result-content">
       <div>
         <span id="calc-fan-num" class="calc-fan-num">0</span>
-        <span class="calc-fan-lbl"> fan</span>
+        <span class="calc-fan-lbl"> pts</span>
       </div>
       <div id="calc-result-detail" class="calc-result-detail">
         <span class="calc-warn" style="color:var(--dim)">Select combinations above</span>
@@ -2108,7 +2108,7 @@
       <input id="nt-name" class="modal-input full" placeholder="Table name (e.g. Table 1)" maxlength="30">
     </div>
     <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
-      <span style="font-size:12px;color:var(--dim);flex:1">Bet per point ($)</span>
+      <span style="font-size:12px;color:var(--dim);flex:1">Bet per fan ($)</span>
       <input id="nt-stake" type="number" class="modal-input" style="width:90px;text-align:center;color:var(--gold)" placeholder="0.25" min="0.25" step="0.25" inputmode="decimal">
     </div>
     <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
@@ -2300,7 +2300,7 @@ function showDetail(id) {
   document.getElementById('view-detail').style.display = 'block';
   document.getElementById('detail-title').textContent  = t.name;
   // Reset full form state
-  F = { winner: null, discarder: null, winType: 'zimo', hand: {}, bonusTiles: {}, fanSel: new Set(), fanManual: new Set(), fanTotal: 0, basePts: 0 };
+  F = { winner: null, discarder: null, winType: 'zimo', hand: {}, bonusTiles: {}, fanSel: new Set(), fanManual: new Set(), basePts: 0 };
 
   document.getElementById('d-preview-box').style.display = 'none';
   document.getElementById('d-submit-btn').disabled = true;
@@ -2570,7 +2570,7 @@ function renderWindBar() {
     </div>`;
   }).join('');
 }
-let F = { winner: null, discarder: null, winType: 'zimo', hand: {}, bonusTiles: {}, fanSel: new Set(), fanManual: new Set(), fanTotal: 0, basePts: 0 };
+let F = { winner: null, discarder: null, winType: 'zimo', hand: {}, bonusTiles: {}, fanSel: new Set(), fanManual: new Set(), basePts: 0 };
 
 function renderDForm() {
   renderWindBar();
@@ -2626,29 +2626,13 @@ document.getElementById('d-btn-discard').addEventListener('click', () => {
   autoDetectFan();
 });
 
-// Fan-laak conversion table (Hong Kong standard)
-// 3→1pt, 4→2pt, 5→4pt, 6→8pt, 7→16pt, 8→32pt, 9→64pt, 10-12→128pt(limit), 13+→256pt(double limit)
-function fanToPoints(fan) {
-  if (fan <= 2)  return 0;   // below minimum — won't actually pay out
-  if (fan === 3) return 1;
-  if (fan === 4) return 2;
-  if (fan === 5) return 4;
-  if (fan === 6) return 8;
-  if (fan === 7) return 16;
-  if (fan === 8) return 32;
-  if (fan === 9) return 64;
-  if (fan <= 12) return 128; // 10/11/12 fan → limit hand
-  return 256;                // 13+ fan → double limit
-}
-
 function calcDChanges() {
   const t      = tableById(currentId);
   if (!t) return null;
-  const fanTotal = F.fanTotal || 0;
-  const pts      = F.basePts  || 0;  // already converted via fanToPoints
-  const minFan   = t.minFan   || 3;
+  const pts    = F.basePts || 0;
+  const minFan = t.minFan   || 3;
   if (F.winner === null) return null;
-  if (fanTotal < minFan) { toast(`Minimum ${minFan} fan required to win`); return null; }
+  if (pts < minFan) { toast(`Minimum ${minFan} fan required to win`); return null; }
   if (F.winType === 'discard' && F.discarder === null) return null;
 
   // Find East player index (wind index 0)
@@ -2708,7 +2692,7 @@ document.getElementById('d-submit-btn').addEventListener('click', () => {
   const changes = calcDChanges();
   if (!changes) return;
   const pts          = F.basePts;
-  const fan          = F.fanTotal; // raw fan count (combos + kongs + bonus tiles)
+  const fan          = F.basePts; // includes combos + kongs + bonus tiles
   const winnerName   = t.players[F.winner];
   const discarderName = F.discarder !== null ? t.players[F.discarder] : null;
 
@@ -3529,22 +3513,18 @@ function calcTotalFan() {
 
 function updateCalcResult() {
   const fan     = calcTotalFan();
-  const basePts = fanToPoints(fan);
+  const basePts = fan;
   const stake   = parseFloat(document.getElementById('calc-stake').value) || 0.25;
-  document.getElementById('calc-fan-num').textContent = fan > 0 ? fan + ' fan' : '0';
+  document.getElementById('calc-fan-num').textContent = fan;
 
   const detail = document.getElementById('calc-result-detail');
   if (fan === 0) {
     detail.innerHTML = `<span style="color:var(--dim);font-size:12px">Select combinations above</span>`;
     return;
   }
-  if (basePts === 0) {
-    detail.innerHTML = `<span style="color:var(--dim);font-size:12px">${fan} fan — below minimum (need 3 fan)</span>`;
-    return;
-  }
-  const money   = n => { const a = n * stake; return (a % 1 === 0 ? a : a.toFixed(2)); };
-  const eastX2  = basePts * 2;
-  let html = `<div class="calc-result-row"><span class="lbl">Fan → Points: </span><span class="val gold">${fan} fan = ${basePts} pt/payer</span></div>`;
+  const money  = n => { const a = n * stake; return (a % 1 === 0 ? a : a.toFixed(2)); };
+  const eastX2 = basePts * 2;
+  let html = `<div class="calc-result-row"><span class="lbl">Base: </span><span class="val gold">${basePts} fan/payer</span></div>`;
   if (calcWinType === 'zimo') {
     html += `<div class="calc-result-row"><span class="lbl">Each non-East pays: </span><span class="val pos">+${money(basePts)}</span></div>`;
     html += `<div class="calc-result-row"><span class="lbl">East pays (×2): </span><span class="val pos">+${money(eastX2)}</span></div>`;
@@ -3861,18 +3841,12 @@ function renderFanUI() {
   const bonusCount = Object.values(F.bonusTiles).reduce((a, b) => a + b, 0);
   const kongCount  = Object.values(F.hand).filter(n => n === 4).length; // +1 fan per kong
   const fan        = comboFan + bonusCount + kongCount;
-  F.fanTotal = fan;
-  F.basePts  = fanToPoints(fan);
+  F.basePts = fan;
 
   document.getElementById('d-fan-count-badge').textContent = fan + ' fan';
   const ptsEl = document.getElementById('d-base-pts-label');
-  if (fan === 0) { ptsEl.textContent = '—'; ptsEl.className = 'fan-pts-val'; }
-  else {
-    const pts = F.basePts;
-    const ptsLabel = pts > 0 ? `${fan} fan → ${pts} pt/payer` : `${fan} fan (below min)`;
-    ptsEl.textContent = ptsLabel;
-    ptsEl.className   = pts > 0 ? 'fan-pts-val pos' : 'fan-pts-val';
-  }
+  if (fan === 0) { ptsEl.textContent = '—';                ptsEl.className = 'fan-pts-val'; }
+  else           { ptsEl.textContent = fan + ' fan/payer'; ptsEl.className = 'fan-pts-val pos'; }
 
   const hint = document.getElementById('d-fan-hint');
   if (hint) hint.style.display = 'none';
