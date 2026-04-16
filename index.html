@@ -146,7 +146,8 @@
     }
     #ptr-indicator.visible  { top: 68px; }
     #ptr-indicator.spinning { top: 68px; animation: ptr-spin .55s linear infinite; }
-    @keyframes ptr-spin { to { transform: translateX(-50%) rotate(360deg); } }
+    @keyframes ptr-spin     { to { transform: translateX(-50%) rotate(360deg); } }
+    @keyframes btn-spin     { to { transform: rotate(360deg); } }
 
     /* ── Player Stats view ── */
     #view-stats { display:none; }
@@ -4043,7 +4044,7 @@ document.getElementById('btn-stats-back').addEventListener('click', showMain);
 
   document.getElementById('btn-refresh').addEventListener('click', () => {
     const btn = document.getElementById('btn-refresh');
-    btn.style.animation = 'ptr-spin .5s linear';
+    btn.style.animation = 'btn-spin .5s linear';
     setTimeout(() => location.reload(), 400);
   });
 })();
