@@ -3862,9 +3862,13 @@ function renderArchives() {
     S.archives.map((a, idx) => {
       const sorted = [...a.players].sort((x,y) => (a.scores[y]||0)-(a.scores[x]||0));
       const chips  = sorted.map(p => {
-        const sc = a.scores[p]||0;
-        const cls = sc>0?'color:var(--accent)':sc<0?'color:var(--red)':'';
-        return `<span class="archive-score-chip" style="${cls}">${esc(p)}: ${sc>0?'+':''}${sc}</span>`;
+        const sc    = a.scores[p]||0;
+        const money = a.stake ? (sc * a.stake) : null;
+        const cls   = sc>0?'color:var(--accent)':sc<0?'color:var(--red)':'';
+        const moneyStr = money !== null
+          ? ` <span style="font-size:10px;color:var(--gold);opacity:.85">(${money>=0?'+':''}$${money.toFixed(2)})</span>`
+          : '';
+        return `<span class="archive-score-chip" style="${cls}">${esc(p)}: ${sc>0?'+':''}${sc}${moneyStr}</span>`;
       }).join('');
       return `<div class="archive-wrap" data-aidx="${idx}">
         <div class="archive-del-reveal"><button data-del-aidx="${idx}">Delete</button></div>
