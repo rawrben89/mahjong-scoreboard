@@ -3166,10 +3166,10 @@ const CALC_GROUPS = [
       ex:['w1','w1','w1','w2','w3','w4','w5','w6','w7','w8','w9','w9','w9','|','w5'] },
     { id:'c_agreen', name:'綠一色 All Green',            desc:'Only bamboo 2,3,4,6,8 and Green Dragon (發).',           fan:10,
       ex:['s2','s3','s4','|','s2','s3','s4','|','s6','s6','s6','|','dg','dg','dg','|','s8','s8'] },
-    { id:'c_ablue',  name:'藍一色 All Blue',             desc:'All tiles from the Circle (筒) suit only.',              fan:10,
-      ex:['t1','t2','t3','|','t4','t5','t6','|','t7','t8','t9','|','t1','t1','t1','|','t5','t5'] },
-    { id:'c_ared',   name:'紅一色 All Red',              desc:'All tiles from the Character (萬) suit only.',           fan:10,
-      ex:['w1','w2','w3','|','w4','w5','w6','|','w7','w8','w9','|','w1','w1','w1','|','w5','w5'] },
+    { id:'c_ablue',  name:'藍一色 All Blue',             desc:'All Circle (筒) tiles + White Dragon (白板) pair/triple required. Pure circles alone = Pure Suit (7 fan).', fan:10,
+      ex:['t1','t2','t3','|','t4','t5','t6','|','t7','t8','t9','|','dw','dw','dw','|','t5','t5'] },
+    { id:'c_ared',   name:'紅一色 All Red',              desc:'All Character (萬) tiles + Red Dragon (中) pair/triple required. Pure characters alone = Pure Suit (7 fan).', fan:10,
+      ex:['w1','w2','w3','|','w4','w5','w6','|','w7','w8','w9','|','dr','dr','dr','|','w5','w5'] },
     { id:'c_t13',    name:'十三幺 Thirteen Orphans',     desc:'One each of all 13 terminals & honors + any duplicate.', fan:13,
       ex:['w1','w9','t1','t9','s1','s9','fe','fs','fw','fn','dr','dg','dw','|','w1'] },
     { id:'c_4k',     name:'十八羅漢 Eighteen Arhats',    desc:'Four kongs and a pair (all kongs in one hand).',         fan:18,
@@ -3452,17 +3452,22 @@ function detectFanFromHand(hand) {
     const kongCnt  = entries.filter(([,n]) => n === 4).length;
 
     // Color / flush patterns (mutually exclusive — check color hands first)
-    const greenSet = new Set(['s2','s3','s4','s6','s8','dg']);
-    if (tiles.every(k => greenSet.has(k)))                            det.c_agreen = true;
-    if (!honorT.length && tiles.every(k => k[0] === 't'))            det.c_ablue  = true;
-    if (!honorT.length && tiles.every(k => k[0] === 'w'))            det.c_ared   = true;
-    // Pure Suit only if not a named color hand
+    const greenSet    = new Set(['s2','s3','s4','s6','s8','dg']);
+    const allBlueTiles = tiles.every(k => k[0] === 't' || k === 'dw');
+    const hasWhite     = tiles.some(k => k === 'dw');
+    const allRedTiles  = tiles.every(k => k[0] === 'w' || k === 'dr');
+    const hasChung     = tiles.some(k => k === 'dr');
+    if (tiles.every(k => greenSet.has(k)))    det.c_agreen = true;
+    if (allBlueTiles && hasWhite)             det.c_ablue  = true; // 筒 + 白 required
+    if (allRedTiles  && hasChung)             det.c_ared   = true; // 萬 + 中 required
+    // Pure Suit: single suit, no honors — also covers 筒-only or 萬-only without the dragon
     if (!honorT.length && suits.size === 1 && !det.c_ablue && !det.c_ared && !det.c_agreen)
-                                                                      det.c_full   = true;
+                                              det.c_full   = true;
 
-    // Honor / mixed patterns
-    if (!suitT.length && honorT.length)                               det.c_hon   = true;
-    if (suits.size === 1 && honorT.length && suitT.length)            det.c_half  = true;
+    // Honor / mixed patterns — exclude named color hands
+    if (!suitT.length && honorT.length)                                          det.c_hon  = true;
+    if (suits.size === 1 && honorT.length && suitT.length && !det.c_ared && !det.c_ablue)
+                                                                                 det.c_half = true;
 
     // Terminals and Honors: all tiles are 1s, 9s, or honors — must have BOTH types
     const isTermHonor = k => ['fe','fs','fw','fn','dr','dg','dw'].includes(k) || k[1]==='1' || k[1]==='9';
