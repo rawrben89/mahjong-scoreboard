@@ -3447,12 +3447,13 @@ function detectFanFromHand(hand) {
   if (wp === 4) det.c_b4w = true;
   else if (wp === 3 && wpr >= 1) det.c_s4w = true;
 
-  // Full 14-tile pattern checks
-  if (tiles.length === 14) {
+  // Full hand pattern checks — size is 14 + one extra per kong
+  const handKongs = Object.values(cnt).filter(n => n === 4).length;
+  if (tiles.length === 14 + handKongs) {
     const entries  = Object.entries(cnt);
     const pairCnt  = entries.filter(([,n]) => n === 2).length;
     const tripCnt  = entries.filter(([,n]) => n >= 3).length;
-    const kongCnt  = entries.filter(([,n]) => n === 4).length;
+    const kongCnt  = handKongs;
 
     // Color / flush patterns (mutually exclusive — check color hands first)
     const greenSet    = new Set(['s2','s3','s4','s6','s8','dg']);
@@ -3497,8 +3498,8 @@ function detectFanFromHand(hand) {
     // Eighteen Arhats (All Kongs): 4 kongs + pair
     if (pairCnt === 1 && kongCnt === 4 && entries.length === 5) det.c_4k = true;
 
-    // Peace Hand: 4 chows + 1 pair, no honor tiles
-    if (!honorT.length && !det.c_7p && !det.c_pung) {
+    // Peace Hand: 4 chows + 1 pair, no honor tiles, no kongs
+    if (!honorT.length && !det.c_7p && !det.c_pung && kongCnt === 0) {
       for (const [pk, pv] of Object.entries(cnt)) {
         if (pv < 2) continue;
         const rem = Object.assign({}, cnt);
