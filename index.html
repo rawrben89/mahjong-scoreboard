@@ -2635,8 +2635,8 @@ function calcDChanges() {
   if (pts < minFan) { toast(`Minimum ${minFan} fan required to win`); return null; }
   if (F.winType === 'discard' && F.discarder === null) return null;
 
-  // Find East player index (wind index 0)
-  const eastIdx = t.winds ? t.players.findIndex((_, i) => t.winds[i] === 0) : -1;
+  // East player is tracked by t.eastIdx (rotates each round)
+  const eastIdx = t.eastIdx || 0;
 
   const changes = {};
   t.players.forEach((_,i) => changes[i] = 0);
