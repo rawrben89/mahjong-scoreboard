@@ -2464,7 +2464,7 @@ document.getElementById('d-submit-btn').addEventListener('click', () => {
   const changes = calcDChanges();
   if (!changes) return;
   const pts          = F.basePts;
-  const fan          = getFanTotal();
+  const fan          = F.basePts; // includes combos + kongs + bonus tiles
   const winnerName   = t.players[F.winner];
   const discarderName = F.discarder !== null ? t.players[F.discarder] : null;
 
@@ -3531,9 +3531,9 @@ function autoDetectFan() {
 function renderFanUI() {
   const comboFan   = getFanTotal();
   const bonusCount = Object.values(F.bonusTiles).reduce((a, b) => a + b, 0);
-  const fan        = comboFan + bonusCount;
-  const basePts    = fan;
-  F.basePts        = basePts;
+  const kongCount  = Object.values(F.hand).filter(n => n === 4).length; // +1 fan per kong
+  const fan        = comboFan + bonusCount + kongCount;
+  F.basePts        = fan;
 
   document.getElementById('d-fan-count-badge').textContent = fan + ' fan';
   const ptsEl = document.getElementById('d-base-pts-label');
@@ -3552,6 +3552,12 @@ function renderFanUI() {
       <span class="chip-rm">✕</span>
     </div>`
   ).join('');
+  if (kongCount > 0) {
+    chipsHtml += `<div class="combo-chip" style="background:var(--surface2);border-color:#8B7355;cursor:default">
+      <span>槓 ×${kongCount}</span>
+      <span class="chip-fan">+${kongCount}</span>
+    </div>`;
+  }
   if (bonusCount > 0) {
     chipsHtml += `<div class="combo-chip" style="background:var(--surface2);border-color:#8B7355;cursor:default">
       <span>&#x82B1;&#x724C;</span>
