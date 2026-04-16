@@ -1772,7 +1772,7 @@
     <div class="combo-card">
       <div class="combo-head">
         <div class="combo-name">混一色 Half Flush<small>Hùn yī sè — One suit mixed with honor tiles</small></div>
-        <span class="fan-badge">2 Fan</span>
+        <span class="fan-badge">3 Fan</span>
       </div>
       <div class="combo-desc">All tiles are from one suit (Wan, Bam, or Circles) plus wind/dragon tiles.</div>
       <div class="combo-tiles">
@@ -1791,7 +1791,7 @@
     <div class="combo-card">
       <div class="combo-head">
         <div class="combo-name">清一色 Full Flush<small>Qīng yī sè — All tiles same suit, no honors</small></div>
-        <span class="fan-badge">3 Fan</span>
+        <span class="fan-badge">7 Fan</span>
       </div>
       <div class="combo-desc">Every single tile belongs to the same suit — no winds or dragons at all.</div>
       <div class="combo-tiles">
@@ -1812,7 +1812,7 @@
     <div class="combo-card">
       <div class="combo-head">
         <div class="combo-name">碰碰胡 All Pungs<small>Pèng pèng hú — Four triplets + one pair</small></div>
-        <span class="fan-badge">2 Fan</span>
+        <span class="fan-badge">3 Fan</span>
       </div>
       <div class="combo-desc">No sequences at all — every set is a triplet (pung) or kong.</div>
       <div class="combo-tiles">
@@ -3213,6 +3213,13 @@ function buildWinsPane() {
     ${combo('磰磰糊 All Triplets','Pèng pèng hú — Four triplets + one pair','3 Fan','','No sequences at all — every set is a triplet or kong.',`${w(1)}${w(1)}${w(1)}${P}${w(4)}${w(4)}${w(4)}${P}${d(1)}${d(1)}${d(1)}${P}${E}${E}${E}${P}${CR}${CR}`)}
     ${combo('七對子 Seven Pairs','Qī duì zĭ — Hand consists of seven pairs','4 Fan','','No sets — just seven different pairs. Each pair must be distinct.',`${w(1)}${w(1)}${P}${w(3)}${w(3)}${P}${b(5)}${b(5)}${P}${b(7)}${b(7)}${P}${d(2)}${d(2)}${P}${E}${E}${P}${CR}${CR}`)}
 
+    <div class="help-cat-label">Honor Tile Bonuses</div>
+    ${combo('中 Red Dragon Pung','Zhōng — Triplet of Red Dragons (中)','+1 Fan','bonus','Standard in all HK rules. Each dragon you pung is worth +1 fan.',`${CR}${CR}${CR}`)}
+    ${combo('發 Green Dragon Pung','Fā — Triplet of Green Dragons (發)','+1 Fan','bonus','Always +1 fan regardless of any other dragon combinations.',`${CG}${CG}${CG}`)}
+    ${combo('白 White Dragon Pung','Bái — Triplet of White Dragons (白板)','+1 Fan','bonus',"Called '白板' (white board) or 'soap' in Cantonese Mahjong.",`${CW}${CW}${CW}`)}
+    ${combo('自風刻 Seat Wind Pung','Zì fēng kè — Triplet of your own seat wind','+1 Fan','bonus',"Only the winning player's assigned seat wind counts. East player punging East = +1 fan.",`${E}${E}${E}`)}
+    ${combo('圈風刻 Round Wind Pung','Quān fēng kè — Triplet of the prevailing round wind','+1 Fan','bonus','If East is prevailing wind and you pung East, and East is also your seat wind, you score +2 fan total (both apply).',`${E}${E}${E}`)}
+
     <div class="help-cat-label">Dragon Hands</div>
     ${combo('小三元 Small Three Dragons','Xiǎo sān yuán — 2 dragon triplets + 1 dragon pair','5 Fan','','Two dragons as triplets; third dragon forms the pair eyes.',`${CR}${CR}${CR}${P}${CG}${CG}${CG}${P}${CW}${CW}${P}${w(1)}${w(2)}${w(3)}${P}${d(5)}${d(6)}${d(7)}`)}
     ${combo('大三元 Big Three Dragons','Dà sān yuán — All 3 dragon triplets','8 Fan','','Triplets of all three dragons.',`${CR}${CR}${CR}${P}${CG}${CG}${CG}${P}${CW}${CW}${CW}${P}${w(1)}${w(2)}${w(3)}${P}${w(4)}${w(4)}`)}
@@ -3371,6 +3378,18 @@ const CALC_GROUPS = [
       ex:['s1','s2','s3','|','s4','s5','s6','|','s7','s8','s9','|','s1','s2','s3','|','s5','s5'] },
     { id:'c_7p',    name:'七對子 Seven Pairs',        desc:'Seven pairs — all 7 tile types are different.',           fan:4,
       ex:['w1','w1','|','w3','w3','|','w5','w5','|','w7','w7','|','w9','w9','|','t2','t2','|','t4','t4'] },
+  ]},
+  { label: 'Honor Bonuses', items: [
+    { id:'c_drag_r',  name:'中 Red Dragon Pung',     desc:'Pung or kong of Red Dragons (中). Standard HK rule: always +1 fan.',       fan:1,
+      ex:['dr','dr','dr'] },
+    { id:'c_drag_g',  name:'發 Green Dragon Pung',   desc:'Pung or kong of Green Dragons (發). Standard HK rule: always +1 fan.',     fan:1,
+      ex:['dg','dg','dg'] },
+    { id:'c_drag_w',  name:'白 White Dragon Pung',   desc:"Pung or kong of White Dragons (白板). Often called 'soap' in Cantonese.",  fan:1,
+      ex:['dw','dw','dw'] },
+    { id:'c_seat_w',  name:'自風刻 Seat Wind Pung',  desc:"Pung of your own seat wind. Only the winner's seat wind counts.",          fan:1,
+      ex:['fe','fe','fe'] },
+    { id:'c_round_w', name:'圈風刻 Round Wind Pung', desc:'Pung of the current round (prevailing) wind. Stacks with seat wind.',      fan:1,
+      ex:['fe','fe','fe'] },
   ]},
   { label: 'Dragon & Wind', items: [
     { id:'c_s3d',   name:'小三元 Small Three Dragons', desc:'Pungs of 2 dragons + pair of the 3rd dragon.',            fan:5,
@@ -3665,6 +3684,11 @@ function detectFanFromHand(hand) {
   const dpr = ['dr','dg','dw'].filter(d => (cnt[d]||0) === 2).length;
   if (dp === 3) det.c_b3d = true;
   else if (dp === 2 && dpr >= 1) det.c_s3d = true;
+
+  // Individual dragon pung bonuses (+1 fan each) — always apply
+  if ((cnt['dr']||0) >= 3) det.c_drag_r = true;
+  if ((cnt['dg']||0) >= 3) det.c_drag_g = true;
+  if ((cnt['dw']||0) >= 3) det.c_drag_w = true;
 
   // Wind pungs (for s4w/b4w)
   const wp  = ['fe','fs','fw','fn'].filter(w => (cnt[w]||0) >= 3).length;
