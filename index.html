@@ -3450,9 +3450,13 @@ function initCalcItems() {
     body.appendChild(div);
   });
 
-  // Combos that forbid individual honor pung bonuses
-  const HONOR_PUNG_EXCLUDERS = new Set(['c_t13','c_full','c_chow','c_7p','c_9g']);
-  const HONOR_PUNG_IDS       = ['c_drag_r','c_drag_g','c_drag_w','c_seat_w','c_round_w'];
+  // Combos that forbid individual dragon pung bonuses
+  const DRAGON_PUNG_EXCLUDERS = new Set(['c_b3d','c_s3d','c_t13','c_full','c_chow','c_7p','c_9g']);
+  // Combos that also forbid wind pung bonuses (but not dragon, which 大三元/小三元 own)
+  const WIND_PUNG_EXCLUDERS   = new Set(['c_t13','c_full','c_chow','c_7p','c_9g']);
+  const DRAGON_PUNG_IDS       = ['c_drag_r','c_drag_g','c_drag_w'];
+  const WIND_PUNG_IDS         = ['c_seat_w','c_round_w'];
+  const HONOR_PUNG_IDS        = [...DRAGON_PUNG_IDS, ...WIND_PUNG_IDS];
 
   function calcDeselect(id) {
     calcState[id] = false;
@@ -3468,13 +3472,17 @@ function initCalcItems() {
     item.classList.toggle('on', !!calcState[cid]);
     item.querySelector('.calc-item-check').textContent = calcState[cid] ? '☑' : '☐';
 
-    // When toggling ON a hand that excludes honor pung bonuses, deselect them
-    if (calcState[cid] && HONOR_PUNG_EXCLUDERS.has(cid)) {
-      HONOR_PUNG_IDS.forEach(calcDeselect);
+    // When toggling ON a combo that excludes pung bonuses, deselect them
+    if (calcState[cid]) {
+      if (DRAGON_PUNG_EXCLUDERS.has(cid)) DRAGON_PUNG_IDS.forEach(calcDeselect);
+      if (WIND_PUNG_EXCLUDERS.has(cid))   WIND_PUNG_IDS.forEach(calcDeselect);
     }
-    // When toggling ON an honor pung bonus, deselect any active excluders
-    if (calcState[cid] && HONOR_PUNG_IDS.includes(cid)) {
-      HONOR_PUNG_EXCLUDERS.forEach(excId => { if (calcState[excId]) calcDeselect(excId); });
+    // When toggling ON a pung bonus, deselect any active excluders
+    if (calcState[cid] && DRAGON_PUNG_IDS.includes(cid)) {
+      DRAGON_PUNG_EXCLUDERS.forEach(excId => { if (calcState[excId]) calcDeselect(excId); });
+    }
+    if (calcState[cid] && WIND_PUNG_IDS.includes(cid)) {
+      WIND_PUNG_EXCLUDERS.forEach(excId => { if (calcState[excId]) calcDeselect(excId); });
     }
 
     updateCalcResult();
@@ -3790,13 +3798,15 @@ function autoDetectFan() {
   const topColor = colorHands.find(id => det[id]);
   colorHands.forEach(id => { if (id !== topColor) det[id] = false; });
 
-  // Honor pung bonuses don't apply to hands with no honor pungs:
-  //   十三幺 (singles only), 清一色 (no honors), 平糊 (sequences only),
-  //   七對子 (pairs only), 九蓮寶燈 (no honors)
-  if (det.c_t13 || det.c_full || det.c_chow || det.c_7p || det.c_9g) {
+  // Honor pung bonuses don't apply when a bigger dragon combo covers them,
+  // or when the hand type has no honor pungs at all
+  if (det.c_b3d || det.c_s3d ||
+      det.c_t13 || det.c_full || det.c_chow || det.c_7p || det.c_9g) {
     det.c_drag_r  = false;
     det.c_drag_g  = false;
     det.c_drag_w  = false;
+  }
+  if (det.c_t13 || det.c_full || det.c_chow || det.c_7p || det.c_9g) {
     det.c_seat_w  = false;
     det.c_round_w = false;
   }
