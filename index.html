@@ -70,7 +70,8 @@
     .wind-assign-row:last-child { border-bottom:none; }
     .wind-assign-name { font-size:14px; flex:1; }
     .wind-assign-sel { display:flex; gap:6px; }
-    .wind-assign-btn { width:34px; height:34px; border-radius:8px; border:1.5px solid var(--border); background:var(--surface2); font-size:14px; font-weight:700; cursor:pointer; }
+    .wind-assign-btn { width:44px; height:46px; border-radius:8px; border:1.5px solid var(--border); background:var(--surface2); font-size:13px; font-weight:700; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; line-height:1; }
+    .wind-assign-btn .w-en { font-size:8px; font-weight:600; opacity:.7; letter-spacing:.2px; text-transform:uppercase; }
     .wind-assign-btn.on { border-color:transparent; }
     .wind-assign-btn.on.wind-east  { background:#8B0000; color:#fff; }
     .wind-assign-btn.on.wind-south { background:#1a5c1a; color:#fff; }
@@ -3928,9 +3929,10 @@ function openWindModal() {
 function renderWindAssignRows(t) {
   const WLBL = ['東','南','西','北'];
   const WCLS = ['east','south','west','north'];
+  const WENL = ['East','South','West','North'];
   document.getElementById('wind-assign-rows').innerHTML = t.players.map((p, pi) => {
     const btns = WLBL.map((lbl, wi) =>
-      `<button class="wind-assign-btn ${windDraft[pi]===wi?'on wind-'+WCLS[wi]:''}" data-pi="${pi}" data-wi="${wi}">${lbl}</button>`
+      `<button class="wind-assign-btn ${windDraft[pi]===wi?'on wind-'+WCLS[wi]:''}" data-pi="${pi}" data-wi="${wi}">${lbl}<span class="w-en">${WENL[wi]}</span></button>`
     ).join('');
     return `<div class="wind-assign-row">
       <span class="wind-assign-name">${esc(p)}</span>
