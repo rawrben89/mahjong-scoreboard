@@ -3121,8 +3121,8 @@ function buildWinsPane() {
     ${combo('海底撈月 Fishing Moon','Win on the very last drawable tile in the wall','+1 Fan','bonus','The final tile drawn completes your hand.','')}
     ${combo('搶橃 Robbing the Kong',"Steal an opponent's added kong tile to win",'+1 Fan','bonus','When an opponent extends a pung to a kong, steal it if it completes your hand.','')}
     ${combo('橃上橃 Double Kong','Win on the supplement tile from a second consecutive kong','+8 Fan','bonus','Extremely rare — must declare two consecutive kongs.',`${d(5)}${d(5)}${d(5)}${d(5)}${P}${b(9)}${b(9)}${b(9)}${b(9)}${P}${w(1)}${w(2)}${w(3)}${P}${w(7)}${w(8)}${w(9)}${P}${w(5)}${w(5)}`)}
-    ${combo('天糊 Heavenly Hand','East wins with the initial 13 tiles on first draw','10 Fan','limit','Instant win before anyone discards.','')}
-    ${combo('地糊 Earthly Hand',"Any non-East wins on East's very first discard",'10 Fan','limit','Instant win. No tiles may have been called.','')}
+    ${combo('天糊 Heavenly Hand','East wins with the initial 13 tiles on first draw','10 Fan','limit','Instant win before anyone discards.',`${w(1)}${w(1)}${w(1)}${P}${w(2)}${w(3)}${w(4)}${P}${w(5)}${w(6)}${w(7)}${P}${w(8)}${w(9)}${w(9)}${w(9)}${P}${w(5)}${w(5)}`)}
+    ${combo('地糊 Earthly Hand',"Any non-East wins on East's very first discard",'10 Fan','limit','Instant win. No tiles may have been called.',`${E}${E}${E}${P}${d(1)}${d(2)}${d(3)}${P}${b(4)}${b(5)}${b(6)}${P}${w(7)}${w(8)}${w(9)}${P}${d(9)}${d(9)}`)}
 
     <div class="help-cat-label">Hand Pattern</div>
     ${combo('平糊 Peace Hand','Píng hú — Every meld is a Chow (sequence)','1 Fan','','No pungs or kongs — pure sequences only.',`${w(1)}${w(2)}${w(3)}${P}${b(4)}${b(5)}${b(6)}${P}${d(7)}${d(8)}${d(9)}${P}${w(5)}${w(6)}${w(7)}${P}${d(2)}${d(2)}`)}
