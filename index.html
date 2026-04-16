@@ -850,26 +850,21 @@
     .spin-open-btn:hover { background: rgba(78,201,82,.13); border-color: rgba(78,201,82,.38); }
     .spin-open-btn:active { transform: scale(.96); }
 
-    /* ── Refresh icon button (circular, icon-only) ── */
+    /* ── Refresh button (rectangle, only icon spins) ── */
     .refresh-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 1px solid rgba(78,201,82,.2);
       background: rgba(78,201,82,.07);
+      border: 1px solid rgba(78,201,82,.2);
       color: var(--accent2);
-      font-size: 18px;
-      line-height: 1;
+      border-radius: var(--radius-sm);
+      padding: 8px 6px;
+      font-size: 15px;
+      font-weight: 600;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background .15s, border-color .15s;
-      padding: 0;
-      flex-shrink: 0;
+      text-align: center;
+      transition: background .15s, border-color .15s, transform .1s;
     }
-    .refresh-btn:hover  { background: rgba(78,201,82,.14); border-color: rgba(78,201,82,.38); }
-    .refresh-btn:active { transform: scale(.9); }
+    .refresh-btn:hover  { background: rgba(78,201,82,.13); border-color: rgba(78,201,82,.38); }
+    .refresh-btn:active { transform: scale(.96); }
     @keyframes btn-spin { to { transform: rotate(360deg); } }
 
     /* ═══ SPINNER VIEW ═══ */
