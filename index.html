@@ -1388,9 +1388,6 @@
 
   <!-- Scores pane -->
   <div id="dpane-scores" class="tab-pane active">
-    <div id="undo-banner" style="display:none;margin:0 0 10px">
-      <button id="btn-undo-round" style="width:100%;padding:11px;background:var(--surface2);border:1.5px solid var(--gold);border-radius:var(--radius-sm);color:var(--gold);font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.3px">↩ Undo Last Round</button>
-    </div>
     <div class="score-summary">
       <div class="summary-box pos-box">
         <div class="summary-label">Total Positive</div>
@@ -2484,11 +2481,6 @@ function createTable() {
 ═══════════════════════════════════════ */
 const DPANES = { scores:'dpane-scores', round:'dpane-round', history:'dpane-history', players:'dpane-players' };
 
-function hideThenSwitchBanner() {
-  const b = document.getElementById('undo-banner');
-  if (b) b.style.display = 'none';
-}
-
 function switchDTab(tab) {
   Object.values(DPANES).forEach(id => document.getElementById(id).classList.remove('active'));
   document.querySelectorAll('[data-dtab]').forEach(b => b.classList.remove('active'));
@@ -2720,7 +2712,6 @@ document.getElementById('d-submit-btn').addEventListener('click', () => {
     combos: [...F.fanSel],
     changes: Object.fromEntries(t.players.map((p,i) => [p, changes[i]]))
   };
-  record.prevEastIdx = t.eastIdx || 0;  // save for undo
   t.history.push(record);
   // Rotate East: if winner is NOT current East player, advance eastIdx
   const winnerIdx = t.players.indexOf(winnerName);
@@ -2745,8 +2736,6 @@ document.getElementById('d-submit-btn').addEventListener('click', () => {
   renderFanUI();
 
   switchDTab('scores');
-  const undoBanner = document.getElementById('undo-banner');
-  if (undoBanner) undoBanner.style.display = 'block';
   toast(`Round ${roundNum} — ${esc(winnerName)} wins! 🎉`);
 });
 
@@ -4238,28 +4227,6 @@ document.getElementById('btn-stats-back').addEventListener('click', showMain);
     setTimeout(() => location.reload(), 500);
   });
 })();
-
-/* ═══════════════════════════════════════
-   UNDO LAST ROUND
-═══════════════════════════════════════ */
-document.getElementById('btn-undo-round').addEventListener('click', () => {
-  const t = tableById(currentId);
-  if (!t || !t.history.length) return;
-  const last = t.history[t.history.length - 1];
-  // Reverse score changes
-  Object.entries(last.changes).forEach(([p, delta]) => {
-    if (p in t.scores) t.scores[p] -= delta;
-  });
-  // Restore East index
-  if (last.prevEastIdx !== undefined) {
-    t.eastIdx = last.prevEastIdx;
-  }
-  t.history.pop();
-  saveState();
-  document.getElementById('undo-banner').style.display = 'none';
-  renderDScores();
-  toast(`Round ${last.round} undone.`);
-});
 
 /* ═══════════════════════════════════════
    INIT
