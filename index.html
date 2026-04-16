@@ -1388,6 +1388,9 @@
 
   <!-- Scores pane -->
   <div id="dpane-scores" class="tab-pane active">
+    <div id="undo-banner" style="display:none;margin:0 0 10px">
+      <button id="btn-undo-round" style="width:100%;padding:11px;background:var(--surface2);border:1.5px solid var(--gold);border-radius:var(--radius-sm);color:var(--gold);font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.3px">↩ Undo Last Round</button>
+    </div>
     <div class="score-summary">
       <div class="summary-box pos-box">
         <div class="summary-label">Total Positive</div>
@@ -1415,9 +1418,6 @@
       <span id="d-minfan-saved" style="font-size:11px;color:var(--dim);min-width:32px;text-align:right"></span>
     </div>
     <div id="d-players-grid" class="players-grid"></div>
-    <div id="undo-banner" style="display:none;margin:8px 0 2px">
-      <button id="btn-undo-round" style="width:100%;padding:10px;background:var(--surface2);border:1px solid var(--gold);border-radius:var(--radius-sm);color:var(--gold);font-size:13px;font-weight:600;cursor:pointer;letter-spacing:.3px">↩ Undo Last Round</button>
-    </div>
     <div class="scores-action-row" style="padding:12px 0 4px">
       <button class="score-action-btn" id="btn-set-winds">&#x1F9ED; Set Winds</button>
       <button class="score-action-btn" id="btn-share-scores">&#x1F4E4; Share</button>
