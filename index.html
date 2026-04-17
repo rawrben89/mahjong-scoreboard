@@ -303,6 +303,41 @@
 
     /* ── Settings Pickers ── */
     .settings-picker-row { display:flex; flex-wrap:wrap; gap:6px; padding:4px 0 12px; }
+
+    /* ── Backup & Restore ── */
+    .backup-section-lbl {
+      font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
+      color: var(--dim); margin: 14px 0 4px;
+    }
+    .backup-btn-row { display: flex; gap: 8px; margin-bottom: 4px; }
+    .backup-btn {
+      flex: 1; padding: 11px 6px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border2); background: var(--surface2);
+      color: var(--text); font-size: 13px; font-weight: 600;
+      cursor: pointer; text-align: center; transition: background .15s, border-color .15s;
+      display: flex; flex-direction: column; align-items: center; gap: 3px; line-height: 1.3;
+    }
+    .backup-btn:hover { border-color: var(--accent); background: var(--accent-dim); }
+    .backup-btn .bk-icon { font-size: 20px; }
+    .backup-btn.danger { border-color: rgba(232,69,69,.4); color: var(--red); }
+    .backup-btn.danger:hover { background: var(--red-dim); border-color: var(--red); }
+    .backup-meta { font-size: 11px; color: var(--dim); margin: 4px 0 10px; text-align: center; }
+    .backup-code-wrap {
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: var(--radius-sm); padding: 10px; margin-bottom: 6px; display: none;
+    }
+    .backup-code-wrap.open { display: block; }
+    .backup-code-textarea {
+      width: 100%; font-size: 10px; font-family: monospace; color: var(--dim);
+      background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+      padding: 8px; resize: none; height: 72px; line-height: 1.4;
+    }
+    .backup-code-actions { display: flex; gap: 6px; margin-top: 6px; }
+    .backup-code-actions button {
+      flex: 1; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600;
+      border: 1.5px solid var(--border2); background: var(--surface2); color: var(--text); cursor: pointer;
+    }
+    .backup-code-actions button.primary { background: var(--accent); border-color: var(--accent); color: #000; }
     .pick-btn {
       padding: 6px 13px; border-radius: 20px;
       border: 1px solid var(--border2); background: var(--surface2);
@@ -2518,6 +2553,37 @@
       <span style="color:var(--dim);font-size:18px">›</span>
     </div>
 
+    <!-- Backup & Restore -->
+    <div class="backup-section-lbl">☁️ Backup &amp; Restore</div>
+    <div class="backup-btn-row">
+      <button class="backup-btn" id="btn-backup-export">
+        <span class="bk-icon">📤</span>Export
+      </button>
+      <button class="backup-btn" id="btn-backup-import">
+        <span class="bk-icon">📥</span>Import
+      </button>
+      <button class="backup-btn" id="btn-backup-code">
+        <span class="bk-icon">🔑</span>Code
+      </button>
+    </div>
+    <div class="backup-meta" id="backup-meta-lbl">No backup yet</div>
+
+    <!-- Backup code panel (shown/hidden) -->
+    <div class="backup-code-wrap" id="backup-code-panel">
+      <div style="font-size:11px;color:var(--dim);margin-bottom:6px">
+        Copy this code and save it anywhere (notes, email, messages).
+        Paste it on any device to restore your games.
+      </div>
+      <textarea class="backup-code-textarea" id="backup-code-text" readonly></textarea>
+      <div class="backup-code-actions">
+        <button id="btn-backup-copy" class="primary">📋 Copy Code</button>
+        <button id="btn-backup-restore-code">Restore from Code</button>
+      </div>
+    </div>
+
+    <!-- Hidden file input -->
+    <input type="file" id="backup-file-input" accept=".json" style="display:none">
+
     </div>
     <div class="modal-btns" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
       <button class="m-cancel" id="ms-settings-close" data-i18n="settings.close">Close</button>
@@ -2563,6 +2629,7 @@ function loadState() {
 function saveState() {
   try {
     localStorage.setItem('hk-mahjong-v3', JSON.stringify(S));
+    localStorage.setItem('hk-last-save', Date.now());
   } catch (_) {
     toast('⚠️ Could not save — browser storage may be full.');
   }
@@ -3687,6 +3754,136 @@ document.getElementById('toggle-show-money').addEventListener('change', e => {
 document.querySelectorAll('.help-tab-btn').forEach(btn =>
   btn.addEventListener('click', () => switchHTab(btn.dataset.htab))
 );
+
+/* ═══════════════════════════════════════
+   BACKUP & RESTORE
+═══════════════════════════════════════ */
+const BACKUP_KEY = 'hk-last-backup';
+
+function backupMetaLabel() {
+  const ts      = localStorage.getItem(BACKUP_KEY);
+  const saveTs  = localStorage.getItem('hk-last-save');
+  const lbl     = document.getElementById('backup-meta-lbl');
+  if (!lbl) return;
+  if (!ts) {
+    lbl.textContent = saveTs ? '⚠️ No backup — tap Export to save your data' : 'No backup yet';
+    lbl.style.color = saveTs ? 'var(--red)' : '';
+    return;
+  }
+  const d = new Date(Number(ts));
+  const stale = saveTs && Number(saveTs) > Number(ts);
+  lbl.textContent = (stale ? '⚠️ Changes since last backup — ' : '✅ Last backup: ')
+    + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+  lbl.style.color = stale ? 'var(--gold)' : 'var(--dim)';
+}
+
+// Open settings → refresh meta label & hide code panel
+document.getElementById('btn-settings').addEventListener('click', backupMetaLabel, true);
+
+// ── Export ──────────────────────────────────────────────────────────────────
+document.getElementById('btn-backup-export').addEventListener('click', () => {
+  const data = JSON.stringify(S, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const date = new Date().toISOString().slice(0, 10);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `mahjong-backup-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  localStorage.setItem(BACKUP_KEY, Date.now());
+  backupMetaLabel();
+  toast('✅ Backup exported!');
+});
+
+// ── Import ──────────────────────────────────────────────────────────────────
+document.getElementById('btn-backup-import').addEventListener('click', () => {
+  document.getElementById('backup-file-input').value = '';
+  document.getElementById('backup-file-input').click();
+});
+
+document.getElementById('backup-file-input').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      if (!parsed.tables || !Array.isArray(parsed.tables)) throw new Error('Invalid file');
+      const tCount = parsed.tables.length;
+      const aCount = (parsed.archives || []).length;
+      const msg = `Restore backup?\n\n${tCount} active table(s), ${aCount} past game(s).\n\nThis will replace all current data.`;
+      if (!confirm(msg)) return;
+      S = parsed;
+      if (!S.savedPlayers) S.savedPlayers = [];
+      saveState();
+      localStorage.setItem(BACKUP_KEY, Date.now());
+      backupMetaLabel();
+      renderMain();
+      document.getElementById('modal-settings').classList.remove('show');
+      toast(`✅ Restored — ${tCount} table(s) loaded!`);
+    } catch (_) {
+      toast('❌ Invalid backup file');
+    }
+  };
+  reader.readAsText(file);
+});
+
+// ── Backup Code ─────────────────────────────────────────────────────────────
+document.getElementById('btn-backup-code').addEventListener('click', () => {
+  const panel = document.getElementById('backup-code-panel');
+  const isOpen = panel.classList.contains('open');
+  if (isOpen) { panel.classList.remove('open'); return; }
+  // Generate code: base64 of JSON state
+  try {
+    const json = JSON.stringify(S);
+    const b64  = btoa(unescape(encodeURIComponent(json)));
+    document.getElementById('backup-code-text').value = b64;
+  } catch (_) {
+    toast('❌ Could not generate code');
+    return;
+  }
+  panel.classList.add('open');
+});
+
+document.getElementById('btn-backup-copy').addEventListener('click', () => {
+  const ta = document.getElementById('backup-code-text');
+  ta.select();
+  try {
+    navigator.clipboard.writeText(ta.value).then(() => {
+      localStorage.setItem(BACKUP_KEY, Date.now());
+      backupMetaLabel();
+      toast('📋 Backup code copied!');
+    }).catch(() => {
+      document.execCommand('copy');
+      toast('📋 Backup code copied!');
+    });
+  } catch (_) { toast('❌ Copy failed — select and copy manually'); }
+});
+
+document.getElementById('btn-backup-restore-code').addEventListener('click', () => {
+  const code = prompt('Paste your backup code:');
+  if (!code) return;
+  try {
+    const json   = decodeURIComponent(escape(atob(code.trim())));
+    const parsed = JSON.parse(json);
+    if (!parsed.tables || !Array.isArray(parsed.tables)) throw new Error('Invalid');
+    const tCount = parsed.tables.length;
+    const aCount = (parsed.archives || []).length;
+    if (!confirm(`Restore backup?\n\n${tCount} active table(s), ${aCount} past game(s).\n\nThis will replace all current data.`)) return;
+    S = parsed;
+    if (!S.savedPlayers) S.savedPlayers = [];
+    saveState();
+    localStorage.setItem(BACKUP_KEY, Date.now());
+    backupMetaLabel();
+    renderMain();
+    document.getElementById('modal-settings').classList.remove('show');
+    document.getElementById('backup-code-panel').classList.remove('open');
+    toast(`✅ Restored — ${tCount} table(s) loaded!`);
+  } catch (_) {
+    toast('❌ Invalid backup code');
+  }
+});
 
 /* ═══════════════════════════════════════
    TILE BUILDER — image tiles from Wikimedia Commons
