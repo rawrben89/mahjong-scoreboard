@@ -3645,74 +3645,27 @@ document.getElementById('btn-help-back').addEventListener('click', showMain);
    TRANSLATIONS
 ═══════════════════════════════════════ */
 const TRANSLATIONS = {
-  en: {
-    'nav.spin':'Spin/Dice','nav.scores':'All Players','nav.stats':'Stats','nav.calc':'Calculator','nav.settle':'Settle','nav.settings':'Settings',
-    'main.title':'🀄 Mahjong Scoreboard','main.subtitle':'Hong Kong Style','main.new_table':'＋ New Table','main.all_pos':'All Positive','main.all_neg':'All Negative',
-    'tab.scores':'Scores','tab.round':'Add Round','tab.history':'History','tab.players':'Players',
-    'scores.pos':'Total Positive','scores.neg':'Total Negative','scores.bet':'💰 Bet per fan','scores.minfan':'🎯 Min fan to win',
-    'detail.back':'← Back','detail.delete':'Delete',
-    'act.winds':'🧭 Set Winds','act.settle':'💸 Settle Up','act.share':'📤 Share','act.end':'🏁 End Game',
-    'round.winner':'Winner 🏆','round.wintype':'Win Type','round.zimo_sub':'All 3 pay','round.discard_sub':'Discarder pays all',
-    'round.discarder':'Who Discarded? 🃏','round.hand':'Hand Tiles 🀄','round.hand_hint':'Tap tiles below to build hand…',
-    'round.fan':'Fan Combinations','round.edit':'＋ Edit combinations','round.confirm':'Confirm Round ✓',
-    'nt.title':'Create New Table','nt.cancel':'Cancel','nt.create':'Create Table','nt.saved_label':'Saved players — tap to fill:',
-    'settings.title':'⚙️ Settings','settings.dark':'🌙 Dark Mode','settings.dark_sub':'Toggle light / dark theme',
-    'settings.money':'💰 Show Money Amounts','settings.money_sub':'Display $ values alongside fan scores',
-    'settings.lang':'🌐 Language','settings.lang_sub':'App display language',
-    'settings.currency':'💱 Currency Symbol','settings.currency_sub':'Symbol shown with money amounts',
-    'settings.help':'❓ Help & Reference','settings.help_sub':'Fan combinations, rules, tile guide',
-    'settings.close':'Close',
-    'rw.prevailing':'Prevailing wind:',
-    'settle.none':'✅ All square — no payments needed!','settle.close':'Close',
-    'rotate.title':'Rotate Seats!','rotate.msg':'All 4 players have been East. Please rotate seats now.','rotate.ok':'Got it!',
-  },
-  fr: {
-    'nav.spin':'Dés','nav.scores':'Joueurs','nav.stats':'Stats','nav.calc':'Calcul','nav.settle':'Règlement','nav.settings':'Réglages',
-    'main.title':'🀄 Tableau Mahjong','main.subtitle':'Style Hong Kong','main.new_table':'＋ Nouvelle Table','main.all_pos':'Total positif','main.all_neg':'Total négatif',
-    'tab.scores':'Scores','tab.round':'Ajouter','tab.history':'Historique','tab.players':'Joueurs',
-    'scores.pos':'Total Positif','scores.neg':'Total Négatif','scores.bet':'💰 Mise par fan','scores.minfan':'🎯 Fan minimum',
-    'detail.back':'← Retour','detail.delete':'Supprimer',
-    'act.winds':'🧭 Vents','act.settle':'💸 Règlement','act.share':'📤 Partager','act.end':'🏁 Fin de partie',
-    'round.winner':'Gagnant 🏆','round.wintype':'Type de gain','round.zimo_sub':'Les 3 paient','round.discard_sub':'Le défausseur paie tout',
-    'round.discarder':'Qui a défaussé? 🃏','round.hand':'Tuiles en main 🀄','round.hand_hint':'Appuyez sur les tuiles ci-dessous…',
-    'round.fan':'Combinaisons','round.edit':'＋ Modifier combinaisons','round.confirm':'Confirmer la manche ✓',
-    'nt.title':'Créer une nouvelle table','nt.cancel':'Annuler','nt.create':'Créer la table','nt.saved_label':'Joueurs sauvegardés — appuyer pour remplir :',
-    'settings.title':'⚙️ Réglages','settings.dark':'🌙 Mode sombre','settings.dark_sub':'Basculer thème clair / sombre',
-    'settings.money':'💰 Afficher les montants','settings.money_sub':'Afficher les valeurs $ avec les scores',
-    'settings.lang':'🌐 Langue','settings.lang_sub':'Langue d\'affichage',
-    'settings.currency':'💱 Symbole monétaire','settings.currency_sub':'Symbole affiché avec les montants',
-    'settings.help':'❓ Aide & Référence','settings.help_sub':'Combinaisons, règles, guide des tuiles',
-    'settings.close':'Fermer',
-    'rw.prevailing':'Vent dominant :',
-    'settle.none':'✅ Tout est réglé — aucun paiement requis !','settle.close':'Fermer',
-    'rotate.title':'Tournez les places !','rotate.msg':'Les 4 joueurs ont été Est. Veuillez tourner les places.','rotate.ok':'Compris !',
-  },
-  zh: {
-    'nav.spin':'转盘/骰子','nav.scores':'所有玩家','nav.stats':'统计','nav.calc':'计算器','nav.settle':'结算','nav.settings':'设置',
-    'main.title':'🀄 麻将记分板','main.subtitle':'香港风格','main.new_table':'＋ 新建牌局','main.all_pos':'总正分','main.all_neg':'总负分',
-    'tab.scores':'分数','tab.round':'添加','tab.history':'历史','tab.players':'玩家',
-    'scores.pos':'总正分','scores.neg':'总负分','scores.bet':'💰 每番押注','scores.minfan':'🎯 最低番数',
-    'detail.back':'← 返回','detail.delete':'删除',
-    'act.winds':'🧭 设置风位','act.settle':'💸 结算','act.share':'📤 分享','act.end':'🏁 结束游戏',
-    'round.winner':'赢家 🏆','round.wintype':'胡牌方式','round.zimo_sub':'三家付','round.discard_sub':'点炮者付',
-    'round.discarder':'谁点炮？🃏','round.hand':'手牌 🀄','round.hand_hint':'点击下方牌面来组建手牌…',
-    'round.fan':'番组合','round.edit':'＋ 编辑组合','round.confirm':'确认本局 ✓',
-    'nt.title':'新建牌局','nt.cancel':'取消','nt.create':'创建牌局','nt.saved_label':'已保存玩家 — 点击填入：',
-    'settings.title':'⚙️ 设置','settings.dark':'🌙 深色模式','settings.dark_sub':'切换浅色 / 深色主题',
-    'settings.money':'💰 显示金额','settings.money_sub':'在番分旁显示金额',
-    'settings.lang':'🌐 语言','settings.lang_sub':'应用显示语言',
-    'settings.currency':'💱 货币符号','settings.currency_sub':'金额显示符号',
-    'settings.help':'❓ 帮助与参考','settings.help_sub':'番组合、规则、牌面指南',
-    'settings.close':'关闭',
-    'rw.prevailing':'场风：',
-    'settle.none':'✅ 无需结算！','settle.close':'关闭',
-    'rotate.title':'轮换座位！','rotate.msg':'四位玩家都做过庄家了。请轮换座位。','rotate.ok':'明白！',
-  }
+  'nav.spin':'Spin/Dice','nav.scores':'All Players','nav.stats':'Stats','nav.calc':'Calculator','nav.settle':'Settle','nav.settings':'Settings',
+  'main.title':'🀄 Mahjong Scoreboard','main.subtitle':'Hong Kong Style','main.new_table':'＋ New Table','main.all_pos':'All Positive','main.all_neg':'All Negative',
+  'tab.scores':'Scores','tab.round':'Add Round','tab.history':'History','tab.players':'Players',
+  'scores.pos':'Total Positive','scores.neg':'Total Negative','scores.bet':'💰 Bet per fan','scores.minfan':'🎯 Min fan to win',
+  'detail.back':'← Back','detail.delete':'Delete',
+  'act.winds':'🧭 Set Winds','act.settle':'💸 Settle Up','act.share':'📤 Share','act.end':'🏁 End Game',
+  'round.winner':'Winner 🏆','round.wintype':'Win Type','round.zimo_sub':'All 3 pay','round.discard_sub':'Discarder pays all',
+  'round.discarder':'Who Discarded? 🃏','round.hand':'Hand Tiles 🀄','round.hand_hint':'Tap tiles below to build hand…',
+  'round.fan':'Fan Combinations','round.edit':'＋ Edit combinations','round.confirm':'Confirm Round ✓',
+  'nt.title':'Create New Table','nt.cancel':'Cancel','nt.create':'Create Table','nt.saved_label':'Saved players — tap to fill:',
+  'settings.title':'⚙️ Settings','settings.dark':'🌙 Dark Mode','settings.dark_sub':'Toggle light / dark theme',
+  'settings.money':'💰 Show Money Amounts','settings.money_sub':'Display $ values alongside fan scores',
+  'settings.help':'❓ Help & Reference','settings.help_sub':'Fan combinations, rules, tile guide',
+  'settings.close':'Close',
+  'rw.prevailing':'Prevailing wind:',
+  'settle.none':'✅ All square — no payments needed!','settle.close':'Close',
+  'rotate.title':'Rotate Seats!','rotate.msg':'All 4 players have been East. Please rotate seats now.','rotate.ok':'Got it!',
 };
 
 function T(key) {
-  const lang = localStorage.getItem('hk-lang') || 'en';
-  return (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS.en[key] || key;
+  return TRANSLATIONS[key] || key;
 }
 
 function applyLang() {
@@ -3720,9 +3673,6 @@ function applyLang() {
     const v = T(el.dataset.i18n);
     if (v) el.textContent = v;
   });
-  // Re-render dynamic content so translated strings appear immediately
-  if (typeof renderMain === 'function') renderMain();
-  if (typeof currentId !== 'undefined' && currentId && typeof renderDScores === 'function') renderDScores();
 }
 
 /* ── Settings modal ── */
