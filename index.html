@@ -3563,17 +3563,6 @@ function applyLang() {
     const v = T(el.dataset.i18n);
     if (v) el.textContent = v;
   });
-  // Update lang picker active state
-  const lang = localStorage.getItem('hk-lang') || 'en';
-  const langNames = { en:'English', fr:'Français (CA)', zh:'简体中文' };
-  const langVal = document.getElementById('settings-lang-val');
-  if (langVal) langVal.textContent = langNames[lang] || 'English';
-  document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
-  // Update currency picker active state
-  const curr = localStorage.getItem('hk-currency') || '$';
-  const currVal = document.getElementById('settings-currency-val');
-  if (currVal) currVal.textContent = curr;
-  document.querySelectorAll('[data-curr]').forEach(b => b.classList.toggle('active', b.dataset.curr === curr));
   // Re-render dynamic content so translated strings appear immediately
   if (typeof renderMain === 'function') renderMain();
   if (typeof currentId !== 'undefined' && currentId && typeof renderDScores === 'function') renderDScores();
@@ -3583,9 +3572,6 @@ function applyLang() {
 document.getElementById('btn-settings').addEventListener('click', () => {
   document.getElementById('toggle-dark-mode').checked = !document.body.classList.contains('light');
   document.getElementById('toggle-show-money').checked = localStorage.getItem('hk-show-money') !== 'false';
-  // Close pickers on open
-  document.getElementById('settings-lang-picker').style.display = 'none';
-  document.getElementById('settings-currency-picker').style.display = 'none';
   applyLang();
   document.getElementById('modal-settings').classList.add('show');
 });
@@ -3607,34 +3593,6 @@ document.getElementById('toggle-show-money').addEventListener('change', e => {
   localStorage.setItem('hk-show-money', e.target.checked ? 'true' : 'false');
   renderMain();
   if (currentId) renderDScores();
-});
-// Language picker toggle
-document.getElementById('settings-lang-row').addEventListener('click', () => {
-  const p = document.getElementById('settings-lang-picker');
-  p.style.display = p.style.display === 'none' ? 'flex' : 'none';
-  document.getElementById('settings-currency-picker').style.display = 'none';
-});
-document.querySelectorAll('[data-lang]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    localStorage.setItem('hk-lang', btn.dataset.lang);
-    applyLang();
-    document.getElementById('settings-lang-picker').style.display = 'none';
-  });
-});
-// Currency picker toggle
-document.getElementById('settings-currency-row').addEventListener('click', () => {
-  const p = document.getElementById('settings-currency-picker');
-  p.style.display = p.style.display === 'none' ? 'flex' : 'none';
-  document.getElementById('settings-lang-picker').style.display = 'none';
-});
-document.querySelectorAll('[data-curr]').forEach(btn => {
-  btn.addEventListener('click', () => {
-    localStorage.setItem('hk-currency', btn.dataset.curr);
-    applyLang();
-    document.getElementById('settings-currency-picker').style.display = 'none';
-    renderMain();
-    if (currentId) renderDScores();
-  });
 });
 document.querySelectorAll('.help-tab-btn').forEach(btn =>
   btn.addEventListener('click', () => switchHTab(btn.dataset.htab))
