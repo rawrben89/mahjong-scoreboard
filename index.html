@@ -336,39 +336,63 @@
     /* ── Splash Screen ── */
     #splash-screen {
       position: fixed; inset: 0; z-index: 9999;
-      background: #040a04;
+      background: radial-gradient(ellipse 60% 50% at 50% 48%, #0c1f0c 0%, #040a04 70%);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
+      gap: 0;
       transition: opacity .5s ease;
     }
     #splash-screen.fade-out { opacity: 0; pointer-events: none; }
-    .splash-tile {
+    @keyframes splash-pop {
+      from { transform: scale(.75); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .splash-tile-wrap {
+      position: relative;
+      margin-bottom: 22px;
+      animation: splash-pop .55s cubic-bezier(.175,.885,.32,1.275) both;
+    }
+    .splash-tile-wrap img {
       width: 110px; height: 110px;
       border-radius: 18px;
       box-shadow: 0 0 48px rgba(78,201,82,.35), 0 8px 32px rgba(0,0,0,.7);
-      margin-bottom: 28px;
-      animation: splash-pop .5s cubic-bezier(.175,.885,.32,1.275) both;
+      display: block;
+      animation: tile-breathe 3s 1s ease-in-out infinite;
     }
-    @keyframes splash-pop {
-      from { transform: scale(.4); opacity: 0; }
-      to   { transform: scale(1);  opacity: 1; }
+    @keyframes tile-breathe {
+      0%, 100% { box-shadow: 0 0 48px rgba(78,201,82,.35), 0 8px 32px rgba(0,0,0,.7); }
+      50%       { box-shadow: 0 0 72px rgba(78,201,82,.6),  0 8px 32px rgba(0,0,0,.7); }
     }
     .splash-title {
       font-size: 26px; font-weight: 800; color: #ecf7ec;
       letter-spacing: .5px; text-align: center;
-      animation: splash-fadein .5s .25s ease both;
+      animation: splash-fadein .5s .3s ease both;
     }
     .splash-sub {
-      font-size: 11px; color: rgba(110,160,112,.6);
-      letter-spacing: 1.5px; text-transform: uppercase;
-      margin-top: 6px; text-align: center;
-      animation: splash-fadein .5s .35s ease both;
+      font-size: 11px; color: rgba(201,168,64,.75);
+      letter-spacing: 2px; text-transform: uppercase;
+      margin-top: 7px; text-align: center;
+      animation: splash-fadein .5s .5s ease both;
     }
     .splash-credit {
       position: absolute; bottom: 32px;
-      font-size: 11px; color: rgba(110,160,112,.45);
-      letter-spacing: .8px;
-      animation: splash-fadein .5s .5s ease both;
+      font-size: 11px; font-weight: 500;
+      color: rgba(110,160,112,.55);
+      letter-spacing: 1px;
+      animation: splash-fadein .5s .7s ease both;
+    }
+    .splash-progress-wrap {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: rgba(255,255,255,.06);
+      animation: splash-fadein .3s .2s ease both;
+    }
+    .splash-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), #a8e6ab);
+      border-radius: 0 2px 2px 0;
+      transition: width .1s linear;
     }
     @keyframes splash-fadein {
       from { opacity: 0; transform: translateY(8px); }
@@ -1541,10 +1565,15 @@
 </head>
 <body>
 <div id="splash-screen">
-  <img class="splash-tile" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/MJd1-.svg/60px-MJd1-.svg.png" alt="Red Dragon">
+  <div class="splash-tile-wrap">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/MJd1-.svg/60px-MJd1-.svg.png" alt="Red Dragon">
+  </div>
   <div class="splash-title">🀄 Mahjong Scoreboard</div>
   <div class="splash-sub">Hong Kong Style</div>
   <div class="splash-credit">Made by Rawrben</div>
+  <div class="splash-progress-wrap">
+    <div class="splash-progress-bar" id="splash-progress"></div>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════
@@ -4874,10 +4903,20 @@ document.getElementById('modal-settlement').addEventListener('click', e => {
 (function() {
   const splash = document.getElementById('splash-screen');
   if (!splash) return;
-  setTimeout(() => {
-    splash.classList.add('fade-out');
-    setTimeout(() => splash.remove(), 500);
-  }, 4000);
+  const bar = document.getElementById('splash-progress');
+  const duration = 1800; // ms before dismiss
+  const interval = 30;
+  let elapsed = 0;
+  const timer = setInterval(() => {
+    elapsed += interval;
+    const pct = Math.min(100, Math.round((elapsed / duration) * 100));
+    if (bar) bar.style.width = pct + '%';
+    if (elapsed >= duration) {
+      clearInterval(timer);
+      splash.classList.add('fade-out');
+      setTimeout(() => splash.remove(), 500);
+    }
+  }, interval);
 })();
 </script>
 </body>
