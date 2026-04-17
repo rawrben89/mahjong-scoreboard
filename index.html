@@ -3662,12 +3662,13 @@ function spinWheel() {
   const winnerIndex   = Math.floor(Math.random() * 4);
   const numFullSpins  = 5 + Math.floor(Math.random() * 4); // 5–8 full rotations
 
-  // Rotation needed to bring segment winnerIndex to top:
-  // East (0) is at top when rot=0. Each 90° CW rotation advances to next wind.
-  // For segment i to be at top: rot = ((4-i) % 4) * π/2
-  const baseTarget    = ((4 - winnerIndex) % 4) * (Math.PI / 2);
-  // Wobble: land anywhere in the middle 60% of the segment
-  const wobble        = (Math.random() - 0.5) * (Math.PI / 2 * 0.5);
+  // Rotation needed to bring the CENTER of segment winnerIndex to the arrow (top).
+  // Arrow is at 12 o'clock (−π/2). Sector i center is at −π/2 + i·π/2 + π/4 before rotation.
+  // To place center at −π/2: rot = −π/4 − i·π/2  (mod 2π, always positive)
+  let baseTarget = ((4 - winnerIndex) % 4) * (Math.PI / 2) - Math.PI / 4;
+  if (baseTarget < 0) baseTarget += 2 * Math.PI;
+  // Wobble: land anywhere in the middle 60% of the segment (±30% of π/2)
+  const wobble = (Math.random() - 0.5) * (Math.PI / 2 * 0.6);
 
   // Normalise current rotation to [0, 2π)
   const normalised    = ((wheelRot % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
