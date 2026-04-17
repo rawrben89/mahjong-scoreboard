@@ -1,0 +1,38 @@
+name: Auto Bump Version
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'package.json'   # avoid infinite loop on version commit
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Bump patch version
+        run: node bump-version.js
+
+      - name: Commit version bump
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json index.html sw.js
+          git diff --cached --quiet || git commit -m "chore: bump version to $(node -p \"require('./package.json').version\")"
+
+      - name: Push
+        run: git push
