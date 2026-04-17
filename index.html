@@ -284,6 +284,17 @@
     .toggle-switch input:checked + .toggle-track { background: var(--accent); }
     .toggle-switch input:checked + .toggle-track::after { transform: translateX(20px); }
 
+    /* ── Settings Pickers ── */
+    .settings-picker-row { display:flex; flex-wrap:wrap; gap:6px; padding:4px 0 12px; }
+    .pick-btn {
+      padding: 6px 13px; border-radius: 20px;
+      border: 1px solid var(--border2); background: var(--surface2);
+      color: var(--text); font-size: 13px; cursor: pointer;
+      transition: background .15s, border-color .15s, color .15s;
+    }
+    .pick-btn:hover  { border-color: var(--accent); color: var(--accent); }
+    .pick-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
     /* ── Streak Badge ── */
     .streak-badge {
       font-size: 11px; font-weight: 700;
@@ -1593,10 +1604,10 @@
     </div>
     <div id="d-players-grid" class="players-grid"></div>
     <div class="scores-action-row" style="padding:12px 0 4px">
-      <button class="score-action-btn" id="btn-set-winds">&#x1F9ED; Set Winds</button>
-      <button class="score-action-btn" id="btn-settle-table">&#x1F4B8; Settle Up</button>
-      <button class="score-action-btn" id="btn-share-scores">&#x1F4E4; Share</button>
-      <button class="score-action-btn danger" id="btn-end-game">&#x1F3C1; End Game</button>
+      <button class="score-action-btn" id="btn-set-winds"><span data-i18n="act.winds">🧭 Set Winds</span></button>
+      <button class="score-action-btn" id="btn-settle-table"><span data-i18n="act.settle">💸 Settle Up</span></button>
+      <button class="score-action-btn" id="btn-share-scores"><span data-i18n="act.share">📤 Share</span></button>
+      <button class="score-action-btn danger" id="btn-end-game"><span data-i18n="act.end">🏁 End Game</span></button>
     </div>
   </div>
 
@@ -1682,10 +1693,10 @@
 
   <!-- Bottom tab bar (detail) -->
   <nav class="tab-bar">
-    <button class="tab-btn active" data-dtab="scores">  <span>📊</span>Scores</button>
-    <button class="tab-btn"        data-dtab="round">   <span>✏️</span>Add Round</button>
-    <button class="tab-btn"        data-dtab="history"> <span>📜</span>History</button>
-    <button class="tab-btn"        data-dtab="players"> <span>👥</span>Players</button>
+    <button class="tab-btn active" data-dtab="scores">  <span>📊</span><span data-i18n="tab.scores">Scores</span></button>
+    <button class="tab-btn"        data-dtab="round">   <span>✏️</span><span data-i18n="tab.round">Add Round</span></button>
+    <button class="tab-btn"        data-dtab="history"> <span>📜</span><span data-i18n="tab.history">History</span></button>
+    <button class="tab-btn"        data-dtab="players"> <span>👥</span><span data-i18n="tab.players">Players</span></button>
   </nav>
 </div>
 
@@ -2356,8 +2367,8 @@
     <p style="font-size:13px;color:var(--dim);margin-bottom:18px;line-height:1.5">
       All 4 players have been East.<br>Please rotate seats now.
     </p>
-    <div id="modal-rotate-wind" style="font-size:13px;color:var(--accent);margin-bottom:16px;font-weight:600"></div>
-    <button class="m-confirm" id="btn-rotate-ok" style="width:100%">Got it!</button>
+    <div id="modal-rotate-wind" style="font-size:13px;color:var(--accent);margin-bottom:20px;font-weight:600"></div>
+    <button id="btn-rotate-ok" data-i18n="rotate.ok" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.3px;box-shadow:0 4px 16px rgba(78,201,82,.35)">Got it!</button>
   </div>
 </div>
 
@@ -2370,7 +2381,7 @@
     <h3 id="ms-title">💸 Settle Up</h3>
     <div id="ms-body"></div>
     <div class="modal-btns" style="margin-top:16px">
-      <button class="m-cancel" id="ms-close">Close</button>
+      <button class="m-cancel" id="ms-close" data-i18n="settle.close">Close</button>
     </div>
   </div>
 </div>
@@ -2381,26 +2392,78 @@
 <div id="modal-settings" class="modal-bg">
   <div class="modal-box" style="max-width:340px">
     <div class="modal-drag"></div>
-    <h3>⚙️ Settings</h3>
+    <h3 data-i18n="settings.title">⚙️ Settings</h3>
+
+    <!-- Dark Mode -->
     <div class="settings-row">
       <div>
-        <div class="settings-row-label">🌙 Dark Mode</div>
-        <div class="settings-row-sub">Toggle light / dark theme</div>
+        <div class="settings-row-label" data-i18n="settings.dark">🌙 Dark Mode</div>
+        <div class="settings-row-sub"   data-i18n="settings.dark_sub">Toggle light / dark theme</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" id="toggle-dark-mode">
         <span class="toggle-track"></span>
       </label>
     </div>
+
+    <!-- Show Money Amounts -->
+    <div class="settings-row">
+      <div>
+        <div class="settings-row-label" data-i18n="settings.money">💰 Show Money Amounts</div>
+        <div class="settings-row-sub"   data-i18n="settings.money_sub">Display $ values alongside fan scores</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="toggle-show-money" checked>
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+
+    <!-- Language -->
+    <div class="settings-row" style="cursor:pointer" id="settings-lang-row">
+      <div>
+        <div class="settings-row-label" data-i18n="settings.lang">🌐 Language</div>
+        <div class="settings-row-sub"   data-i18n="settings.lang_sub">App display language</div>
+      </div>
+      <span id="settings-lang-val" style="color:var(--accent);font-weight:700;font-size:13px">English</span>
+    </div>
+    <div id="settings-lang-picker" class="settings-picker-row" style="display:none">
+      <button class="pick-btn" data-lang="en">🇨🇦 English</button>
+      <button class="pick-btn" data-lang="fr">🇨🇦 Français (CA)</button>
+      <button class="pick-btn" data-lang="zh">🇨🇳 简体中文</button>
+    </div>
+
+    <!-- Currency Symbol -->
+    <div class="settings-row" style="cursor:pointer" id="settings-currency-row">
+      <div>
+        <div class="settings-row-label" data-i18n="settings.currency">💱 Currency Symbol</div>
+        <div class="settings-row-sub"   data-i18n="settings.currency_sub">Symbol shown with money amounts</div>
+      </div>
+      <span id="settings-currency-val" style="color:var(--accent);font-weight:700;font-size:16px">$</span>
+    </div>
+    <div id="settings-currency-picker" class="settings-picker-row" style="display:none">
+      <button class="pick-btn" data-curr="$">$ USD</button>
+      <button class="pick-btn" data-curr="CA$">CA$ CAD</button>
+      <button class="pick-btn" data-curr="HK$">HK$</button>
+      <button class="pick-btn" data-curr="S$">S$ SGD</button>
+      <button class="pick-btn" data-curr="RM">RM MYR</button>
+      <button class="pick-btn" data-curr="¥">¥ CNY</button>
+      <button class="pick-btn" data-curr="€">€ EUR</button>
+      <button class="pick-btn" data-curr="£">£ GBP</button>
+      <button class="pick-btn" data-curr="₱">₱ PHP</button>
+      <button class="pick-btn" data-curr="฿">฿ THB</button>
+    </div>
+
+    <!-- Help -->
     <div class="settings-row" style="cursor:pointer" id="settings-open-help">
       <div>
-        <div class="settings-row-label">❓ Help &amp; Reference</div>
-        <div class="settings-row-sub">Fan combinations, rules, tile guide</div>
+        <div class="settings-row-label" data-i18n="settings.help">❓ Help &amp; Reference</div>
+        <div class="settings-row-sub"   data-i18n="settings.help_sub">Fan combinations, rules, tile guide</div>
       </div>
       <span style="color:var(--dim);font-size:18px">›</span>
     </div>
+
     <div class="modal-btns" style="margin-top:8px">
-      <button class="m-cancel" id="ms-settings-close">Close</button>
+      <button class="m-cancel" id="ms-settings-close" data-i18n="settings.close">Close</button>
     </div>
   </div>
 </div>
@@ -2409,12 +2472,12 @@
      BOTTOM NAV
 ═══════════════════════════════════ -->
 <nav id="bottom-nav">
-  <button class="nav-btn" id="btn-open-spinner"><span class="nav-icon">🎲</span>Spin/Dice</button>
-  <button class="nav-btn" id="btn-open-combined"><span class="nav-icon">📊</span>Scores</button>
-  <button class="nav-btn" id="btn-open-stats"><span class="nav-icon">📈</span>Stats</button>
-  <button class="nav-btn" id="btn-open-calc"><span class="nav-icon">🧮</span>Calculator</button>
-  <button class="nav-btn" id="btn-settlement"><span class="nav-icon">💸</span>Settle</button>
-  <button class="nav-btn" id="btn-settings"><span class="nav-icon">⚙️</span>Settings</button>
+  <button class="nav-btn" id="btn-open-spinner"><span class="nav-icon">🎲</span><span data-i18n="nav.spin">Spin/Dice</span></button>
+  <button class="nav-btn" id="btn-open-combined"><span class="nav-icon">📊</span><span data-i18n="nav.scores">Scores</span></button>
+  <button class="nav-btn" id="btn-open-stats"><span class="nav-icon">📈</span><span data-i18n="nav.stats">Stats</span></button>
+  <button class="nav-btn" id="btn-open-calc"><span class="nav-icon">🧮</span><span data-i18n="nav.calc">Calculator</span></button>
+  <button class="nav-btn" id="btn-settlement"><span class="nav-icon">💸</span><span data-i18n="nav.settle">Settle</span></button>
+  <button class="nav-btn" id="btn-settings"><span class="nav-icon">⚙️</span><span data-i18n="nav.settings">Settings</span></button>
 </nav>
 
 <div id="toast" class="toast"></div>
@@ -2460,10 +2523,12 @@ function esc(s) {
 function fmt(n) { return (n > 0 ? '+' : '') + n; }
 function fmtMoney(pts, stake) {
   if (!stake || stake === 0) return '';
+  if (localStorage.getItem('hk-show-money') === 'false') return '';
   const val = pts * stake;
   const abs = Math.abs(val);
   const str = abs % 1 === 0 ? String(abs) : abs.toFixed(2);
-  return (pts < 0 ? '-' : pts > 0 ? '+' : '') + '$' + str;
+  const sym = localStorage.getItem('hk-currency') || '$';
+  return (pts < 0 ? '-' : pts > 0 ? '+' : '') + sym + str;
 }
 
 let _toastTimer;
@@ -2819,7 +2884,7 @@ function renderDScores() {
     const rw = t.roundWind || 0;
     rwBanner.style.display = '';
     rwBanner.innerHTML = `<span class="rw-badge">${WLBL_FULL[rw]}局</span>
-      <div class="rw-label"><strong>${WENL_FULL[rw]} Round</strong><span>Prevailing wind: ${WENL_FULL[rw]}</span></div>`;
+      <div class="rw-label"><strong>${WENL_FULL[rw]} Round</strong><span>${T('rw.prevailing')} ${WENL_FULL[rw]}</span></div>`;
   }
 
   // Winning streaks
@@ -3442,9 +3507,85 @@ function switchHTab(tab) {
 
 document.getElementById('btn-help-back').addEventListener('click', showMain);
 
+/* ═══════════════════════════════════════
+   TRANSLATIONS
+═══════════════════════════════════════ */
+const TRANSLATIONS = {
+  en: {
+    'nav.spin':'Spin/Dice','nav.scores':'Scores','nav.stats':'Stats','nav.calc':'Calculator','nav.settle':'Settle','nav.settings':'Settings',
+    'tab.scores':'Scores','tab.round':'Add Round','tab.history':'History','tab.players':'Players',
+    'act.winds':'🧭 Set Winds','act.settle':'💸 Settle Up','act.share':'📤 Share','act.end':'🏁 End Game',
+    'settings.title':'⚙️ Settings','settings.dark':'🌙 Dark Mode','settings.dark_sub':'Toggle light / dark theme',
+    'settings.money':'💰 Show Money Amounts','settings.money_sub':'Display $ values alongside fan scores',
+    'settings.lang':'🌐 Language','settings.lang_sub':'App display language',
+    'settings.currency':'💱 Currency Symbol','settings.currency_sub':'Symbol shown with money amounts',
+    'settings.help':'❓ Help & Reference','settings.help_sub':'Fan combinations, rules, tile guide',
+    'settings.close':'Close',
+    'rw.prevailing':'Prevailing wind:',
+    'settle.none':'✅ All square — no payments needed!','settle.close':'Close',
+    'rotate.title':'Rotate Seats!','rotate.msg':'All 4 players have been East.\nPlease rotate seats now.','rotate.ok':'Got it!',
+  },
+  fr: {
+    'nav.spin':'Dés','nav.scores':'Scores','nav.stats':'Stats','nav.calc':'Calcul','nav.settle':'Règlement','nav.settings':'Réglages',
+    'tab.scores':'Scores','tab.round':'Ajouter','tab.history':'Historique','tab.players':'Joueurs',
+    'act.winds':'🧭 Vents','act.settle':'💸 Règlement','act.share':'📤 Partager','act.end':'🏁 Fin',
+    'settings.title':'⚙️ Réglages','settings.dark':'🌙 Mode sombre','settings.dark_sub':'Basculer thème clair / sombre',
+    'settings.money':'💰 Afficher les montants','settings.money_sub':'Afficher les valeurs $ avec les scores',
+    'settings.lang':'🌐 Langue','settings.lang_sub':'Langue d\'affichage',
+    'settings.currency':'💱 Symbole monétaire','settings.currency_sub':'Symbole affiché avec les montants',
+    'settings.help':'❓ Aide & Référence','settings.help_sub':'Combinaisons, règles, guide des tuiles',
+    'settings.close':'Fermer',
+    'rw.prevailing':'Vent dominant :',
+    'settle.none':'✅ Tout est réglé — aucun paiement requis !','settle.close':'Fermer',
+    'rotate.title':'Tournez les places !','rotate.msg':'Les 4 joueurs ont été Est.\nVeuillez tourner les places.','rotate.ok':'Compris !',
+  },
+  zh: {
+    'nav.spin':'转盘/骰子','nav.scores':'分数','nav.stats':'统计','nav.calc':'计算器','nav.settle':'结算','nav.settings':'设置',
+    'tab.scores':'分数','tab.round':'添加','tab.history':'历史','tab.players':'玩家',
+    'act.winds':'🧭 设置风位','act.settle':'💸 结算','act.share':'📤 分享','act.end':'🏁 结束游戏',
+    'settings.title':'⚙️ 设置','settings.dark':'🌙 深色模式','settings.dark_sub':'切换浅色 / 深色主题',
+    'settings.money':'💰 显示金额','settings.money_sub':'在番分旁显示金额',
+    'settings.lang':'🌐 语言','settings.lang_sub':'应用显示语言',
+    'settings.currency':'💱 货币符号','settings.currency_sub':'金额显示符号',
+    'settings.help':'❓ 帮助与参考','settings.help_sub':'番组合、规则、牌面指南',
+    'settings.close':'关闭',
+    'rw.prevailing':'场风：',
+    'settle.none':'✅ 无需结算！','settle.close':'关闭',
+    'rotate.title':'轮换座位！','rotate.msg':'四位玩家都做过庄家了。\n请轮换座位。','rotate.ok':'明白！',
+  }
+};
+
+function T(key) {
+  const lang = localStorage.getItem('hk-lang') || 'en';
+  return (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS.en[key] || key;
+}
+
+function applyLang() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const v = T(el.dataset.i18n);
+    if (v) el.textContent = v;
+  });
+  // Update lang picker active state
+  const lang = localStorage.getItem('hk-lang') || 'en';
+  const langNames = { en:'English', fr:'Français (CA)', zh:'简体中文' };
+  const langVal = document.getElementById('settings-lang-val');
+  if (langVal) langVal.textContent = langNames[lang] || 'English';
+  document.querySelectorAll('[data-lang]').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  // Update currency picker active state
+  const curr = localStorage.getItem('hk-currency') || '$';
+  const currVal = document.getElementById('settings-currency-val');
+  if (currVal) currVal.textContent = curr;
+  document.querySelectorAll('[data-curr]').forEach(b => b.classList.toggle('active', b.dataset.curr === curr));
+}
+
 /* ── Settings modal ── */
 document.getElementById('btn-settings').addEventListener('click', () => {
   document.getElementById('toggle-dark-mode').checked = !document.body.classList.contains('light');
+  document.getElementById('toggle-show-money').checked = localStorage.getItem('hk-show-money') !== 'false';
+  // Close pickers on open
+  document.getElementById('settings-lang-picker').style.display = 'none';
+  document.getElementById('settings-currency-picker').style.display = 'none';
+  applyLang();
   document.getElementById('modal-settings').classList.add('show');
 });
 document.getElementById('ms-settings-close').addEventListener('click', () => {
@@ -3458,9 +3599,41 @@ document.getElementById('settings-open-help').addEventListener('click', () => {
   showHelp();
 });
 document.getElementById('toggle-dark-mode').addEventListener('change', e => {
-  const isDark = e.target.checked;
-  document.body.classList.toggle('light', !isDark);
-  localStorage.setItem('hk-theme', isDark ? 'dark' : 'light');
+  document.body.classList.toggle('light', !e.target.checked);
+  localStorage.setItem('hk-theme', e.target.checked ? 'dark' : 'light');
+});
+document.getElementById('toggle-show-money').addEventListener('change', e => {
+  localStorage.setItem('hk-show-money', e.target.checked ? 'true' : 'false');
+  renderMain();
+  if (currentId) renderDScores();
+});
+// Language picker toggle
+document.getElementById('settings-lang-row').addEventListener('click', () => {
+  const p = document.getElementById('settings-lang-picker');
+  p.style.display = p.style.display === 'none' ? 'flex' : 'none';
+  document.getElementById('settings-currency-picker').style.display = 'none';
+});
+document.querySelectorAll('[data-lang]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    localStorage.setItem('hk-lang', btn.dataset.lang);
+    applyLang();
+    document.getElementById('settings-lang-picker').style.display = 'none';
+  });
+});
+// Currency picker toggle
+document.getElementById('settings-currency-row').addEventListener('click', () => {
+  const p = document.getElementById('settings-currency-picker');
+  p.style.display = p.style.display === 'none' ? 'flex' : 'none';
+  document.getElementById('settings-lang-picker').style.display = 'none';
+});
+document.querySelectorAll('[data-curr]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    localStorage.setItem('hk-currency', btn.dataset.curr);
+    applyLang();
+    document.getElementById('settings-currency-picker').style.display = 'none';
+    renderMain();
+    if (currentId) renderDScores();
+  });
 });
 document.querySelectorAll('.help-tab-btn').forEach(btn =>
   btn.addEventListener('click', () => switchHTab(btn.dataset.htab))
@@ -4630,6 +4803,7 @@ document.getElementById('btn-stats-back').addEventListener('click', showMain);
 })();
 
 loadState();
+applyLang();
 showMain();
 initHelpPanes();
 initCalcItems();
@@ -4683,7 +4857,7 @@ function showSettlement(tid) {
   title.textContent = `💸 ${esc(t.name || 'Table')} — Settle Up`;
   const transfers = computeSettlement(t);
   if (!transfers.length) {
-    body.innerHTML = `<div class="settle-none">✅ All square — no payments needed!</div>`;
+    body.innerHTML = `<div class="settle-none">${T('settle.none')}</div>`;
   } else {
     const stake = t.stake || 1;
     body.innerHTML = transfers.map(tr =>
