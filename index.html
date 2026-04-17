@@ -209,6 +209,30 @@
     }
     .settle-table-btn:hover { border-color: var(--accent); }
 
+    /* ── Round Counter ── */
+    .round-counter {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--surface2); border-radius: 8px;
+      padding: 5px 10px; margin-bottom: 10px;
+      font-size: 12px; color: var(--dim);
+    }
+    .round-counter strong { color: var(--text); font-size: 14px; }
+
+    /* ── Saved Player Chips ── */
+    .saved-players-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+    .saved-player-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 10px; font-size: 12px;
+      color: var(--text); cursor: pointer;
+    }
+    .saved-player-chip:hover { border-color: var(--accent); color: var(--accent); }
+    .saved-player-chip .spc-rm {
+      font-size: 10px; color: var(--dim); margin-left: 2px;
+      padding: 0 2px; line-height: 1;
+    }
+    .saved-player-chip .spc-rm:hover { color: #e06c75; }
+
     /* ── Round Wind Banner ── */
     .rw-banner {
       display: flex; align-items: center; gap: 10px;
@@ -1475,6 +1499,9 @@
   <!-- Scores pane -->
   <div id="dpane-scores" class="tab-pane active">
     <div id="d-rw-banner" class="rw-banner" style="display:none"></div>
+    <div id="d-round-counter" class="round-counter" style="display:none">
+      🀄 Round <strong id="d-round-num">0</strong> played
+    </div>
     <div class="score-summary">
       <div class="summary-box pos-box">
         <div class="summary-label">Total Positive</div>
@@ -2215,6 +2242,10 @@
       <input id="nt-p3" class="modal-input" placeholder="Player 3" maxlength="20">
       <input id="nt-p4" class="modal-input" placeholder="Player 4" maxlength="20">
     </div>
+    <div id="nt-saved-row" style="display:none">
+      <div style="font-size:11px;color:var(--dim);margin-bottom:4px">Saved players — tap to fill:</div>
+      <div id="nt-saved-chips" class="saved-players-row"></div>
+    </div>
     <div class="modal-btns">
       <button class="m-cancel"  id="nt-cancel">Cancel</button>
       <button class="m-confirm" id="nt-create">Create Table</button>
@@ -2253,6 +2284,21 @@
 </div>
 
 <!-- ═══════════════════════════════════
+     MODAL — Seat Rotation Reminder
+═══════════════════════════════════ -->
+<div id="modal-rotate" class="modal-bg" style="align-items:center">
+  <div class="modal-box" style="max-width:300px;border-radius:18px;text-align:center">
+    <div style="font-size:42px;margin-bottom:8px">🔄</div>
+    <h3 style="margin-bottom:8px">Rotate Seats!</h3>
+    <p style="font-size:13px;color:var(--dim);margin-bottom:18px;line-height:1.5">
+      All 4 players have been East.<br>Please rotate seats now.
+    </p>
+    <div id="modal-rotate-wind" style="font-size:13px;color:var(--accent);margin-bottom:16px;font-weight:600"></div>
+    <button class="m-confirm" id="btn-rotate-ok" style="width:100%">Got it!</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
      MODAL — Settlement
 ═══════════════════════════════════ -->
 <div id="modal-settlement" class="modal-bg">
@@ -2286,6 +2332,8 @@ function loadState() {
     if (raw) S = JSON.parse(raw);
     // Migrate older tables that don't have a stake field
     S.tables.forEach(t => { if (!t.stake) t.stake = 0.25; });
+    // Migrate: ensure savedPlayers exists
+    if (!S.savedPlayers) S.savedPlayers = [];
   } catch (_) {}
 }
 function saveState() {
@@ -2518,10 +2566,39 @@ function renderMain() {
 /* ═══════════════════════════════════════
    NEW TABLE MODAL
 ═══════════════════════════════════════ */
+function renderSavedPlayerChips() {
+  const sp = S.savedPlayers || [];
+  const row  = document.getElementById('nt-saved-row');
+  const chips = document.getElementById('nt-saved-chips');
+  if (!sp.length) { row.style.display = 'none'; return; }
+  row.style.display = '';
+  chips.innerHTML = sp.map(name =>
+    `<span class="saved-player-chip" data-name="${esc(name)}">
+      ${esc(name)}<span class="spc-rm" data-rm="${esc(name)}">✕</span>
+    </span>`
+  ).join('');
+  chips.querySelectorAll('.saved-player-chip').forEach(chip => {
+    chip.addEventListener('click', e => {
+      if (e.target.classList.contains('spc-rm')) {
+        const nm = e.target.dataset.rm;
+        S.savedPlayers = (S.savedPlayers || []).filter(p => p !== nm);
+        saveState();
+        renderSavedPlayerChips();
+        return;
+      }
+      const name = chip.dataset.name;
+      const inputs = ['nt-p1','nt-p2','nt-p3','nt-p4'].map(id => document.getElementById(id));
+      const empty = inputs.find(i => !i.value.trim());
+      if (empty) empty.value = name;
+    });
+  });
+}
+
 document.getElementById('btn-new-table').addEventListener('click', () => {
   ['nt-name','nt-p1','nt-p2','nt-p3','nt-p4'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('nt-stake').value  = '1';
   document.getElementById('nt-minfan').value = '3';
+  renderSavedPlayerChips();
   document.getElementById('modal-newtable').classList.add('show');
   document.getElementById('nt-name').focus();
 });
@@ -2565,6 +2642,11 @@ function createTable() {
     nextRound: 1
   };
   S.tables.push(t);
+  // Save player names for future use
+  if (!S.savedPlayers) S.savedPlayers = [];
+  players.forEach(p => {
+    if (p && !S.savedPlayers.includes(p)) S.savedPlayers.push(p);
+  });
   saveState();
   document.getElementById('modal-newtable').classList.remove('show');
   renderMain();
@@ -2623,6 +2705,14 @@ function renderDScores() {
 
   const sorted   = [...t.players].sort((a,b) => (t.scores[b]||0) - (t.scores[a]||0));
   const topScore = t.scores[sorted[0]] || 0;
+
+  // Round counter
+  const roundsPlayed = t.history ? t.history.length : 0;
+  const rcEl = document.getElementById('d-round-counter');
+  if (rcEl) {
+    rcEl.style.display = roundsPlayed > 0 ? '' : 'none';
+    document.getElementById('d-round-num').textContent = roundsPlayed;
+  }
 
   // Round wind banner
   const rwBanner = document.getElementById('d-rw-banner');
@@ -2824,9 +2914,10 @@ document.getElementById('d-submit-btn').addEventListener('click', () => {
   if (winnerIdx !== (t.eastIdx || 0)) {
     const prevEast = t.eastIdx || 0;
     t.eastIdx = (prevEast + 1) % 4;
-    // When eastIdx wraps back to 0, advance the prevailing round wind
+    // When eastIdx wraps back to 0, advance the prevailing round wind + remind to rotate seats
     if (t.eastIdx === 0) {
       t.roundWind = Math.min((t.roundWind || 0) + 1, 3);
+      t._seatRotationPending = true;
     }
   }
   saveState();
@@ -2848,6 +2939,16 @@ document.getElementById('d-submit-btn').addEventListener('click', () => {
 
   switchDTab('scores');
   toast(`Round ${roundNum} — ${esc(winnerName)} wins! 🎉`);
+  // Show seat rotation reminder if needed
+  const tAfter = tableById(currentId);
+  if (tAfter && tAfter._seatRotationPending) {
+    tAfter._seatRotationPending = false;
+    saveState();
+    const WENL = ['East','South','West','North'];
+    const newWind = WENL[tAfter.roundWind || 0];
+    document.getElementById('modal-rotate-wind').textContent = `Now entering: ${newWind} Round (${['東','南','西','北'][tAfter.roundWind || 0]}局)`;
+    setTimeout(() => document.getElementById('modal-rotate').classList.add('show'), 600);
+  }
 });
 
 /* ═══════════════════════════════════════
@@ -4426,6 +4527,10 @@ function showSettlement(tid) {
   }
   modal.classList.add('show');
 }
+
+document.getElementById('btn-rotate-ok').addEventListener('click', () => {
+  document.getElementById('modal-rotate').classList.remove('show');
+});
 
 document.getElementById('btn-settlement').addEventListener('click', () => showSettlement(null));
 document.getElementById('btn-settle-table').addEventListener('click', () => showSettlement(currentId));
