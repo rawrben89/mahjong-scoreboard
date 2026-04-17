@@ -1528,7 +1528,6 @@
     <div class="scores-action-row" style="padding:12px 0 4px">
       <button class="score-action-btn" id="btn-set-winds">&#x1F9ED; Set Winds</button>
       <button class="score-action-btn" id="btn-settle-table">&#x1F4B8; Settle Up</button>
-      <button class="score-action-btn" id="btn-rematch">&#x1F501; Rematch</button>
       <button class="score-action-btn" id="btn-share-scores">&#x1F4E4; Share</button>
       <button class="score-action-btn danger" id="btn-end-game">&#x1F3C1; End Game</button>
     </div>
@@ -4199,28 +4198,6 @@ function endGame() {
 }
 document.getElementById('btn-end-game').addEventListener('click', endGame);
 
-document.getElementById('btn-rematch').addEventListener('click', () => {
-  const t = tableById(currentId);
-  if (!t) return;
-  showConfirm('Start Rematch?', `New game with the same ${t.players.length} players and settings.`, () => {
-    const players = [...t.players];
-    const newT = {
-      id: S.nextTableId++,
-      name: t.name + ' (Rematch)',
-      stake: t.stake,
-      minFan: t.minFan || 3,
-      players,
-      scores:    Object.fromEntries(players.map(p => [p, 0])),
-      history:   [],
-      nextRound: 1
-    };
-    S.tables.push(newT);
-    saveState();
-    currentId = newT.id;
-    showDetail(newT.id);
-    toast('Rematch started! 🀄');
-  });
-});
 
 function renderArchives() {
   const container = document.getElementById('archives-container');
