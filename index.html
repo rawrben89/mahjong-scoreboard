@@ -2644,9 +2644,9 @@ function esc(s) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function fmt(n) { return (n > 0 ? '+' : '') + n; }
-function fmtMoney(pts, stake) {
+function fmtMoney(pts, stake, forceShow = false) {
   if (!stake || stake === 0) return '';
-  if (localStorage.getItem('hk-show-money') === 'false') return '';
+  if (!forceShow && localStorage.getItem('hk-show-money') === 'false') return '';
   const val = pts * stake;
   const abs = Math.abs(val);
   const str = abs % 1 === 0 ? String(abs) : abs.toFixed(2);
@@ -2997,9 +2997,9 @@ function renderDScores() {
   const totalPos  = allScores.filter(s => s > 0).reduce((a,b) => a+b, 0);
   const totalNeg  = allScores.filter(s => s < 0).reduce((a,b) => a+b, 0);
   document.getElementById('d-sum-pos-pts').textContent   = '+' + totalPos;
-  document.getElementById('d-sum-pos-money').textContent = stake ? fmtMoney(totalPos, stake) : '';
+  document.getElementById('d-sum-pos-money').textContent = stake ? fmtMoney(totalPos, stake, true) : '';
   document.getElementById('d-sum-neg-pts').textContent   = fmt(totalNeg);
-  document.getElementById('d-sum-neg-money').textContent = stake ? fmtMoney(totalNeg, stake) : '';
+  document.getElementById('d-sum-neg-money').textContent = stake ? fmtMoney(totalNeg, stake, true) : '';
 
   // Sync stake + minFan inputs
   document.getElementById('d-stake-input').value  = stake;
