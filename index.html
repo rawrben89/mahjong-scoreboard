@@ -1533,21 +1533,21 @@
   <div id="main-top">
     <div class="app-header">
       <div class="title">
-        <h1>🀄 Mahjong Scoreboard</h1>
-        <p>Hong Kong Style</p>
+        <h1 data-i18n="main.title">🀄 Mahjong Scoreboard</h1>
+        <p data-i18n="main.subtitle">Hong Kong Style</p>
       </div>
     </div>
 
     <div class="main-sticky-bar">
-      <button class="add-table-btn" id="btn-new-table">＋ New Table</button>
+      <button class="add-table-btn" id="btn-new-table" data-i18n="main.new_table">＋ New Table</button>
       <div id="global-totals" class="global-totals" style="display:none">
         <div class="gt-item pos-sum">
-          <span class="lbl">All Positive</span>
+          <span class="lbl" data-i18n="main.all_pos">All Positive</span>
           <span class="val" id="gt-pos">+0</span>
           <span class="gt-money" id="gt-pos-money"></span>
         </div>
         <div class="gt-item neg-sum">
-          <span class="lbl">All Negative</span>
+          <span class="lbl" data-i18n="main.all_neg">All Negative</span>
           <span class="val" id="gt-neg">0</span>
           <span class="gt-money" id="gt-neg-money"></span>
         </div>
@@ -1566,11 +1566,11 @@
 ═══════════════════════════════════ -->
 <div id="view-detail">
   <div class="app-header">
-    <button class="back-btn" id="btn-back">← Back</button>
+    <button class="back-btn" id="btn-back" data-i18n="detail.back">← Back</button>
     <div class="title">
       <h1 id="detail-title">Table</h1>
     </div>
-    <button class="header-action" id="btn-delete-table">Delete</button>
+    <button class="header-action" id="btn-delete-table" data-i18n="detail.delete">Delete</button>
   </div>
 
   <!-- Scores pane -->
@@ -1578,21 +1578,21 @@
     <div id="d-rw-banner" class="rw-banner" style="display:none"></div>
     <div class="score-summary">
       <div class="summary-box pos-box">
-        <div class="summary-label">Total Positive</div>
+        <div class="summary-label" data-i18n="scores.pos">Total Positive</div>
         <div class="summary-val pos"><div id="d-sum-pos-pts">+0</div><div id="d-sum-pos-money" class="sum-money"></div></div>
       </div>
       <div class="summary-box neg-box">
-        <div class="summary-label">Total Negative</div>
+        <div class="summary-label" data-i18n="scores.neg">Total Negative</div>
         <div class="summary-val neg"><div id="d-sum-neg-pts">0</div><div id="d-sum-neg-money" class="sum-money"></div></div>
       </div>
     </div>
     <div id="d-stake-row" class="stake-row">
-      <label>💰 Bet per fan</label>
+      <label data-i18n="scores.bet">💰 Bet per fan</label>
       <input id="d-stake-input" type="number" class="stake-input" min="0.25" step="0.25" inputmode="decimal" value="0.25">
       <span id="d-stake-saved" style="font-size:11px;color:var(--dim);min-width:32px;text-align:right"></span>
     </div>
     <div class="stake-row" style="margin-top:4px">
-      <label>🎯 Min fan to win</label>
+      <label data-i18n="scores.minfan">🎯 Min fan to win</label>
       <select id="d-minfan-input" class="stake-input" style="color:var(--accent);text-align:center">
         <option value="1">1 fan</option>
         <option value="2">2 fan</option>
@@ -1615,30 +1615,30 @@
   <div id="dpane-round" class="tab-pane">
     <div id="d-wind-bar" class="wind-info-bar" style="margin:8px 0 4px"></div>
     <div class="form-card">
-      <div class="section-label">Winner 🏆</div>
+      <div class="section-label" data-i18n="round.winner">Winner 🏆</div>
       <div id="d-winner-chips" class="chip-row"></div>
     </div>
 
     <div class="form-card">
-      <div class="section-label">Win Type</div>
+      <div class="section-label" data-i18n="round.wintype">Win Type</div>
       <div class="win-type-row">
-        <div id="d-btn-zimo"    class="win-type-btn on" >🀄 Zimo<br><small style="font-size:10px;opacity:.7">All 3 pay</small></div>
-        <div id="d-btn-discard" class="win-type-btn"    >🎴 Discard<br><small style="font-size:10px;opacity:.7">Discarder pays all</small></div>
+        <div id="d-btn-zimo"    class="win-type-btn on" >🀄 Zimo<br><small style="font-size:10px;opacity:.7" data-i18n="round.zimo_sub">All 3 pay</small></div>
+        <div id="d-btn-discard" class="win-type-btn"    >🎴 Discard<br><small style="font-size:10px;opacity:.7" data-i18n="round.discard_sub">Discarder pays all</small></div>
       </div>
     </div>
 
     <div id="d-discard-card" class="form-card" style="display:none">
-      <div class="section-label">Who Discarded? 🃏</div>
+      <div class="section-label" data-i18n="round.discarder">Who Discarded? 🃏</div>
       <div id="d-discard-chips" class="chip-row"></div>
     </div>
 
     <div class="form-card">
       <div class="section-label" style="display:flex;justify-content:space-between;align-items:center">
-        <span>Hand Tiles 🀄</span>
+        <span data-i18n="round.hand">Hand Tiles 🀄</span>
         <span id="d-tile-count" style="font-size:10px;color:var(--dim)">0 / 14</span>
       </div>
       <div id="d-hand-display" class="hand-display">
-        <span class="hand-count-lbl">Tap tiles below to build hand…</span>
+        <span class="hand-count-lbl" data-i18n="round.hand_hint">Tap tiles below to build hand…</span>
       </div>
       <div id="d-tile-picker"></div>
       <button class="clear-hand-btn" id="d-clear-hand">✕ Clear Hand</button>
@@ -1646,7 +1646,7 @@
 
     <div class="form-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-        <span class="section-label" style="margin-bottom:0">Fan Combinations</span>
+        <span class="section-label" style="margin-bottom:0" data-i18n="round.fan">Fan Combinations</span>
         <span id="d-fan-count-badge" style="font-size:12px;color:var(--gold);font-weight:700">0 fan</span>
       </div>
       <div id="d-active-combo-chips" class="active-combo-chips">
@@ -1656,7 +1656,7 @@
         <span style="color:var(--dim)">Base pts / payer:</span>
         <span id="d-base-pts-label" class="fan-pts-val">—</span>
       </div>
-      <button id="d-expand-combos" class="expand-combos-btn">＋ Edit combinations</button>
+      <button id="d-expand-combos" class="expand-combos-btn" data-i18n="round.edit">＋ Edit combinations</button>
       <div id="d-full-combo-list" style="display:none;margin-top:6px"></div>
     </div>
 
@@ -1666,7 +1666,7 @@
     </div>
 
     <div id="d-fan-hint" style="display:none;font-size:11px;color:var(--dim);text-align:center;padding:6px 0 0"></div>
-    <button id="d-submit-btn" class="submit-btn" disabled>Confirm Round ✓</button>
+    <button id="d-submit-btn" class="submit-btn" data-i18n="round.confirm" disabled>Confirm Round ✓</button>
   </div>
 
   <!-- History pane -->
@@ -2292,7 +2292,7 @@
 <div id="modal-newtable" class="modal-bg">
   <div class="modal-box">
     <div class="modal-drag"></div>
-    <h3>Create New Table</h3>
+    <h3 data-i18n="nt.title">Create New Table</h3>
     <div style="margin-bottom:8px">
       <input id="nt-name" class="modal-input full" placeholder="Table name (e.g. Table 1)" maxlength="30">
     </div>
@@ -2317,12 +2317,12 @@
       <input id="nt-p4" class="modal-input" placeholder="Player 4" maxlength="20">
     </div>
     <div id="nt-saved-row" style="display:none">
-      <div style="font-size:11px;color:var(--dim);margin-bottom:4px">Saved players — tap to fill:</div>
+      <div style="font-size:11px;color:var(--dim);margin-bottom:4px" data-i18n="nt.saved_label">Saved players — tap to fill:</div>
       <div id="nt-saved-chips" class="saved-players-row"></div>
     </div>
     <div class="modal-btns">
-      <button class="m-cancel"  id="nt-cancel">Cancel</button>
-      <button class="m-confirm" id="nt-create">Create Table</button>
+      <button class="m-cancel"  id="nt-cancel" data-i18n="nt.cancel">Cancel</button>
+      <button class="m-confirm" id="nt-create" data-i18n="nt.create">Create Table</button>
     </div>
   </div>
 </div>
@@ -2363,9 +2363,9 @@
 <div id="modal-rotate" class="modal-bg" style="align-items:center">
   <div class="modal-box" style="max-width:300px;border-radius:18px;text-align:center">
     <div style="font-size:42px;margin-bottom:8px">🔄</div>
-    <h3 style="margin-bottom:8px">Rotate Seats!</h3>
-    <p style="font-size:13px;color:var(--dim);margin-bottom:18px;line-height:1.5">
-      All 4 players have been East.<br>Please rotate seats now.
+    <h3 style="margin-bottom:8px" data-i18n="rotate.title">Rotate Seats!</h3>
+    <p id="rotate-msg" style="font-size:13px;color:var(--dim);margin-bottom:18px;line-height:1.5" data-i18n="rotate.msg">
+      All 4 players have been East. Please rotate seats now.
     </p>
     <div id="modal-rotate-wind" style="font-size:13px;color:var(--accent);margin-bottom:20px;font-weight:600"></div>
     <button id="btn-rotate-ok" data-i18n="rotate.ok" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.3px;box-shadow:0 4px 16px rgba(78,201,82,.35)">Got it!</button>
@@ -3515,8 +3515,15 @@ document.getElementById('btn-help-back').addEventListener('click', showMain);
 const TRANSLATIONS = {
   en: {
     'nav.spin':'Spin/Dice','nav.scores':'Scores','nav.stats':'Stats','nav.calc':'Calculator','nav.settle':'Settle','nav.settings':'Settings',
+    'main.title':'🀄 Mahjong Scoreboard','main.subtitle':'Hong Kong Style','main.new_table':'＋ New Table','main.all_pos':'All Positive','main.all_neg':'All Negative',
     'tab.scores':'Scores','tab.round':'Add Round','tab.history':'History','tab.players':'Players',
+    'scores.pos':'Total Positive','scores.neg':'Total Negative','scores.bet':'💰 Bet per fan','scores.minfan':'🎯 Min fan to win',
+    'detail.back':'← Back','detail.delete':'Delete',
     'act.winds':'🧭 Set Winds','act.settle':'💸 Settle Up','act.share':'📤 Share','act.end':'🏁 End Game',
+    'round.winner':'Winner 🏆','round.wintype':'Win Type','round.zimo_sub':'All 3 pay','round.discard_sub':'Discarder pays all',
+    'round.discarder':'Who Discarded? 🃏','round.hand':'Hand Tiles 🀄','round.hand_hint':'Tap tiles below to build hand…',
+    'round.fan':'Fan Combinations','round.edit':'＋ Edit combinations','round.confirm':'Confirm Round ✓',
+    'nt.title':'Create New Table','nt.cancel':'Cancel','nt.create':'Create Table','nt.saved_label':'Saved players — tap to fill:',
     'settings.title':'⚙️ Settings','settings.dark':'🌙 Dark Mode','settings.dark_sub':'Toggle light / dark theme',
     'settings.money':'💰 Show Money Amounts','settings.money_sub':'Display $ values alongside fan scores',
     'settings.lang':'🌐 Language','settings.lang_sub':'App display language',
@@ -3525,12 +3532,19 @@ const TRANSLATIONS = {
     'settings.close':'Close',
     'rw.prevailing':'Prevailing wind:',
     'settle.none':'✅ All square — no payments needed!','settle.close':'Close',
-    'rotate.title':'Rotate Seats!','rotate.msg':'All 4 players have been East.\nPlease rotate seats now.','rotate.ok':'Got it!',
+    'rotate.title':'Rotate Seats!','rotate.msg':'All 4 players have been East. Please rotate seats now.','rotate.ok':'Got it!',
   },
   fr: {
     'nav.spin':'Dés','nav.scores':'Scores','nav.stats':'Stats','nav.calc':'Calcul','nav.settle':'Règlement','nav.settings':'Réglages',
+    'main.title':'🀄 Tableau Mahjong','main.subtitle':'Style Hong Kong','main.new_table':'＋ Nouvelle Table','main.all_pos':'Total positif','main.all_neg':'Total négatif',
     'tab.scores':'Scores','tab.round':'Ajouter','tab.history':'Historique','tab.players':'Joueurs',
-    'act.winds':'🧭 Vents','act.settle':'💸 Règlement','act.share':'📤 Partager','act.end':'🏁 Fin',
+    'scores.pos':'Total Positif','scores.neg':'Total Négatif','scores.bet':'💰 Mise par fan','scores.minfan':'🎯 Fan minimum',
+    'detail.back':'← Retour','detail.delete':'Supprimer',
+    'act.winds':'🧭 Vents','act.settle':'💸 Règlement','act.share':'📤 Partager','act.end':'🏁 Fin de partie',
+    'round.winner':'Gagnant 🏆','round.wintype':'Type de gain','round.zimo_sub':'Les 3 paient','round.discard_sub':'Le défausseur paie tout',
+    'round.discarder':'Qui a défaussé? 🃏','round.hand':'Tuiles en main 🀄','round.hand_hint':'Appuyez sur les tuiles ci-dessous…',
+    'round.fan':'Combinaisons','round.edit':'＋ Modifier combinaisons','round.confirm':'Confirmer la manche ✓',
+    'nt.title':'Créer une nouvelle table','nt.cancel':'Annuler','nt.create':'Créer la table','nt.saved_label':'Joueurs sauvegardés — appuyer pour remplir :',
     'settings.title':'⚙️ Réglages','settings.dark':'🌙 Mode sombre','settings.dark_sub':'Basculer thème clair / sombre',
     'settings.money':'💰 Afficher les montants','settings.money_sub':'Afficher les valeurs $ avec les scores',
     'settings.lang':'🌐 Langue','settings.lang_sub':'Langue d\'affichage',
@@ -3539,12 +3553,19 @@ const TRANSLATIONS = {
     'settings.close':'Fermer',
     'rw.prevailing':'Vent dominant :',
     'settle.none':'✅ Tout est réglé — aucun paiement requis !','settle.close':'Fermer',
-    'rotate.title':'Tournez les places !','rotate.msg':'Les 4 joueurs ont été Est.\nVeuillez tourner les places.','rotate.ok':'Compris !',
+    'rotate.title':'Tournez les places !','rotate.msg':'Les 4 joueurs ont été Est. Veuillez tourner les places.','rotate.ok':'Compris !',
   },
   zh: {
     'nav.spin':'转盘/骰子','nav.scores':'分数','nav.stats':'统计','nav.calc':'计算器','nav.settle':'结算','nav.settings':'设置',
+    'main.title':'🀄 麻将记分板','main.subtitle':'香港风格','main.new_table':'＋ 新建牌局','main.all_pos':'总正分','main.all_neg':'总负分',
     'tab.scores':'分数','tab.round':'添加','tab.history':'历史','tab.players':'玩家',
+    'scores.pos':'总正分','scores.neg':'总负分','scores.bet':'💰 每番押注','scores.minfan':'🎯 最低番数',
+    'detail.back':'← 返回','detail.delete':'删除',
     'act.winds':'🧭 设置风位','act.settle':'💸 结算','act.share':'📤 分享','act.end':'🏁 结束游戏',
+    'round.winner':'赢家 🏆','round.wintype':'胡牌方式','round.zimo_sub':'三家付','round.discard_sub':'点炮者付',
+    'round.discarder':'谁点炮？🃏','round.hand':'手牌 🀄','round.hand_hint':'点击下方牌面来组建手牌…',
+    'round.fan':'番组合','round.edit':'＋ 编辑组合','round.confirm':'确认本局 ✓',
+    'nt.title':'新建牌局','nt.cancel':'取消','nt.create':'创建牌局','nt.saved_label':'已保存玩家 — 点击填入：',
     'settings.title':'⚙️ 设置','settings.dark':'🌙 深色模式','settings.dark_sub':'切换浅色 / 深色主题',
     'settings.money':'💰 显示金额','settings.money_sub':'在番分旁显示金额',
     'settings.lang':'🌐 语言','settings.lang_sub':'应用显示语言',
@@ -3553,7 +3574,7 @@ const TRANSLATIONS = {
     'settings.close':'关闭',
     'rw.prevailing':'场风：',
     'settle.none':'✅ 无需结算！','settle.close':'关闭',
-    'rotate.title':'轮换座位！','rotate.msg':'四位玩家都做过庄家了。\n请轮换座位。','rotate.ok':'明白！',
+    'rotate.title':'轮换座位！','rotate.msg':'四位玩家都做过庄家了。请轮换座位。','rotate.ok':'明白！',
   }
 };
 
@@ -3578,6 +3599,9 @@ function applyLang() {
   const currVal = document.getElementById('settings-currency-val');
   if (currVal) currVal.textContent = curr;
   document.querySelectorAll('[data-curr]').forEach(b => b.classList.toggle('active', b.dataset.curr === curr));
+  // Re-render dynamic content so translated strings appear immediately
+  if (typeof renderMain === 'function') renderMain();
+  if (typeof currentId !== 'undefined' && currentId && typeof renderDScores === 'function') renderDScores();
 }
 
 /* ── Settings modal ── */
