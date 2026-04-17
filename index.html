@@ -209,15 +209,6 @@
     }
     .settle-table-btn:hover { border-color: var(--accent); }
 
-    /* ── Round Counter ── */
-    .round-counter {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--surface2); border-radius: 8px;
-      padding: 5px 10px; margin-bottom: 10px;
-      font-size: 12px; color: var(--dim);
-    }
-    .round-counter strong { color: var(--text); font-size: 14px; }
-
     /* ── Saved Player Chips ── */
     .saved-players-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
     .saved-player-chip {
@@ -1499,9 +1490,6 @@
   <!-- Scores pane -->
   <div id="dpane-scores" class="tab-pane active">
     <div id="d-rw-banner" class="rw-banner" style="display:none"></div>
-    <div id="d-round-counter" class="round-counter" style="display:none">
-      🀄 Round <strong id="d-round-num">0</strong> played
-    </div>
     <div class="score-summary">
       <div class="summary-box pos-box">
         <div class="summary-label">Total Positive</div>
@@ -2705,14 +2693,6 @@ function renderDScores() {
 
   const sorted   = [...t.players].sort((a,b) => (t.scores[b]||0) - (t.scores[a]||0));
   const topScore = t.scores[sorted[0]] || 0;
-
-  // Round counter
-  const roundsPlayed = t.history ? t.history.length : 0;
-  const rcEl = document.getElementById('d-round-counter');
-  if (rcEl) {
-    rcEl.style.display = roundsPlayed > 0 ? '' : 'none';
-    document.getElementById('d-round-num').textContent = roundsPlayed;
-  }
 
   // Round wind banner
   const rwBanner = document.getElementById('d-rw-banner');
