@@ -466,6 +466,12 @@
       -webkit-backdrop-filter: blur(20px);
       padding-bottom: env(safe-area-inset-bottom, 0);
       box-shadow: 0 -4px 24px rgba(0,0,0,.5);
+      transition: background .2s, border-color .2s;
+    }
+    body.light .tab-bar {
+      background: linear-gradient(180deg, rgba(255,255,255,.98) 0%, rgba(244,248,244,1) 100%);
+      border-top-color: var(--border);
+      box-shadow: 0 -4px 16px rgba(0,0,0,.08);
     }
     .tab-btn {
       flex: 1;
@@ -1053,6 +1059,12 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       box-shadow: 0 4px 20px rgba(0,0,0,.6), 0 0 0 1px rgba(78,201,82,.08);
+    }
+    body.light .toast {
+      background: rgba(255,255,255,.97);
+      border-color: var(--border2);
+      color: var(--text);
+      box-shadow: 0 4px 20px rgba(0,0,0,.15), 0 0 0 1px rgba(30,124,34,.1);
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
