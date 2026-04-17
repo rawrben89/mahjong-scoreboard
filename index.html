@@ -4075,13 +4075,31 @@ function renderCombined() {
   all.sort((a, b) => b.score - a.score);
 
   // Summary totals
-  const totalPos = all.filter(e => e.score > 0).reduce((s,e) => s + e.score, 0);
-  const totalNeg = all.filter(e => e.score < 0).reduce((s,e) => s + e.score, 0);
+  const totalPos    = all.filter(e => e.score > 0).reduce((s,e) => s + e.score, 0);
+  const totalNeg    = all.filter(e => e.score < 0).reduce((s,e) => s + e.score, 0);
+  const totalMoneyPos = all.filter(e => e.score > 0).reduce((s,e) => s + e.score * (e.stake || 1), 0);
+  const totalMoneyNeg = all.filter(e => e.score < 0).reduce((s,e) => s + e.score * (e.stake || 1), 0);
+  const sym = localStorage.getItem('hk-currency') || '$';
+  const fmtAmt = v => { const a = Math.abs(v); return (v >= 0 ? '+' : '-') + sym + (a % 1 === 0 ? a : a.toFixed(2)); };
+  const posMoneyStr = totalMoneyPos ? fmtAmt(totalMoneyPos) : '';
+  const negMoneyStr = totalMoneyNeg ? fmtAmt(totalMoneyNeg) : '';
 
   const summaryHtml = `
     <div class="score-summary" style="margin-bottom:14px">
-      <div class="summary-box pos-box"><div class="summary-label">Total Positive</div><div class="summary-val pos">+${totalPos}</div></div>
-      <div class="summary-box neg-box"><div class="summary-label">Total Negative</div><div class="summary-val neg">${fmt(totalNeg)}</div></div>
+      <div class="summary-box pos-box">
+        <div class="summary-label">Total Positive</div>
+        <div class="summary-val pos">
+          +${totalPos}
+          ${posMoneyStr ? `<div class="sum-money">${posMoneyStr}</div>` : ''}
+        </div>
+      </div>
+      <div class="summary-box neg-box">
+        <div class="summary-label">Total Negative</div>
+        <div class="summary-val neg">
+          ${fmt(totalNeg)}
+          ${negMoneyStr ? `<div class="sum-money">${negMoneyStr}</div>` : ''}
+        </div>
+      </div>
     </div>`;
 
   const rows = all.map((e, i) => {
