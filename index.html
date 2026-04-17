@@ -190,6 +190,51 @@
     .stats-empty { text-align:center; color:var(--dim); font-size:14px; padding:60px 20px; line-height:1.7; }
     .stats-section-lbl { font-size:10px; color:var(--dim); padding:16px 0 8px; letter-spacing:.7px; text-transform:uppercase; font-weight:700; border-left:2px solid var(--accent); padding-left:8px; margin-bottom:4px; }
 
+    /* ── Splash Screen ── */
+    #splash-screen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #040a04;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity .5s ease;
+    }
+    #splash-screen.fade-out { opacity: 0; pointer-events: none; }
+    .splash-tile {
+      width: 110px; height: 110px;
+      border-radius: 18px;
+      box-shadow: 0 0 48px rgba(78,201,82,.35), 0 8px 32px rgba(0,0,0,.7);
+      margin-bottom: 28px;
+      animation: splash-pop .5s cubic-bezier(.175,.885,.32,1.275) both;
+    }
+    @keyframes splash-pop {
+      from { transform: scale(.4); opacity: 0; }
+      to   { transform: scale(1);  opacity: 1; }
+    }
+    .splash-title {
+      font-size: 26px; font-weight: 800; color: #ecf7ec;
+      letter-spacing: .5px; text-align: center;
+      animation: splash-fadein .5s .25s ease both;
+    }
+    .splash-sub {
+      font-size: 11px; color: rgba(110,160,112,.6);
+      letter-spacing: 1.5px; text-transform: uppercase;
+      margin-top: 6px; text-align: center;
+      animation: splash-fadein .5s .35s ease both;
+    }
+    .splash-credit {
+      position: absolute; bottom: 32px;
+      font-size: 11px; color: rgba(110,160,112,.45);
+      letter-spacing: .8px;
+      animation: splash-fadein .5s .5s ease both;
+    }
+    @keyframes splash-fadein {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .chip-zh { font-size: 13px; font-weight: 600; }
+    .chip-en-lbl { font-size: 9px; color: var(--dim); line-height: 1; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 72px; }
+
     /* ── Shared Header ── */
     .app-header {
       background: linear-gradient(180deg, rgba(16,30,16,.99) 0%, rgba(10,22,10,.99) 100%);
@@ -1328,6 +1373,12 @@
   </style>
 </head>
 <body>
+<div id="splash-screen">
+  <img class="splash-tile" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/MJd1-.svg/60px-MJd1-.svg.png" alt="Red Dragon">
+  <div class="splash-title">🀄 Mahjong Scoreboard</div>
+  <div class="splash-sub">Hong Kong Style</div>
+  <div class="splash-credit">Made by Rawrben</div>
+</div>
 
 <!-- ═══════════════════════════════════
      MAIN VIEW  (Tables list)
@@ -3847,28 +3898,35 @@ function renderFanUI() {
 
   const activeList = ALL_COMBOS_FLAT.filter(c => F.fanSel.has(c.id));
   const chipsEl = document.getElementById('d-active-combo-chips');
-  let chipsHtml = activeList.map(c =>
-    `<div class="combo-chip" data-chip-id="${c.id}">
-      <span>${c.name.split(' ')[0]}</span>
+  let chipsHtml = activeList.map(c => {
+    const parts = c.name.split(' ');
+    const zh = parts[0];
+    const en = parts.slice(1).join(' ').replace(/ ?—.*$/, '').trim(); // strip "— subtitle"
+    return `<div class="combo-chip" data-chip-id="${c.id}">
+      <span class="chip-zh">${zh}</span>
+      ${en ? `<span class="chip-en-lbl">${en}</span>` : ''}
       <span class="chip-fan">+${c.fan}</span>
       <span class="chip-rm">✕</span>
-    </div>`
-  ).join('');
+    </div>`;
+  }).join('');
   if (kongCount > 0) {
     chipsHtml += `<div class="combo-chip" style="background:var(--surface2);border-color:#8B7355;cursor:default">
-      <span>槓 ×${kongCount}</span>
+      <span class="chip-zh">槓</span>
+      <span class="chip-en-lbl">Kong ×${kongCount}</span>
       <span class="chip-fan">+${kongCount}</span>
     </div>`;
   }
   if (bonusCount > 0) {
     chipsHtml += `<div class="combo-chip" style="background:var(--surface2);border-color:#8B7355;cursor:default">
-      <span>&#x82B1;&#x724C;</span>
+      <span class="chip-zh">&#x82B1;&#x724C;</span>
+      <span class="chip-en-lbl">Bonus Tiles</span>
       <span class="chip-fan">+${bonusCount}</span>
     </div>`;
   }
   if (zimoBonus) {
     chipsHtml += `<div class="combo-chip" style="background:var(--surface2);border-color:var(--accent);cursor:default">
-      <span>自摸</span>
+      <span class="chip-zh">自摸</span>
+      <span class="chip-en-lbl">Zimo</span>
       <span class="chip-fan">+1</span>
     </div>`;
   }
@@ -4236,6 +4294,16 @@ showMain();
 initHelpPanes();
 initCalcItems();
 initRoundTilePicker();
+
+// Splash screen dismiss
+(function() {
+  const splash = document.getElementById('splash-screen');
+  if (!splash) return;
+  setTimeout(() => {
+    splash.classList.add('fade-out');
+    setTimeout(() => splash.remove(), 500);
+  }, 1800);
+})();
 </script>
 </body>
 </html>
