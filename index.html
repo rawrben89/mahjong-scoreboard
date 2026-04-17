@@ -380,8 +380,8 @@
 
     /* ── Shared Header ── */
     .app-header {
-      background: linear-gradient(180deg, rgba(16,30,16,.99) 0%, rgba(10,22,10,.99) 100%);
-      border-bottom: 1px solid rgba(40,66,40,.65);
+      background: linear-gradient(180deg, var(--surface2) 0%, var(--surface) 100%);
+      border-bottom: 1px solid var(--border2);
       border-top: 1px solid rgba(78,201,82,.12);
       padding: 13px 16px;
       display: flex;
@@ -561,11 +561,11 @@
       align-items: center;
       justify-content: space-between;
       padding: 13px 15px 11px;
-      background: linear-gradient(135deg, rgba(24,42,24,.95) 0%, rgba(14,26,14,.95) 100%);
-      border-bottom: 1px solid rgba(40,66,40,.5);
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
     }
     .table-name { font-size: 15px; font-weight: 700; color: var(--gold); letter-spacing: .2px; text-shadow: 0 1px 8px rgba(255,201,64,.25); }
-    .table-round-count { font-size: 10px; color: var(--dim); background: rgba(0,0,0,.4); border-radius: 20px; padding: 2px 9px; border: 1px solid var(--border); letter-spacing: .3px; }
+    .table-round-count { font-size: 10px; color: var(--dim); background: var(--surface3); border-radius: 20px; padding: 2px 9px; border: 1px solid var(--border); letter-spacing: .3px; }
 
     .table-scores-grid {
       display: grid;
@@ -1539,7 +1539,10 @@
     </div>
 
     <div class="main-sticky-bar">
-      <button class="add-table-btn" id="btn-new-table" data-i18n="main.new_table">＋ New Table</button>
+      <div style="display:flex;gap:8px">
+        <button class="add-table-btn" id="btn-new-table" data-i18n="main.new_table" style="flex:1">＋ New Table</button>
+        <button class="add-table-btn" id="btn-open-spinner" style="flex:0;padding:0 16px;background:var(--surface2);border-color:var(--border2);color:var(--dim)">🎲</button>
+      </div>
       <div id="global-totals" class="global-totals" style="display:none">
         <div class="gt-item pos-sum">
           <span class="lbl" data-i18n="main.all_pos">All Positive</span>
@@ -2419,41 +2422,6 @@
       </label>
     </div>
 
-    <!-- Language -->
-    <div class="settings-row" style="cursor:pointer" id="settings-lang-row">
-      <div>
-        <div class="settings-row-label" data-i18n="settings.lang">🌐 Language</div>
-        <div class="settings-row-sub"   data-i18n="settings.lang_sub">App display language</div>
-      </div>
-      <span id="settings-lang-val" style="color:var(--accent);font-weight:700;font-size:13px">English</span>
-    </div>
-    <div id="settings-lang-picker" class="settings-picker-row" style="display:none">
-      <button class="pick-btn" data-lang="en">🇨🇦 English</button>
-      <button class="pick-btn" data-lang="fr">🇨🇦 Français (CA)</button>
-      <button class="pick-btn" data-lang="zh">🇨🇳 简体中文</button>
-    </div>
-
-    <!-- Currency Symbol -->
-    <div class="settings-row" style="cursor:pointer" id="settings-currency-row">
-      <div>
-        <div class="settings-row-label" data-i18n="settings.currency">💱 Currency Symbol</div>
-        <div class="settings-row-sub"   data-i18n="settings.currency_sub">Symbol shown with money amounts</div>
-      </div>
-      <span id="settings-currency-val" style="color:var(--accent);font-weight:700;font-size:16px">$</span>
-    </div>
-    <div id="settings-currency-picker" class="settings-picker-row" style="display:none">
-      <button class="pick-btn" data-curr="$">$ USD</button>
-      <button class="pick-btn" data-curr="CA$">CA$ CAD</button>
-      <button class="pick-btn" data-curr="HK$">HK$</button>
-      <button class="pick-btn" data-curr="S$">S$ SGD</button>
-      <button class="pick-btn" data-curr="RM">RM MYR</button>
-      <button class="pick-btn" data-curr="¥">¥ CNY</button>
-      <button class="pick-btn" data-curr="€">€ EUR</button>
-      <button class="pick-btn" data-curr="£">£ GBP</button>
-      <button class="pick-btn" data-curr="₱">₱ PHP</button>
-      <button class="pick-btn" data-curr="฿">฿ THB</button>
-    </div>
-
     <!-- Help -->
     <div class="settings-row" style="cursor:pointer" id="settings-open-help">
       <div>
@@ -2474,7 +2442,6 @@
      BOTTOM NAV
 ═══════════════════════════════════ -->
 <nav id="bottom-nav">
-  <button class="nav-btn" id="btn-open-spinner"><span class="nav-icon">🎲</span><span data-i18n="nav.spin">Spin/Dice</span></button>
   <button class="nav-btn" id="btn-open-combined"><span class="nav-icon">📊</span><span data-i18n="nav.scores">Scores</span></button>
   <button class="nav-btn" id="btn-open-stats"><span class="nav-icon">📈</span><span data-i18n="nav.stats">Stats</span></button>
   <button class="nav-btn" id="btn-open-calc"><span class="nav-icon">🧮</span><span data-i18n="nav.calc">Calculator</span></button>
@@ -2571,6 +2538,10 @@ document.getElementById('modal-confirm').addEventListener('click', e => {
 /* ═══════════════════════════════════════
    VIEWS
 ═══════════════════════════════════════ */
+function setNavVisible(v) {
+  document.getElementById('bottom-nav').style.display = v ? 'flex' : 'none';
+}
+
 function showMain() {
   document.getElementById('view-main').style.display     = 'block';
   document.getElementById('view-detail').style.display   = 'none';
@@ -2579,6 +2550,7 @@ function showMain() {
   document.getElementById('view-combined').style.display = 'none';
   document.getElementById('view-calc').style.display     = 'none';
   document.getElementById('view-stats').style.display    = 'none';
+  setNavVisible(true);
   currentId = null;
   renderMain();
 }
@@ -2611,6 +2583,7 @@ function resetRoundForm() {
 function showDetail(id) {
   currentId = id;
   const t = tableById(id);
+  setNavVisible(false);
   document.getElementById('view-main').style.display   = 'none';
   document.getElementById('view-detail').style.display = 'block';
   document.getElementById('detail-title').textContent  = t.name;
@@ -3477,6 +3450,7 @@ function spinWheel() {
 }
 
 function showSpinner() {
+  setNavVisible(false);
   document.getElementById('view-main').style.display    = 'none';
   document.getElementById('view-detail').style.display  = 'none';
   document.getElementById('view-help').style.display    = 'none';
@@ -3494,6 +3468,7 @@ document.getElementById('btn-spin').addEventListener('click', spinWheel);
    HELP VIEW
 ═══════════════════════════════════════ */
 function showHelp() {
+  setNavVisible(false);
   document.getElementById('view-main').style.display    = 'none';
   document.getElementById('view-detail').style.display  = 'none';
   document.getElementById('view-spinner').style.display = 'none';
@@ -3829,6 +3804,7 @@ function initHelpPanes() {
    COMBINED SCORES VIEW
 ═══════════════════════════════════════ */
 function showCombined() {
+  setNavVisible(false);
   document.getElementById('view-main').style.display     = 'none';
   document.getElementById('view-detail').style.display   = 'none';
   document.getElementById('view-help').style.display     = 'none';
@@ -4114,6 +4090,7 @@ function resetCalc() {
 }
 
 function showCalc() {
+  setNavVisible(false);
   document.getElementById('view-main').style.display     = 'none';
   document.getElementById('view-detail').style.display   = 'none';
   document.getElementById('view-help').style.display     = 'none';
@@ -4754,6 +4731,7 @@ function renderStats() {
 }
 
 function showStats() {
+  setNavVisible(false);
   ['view-main','view-detail','view-help','view-spinner','view-combined','view-calc'].forEach(id => {
     document.getElementById(id).style.display = 'none';
   });
