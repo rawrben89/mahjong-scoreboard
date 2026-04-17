@@ -209,6 +209,14 @@
     }
     .settle-table-btn:hover { border-color: var(--accent); }
 
+    /* ── Streak Badge ── */
+    .streak-badge {
+      font-size: 11px; font-weight: 700;
+      color: #e5a100; background: rgba(229,161,0,.13);
+      border-radius: 6px; padding: 1px 5px;
+      margin-left: 4px; white-space: nowrap;
+    }
+
     /* ── Saved Player Chips ── */
     .saved-players-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
     .saved-player-chip {
@@ -1520,6 +1528,7 @@
     <div class="scores-action-row" style="padding:12px 0 4px">
       <button class="score-action-btn" id="btn-set-winds">&#x1F9ED; Set Winds</button>
       <button class="score-action-btn" id="btn-settle-table">&#x1F4B8; Settle Up</button>
+      <button class="score-action-btn" id="btn-rematch">&#x1F501; Rematch</button>
       <button class="score-action-btn" id="btn-share-scores">&#x1F4E4; Share</button>
       <button class="score-action-btn danger" id="btn-end-game">&#x1F3C1; End Game</button>
     </div>
@@ -2705,6 +2714,9 @@ function renderDScores() {
       <div class="rw-label"><strong>${WENL_FULL[rw]} Round</strong><span>Prevailing wind: ${WENL_FULL[rw]}</span></div>`;
   }
 
+  // Winning streaks
+  const streaks = getStreaks(t);
+
   const WLBL  = ['東','南','西','北'];
   const WENGL = ['East','South','West','North'];
   const WCLS  = ['east','south','west','north'];
@@ -2716,15 +2728,47 @@ function renderDScores() {
     const money  = fmtMoney(sc, stake);
     const wOff   = (i - ei + 4) % 4;
     const wBadge = `<span class="wind-badge wind-${WCLS[wOff]}">${WLBL[wOff]} ${WENGL[wOff]}</span>`;
+    const st = streaks[p] || { current: 0, longest: 0 };
+    const streakHtml = st.current >= 2
+      ? `<span class="streak-badge">🔥 ${st.current} in a row</span>` : '';
     return `
       <div class="player-card ${cls}">
         <span class="p-rank">#${rank}</span>
         ${wBadge}
-        <div class="p-name">${esc(p)}</div>
+        <div class="p-name">${esc(p)}${streakHtml}</div>
         <div class="p-score ${sc < 0 ? 'neg' : ''}">${fmt(sc)}</div>
         ${money ? `<div class="p-money">${money}</div>` : ''}
       </div>`;
   }).join('');
+}
+
+function getStreaks(t) {
+  const h = t.history || [];
+  const streaks = {};
+  t.players.forEach(p => streaks[p] = { current: 0, longest: 0 });
+  // Longest streak pass
+  const running = {};
+  t.players.forEach(p => running[p] = 0);
+  h.forEach(round => {
+    t.players.forEach(p => {
+      if (round.winner === p) {
+        running[p]++;
+        if (running[p] > streaks[p].longest) streaks[p].longest = running[p];
+      } else {
+        running[p] = 0;
+      }
+    });
+  });
+  // Current streak (count backwards from last round)
+  t.players.forEach(p => {
+    let count = 0;
+    for (let i = h.length - 1; i >= 0; i--) {
+      if (h[i].winner === p) count++;
+      else break;
+    }
+    streaks[p].current = count;
+  });
+  return streaks;
 }
 
 /* ═══════════════════════════════════════
@@ -2916,6 +2960,9 @@ document.getElementById('d-submit-btn').addEventListener('click', () => {
   document.getElementById('d-submit-btn').disabled = true;
   updateHandDisplay();
   renderFanUI();
+
+  // Haptic feedback on submit
+  if (navigator.vibrate) navigator.vibrate(50);
 
   switchDTab('scores');
   toast(`Round ${roundNum} — ${esc(winnerName)} wins! 🎉`);
@@ -4151,6 +4198,29 @@ function endGame() {
   });
 }
 document.getElementById('btn-end-game').addEventListener('click', endGame);
+
+document.getElementById('btn-rematch').addEventListener('click', () => {
+  const t = tableById(currentId);
+  if (!t) return;
+  showConfirm('Start Rematch?', `New game with the same ${t.players.length} players and settings.`, () => {
+    const players = [...t.players];
+    const newT = {
+      id: S.nextTableId++,
+      name: t.name + ' (Rematch)',
+      stake: t.stake,
+      minFan: t.minFan || 3,
+      players,
+      scores:    Object.fromEntries(players.map(p => [p, 0])),
+      history:   [],
+      nextRound: 1
+    };
+    S.tables.push(newT);
+    saveState();
+    currentId = newT.id;
+    showDetail(newT.id);
+    toast('Rematch started! 🀄');
+  });
+});
 
 function renderArchives() {
   const container = document.getElementById('archives-container');
