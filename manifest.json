@@ -1,17 +1,46 @@
 {
-  "name": "Mahjong Scoreboard",
-  "short_name": "Mahjong",
-  "description": "Hong Kong Mahjong score tracker",
+  "name": "Mahjong Scoreboard — Hong Kong Style",
+  "short_name": "Mahjong HK",
+  "description": "Track scores for Hong Kong-style Mahjong games. Fan calculator, round history, seat rotation, settlement and more.",
   "start_url": "/mahjong-scoreboard/",
+  "scope": "/mahjong-scoreboard/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0c1a0c",
   "theme_color": "#0c1a0c",
-  "orientation": "portrait",
+  "lang": "en",
+  "categories": ["games", "utilities"],
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%230c1a0c'/><text x='96' y='130' font-size='120' text-anchor='middle'>🀄</text></svg>",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    { "src": "screenshots/2-main.png",        "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Home screen with table overview" },
+    { "src": "screenshots/5-scores.png",       "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Live scores with wind tracker" },
+    { "src": "screenshots/6-add-round.png",    "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Add round with hand tile picker" },
+    { "src": "screenshots/7-history.png",      "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Round history" },
+    { "src": "screenshots/4-spin-result.png",  "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Spin wheel to pick East dealer" },
+    { "src": "screenshots/8-settlement.png",   "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Settle up — who pays who" },
+    { "src": "screenshots/10-calculator.png",  "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Fan calculator" },
+    { "src": "screenshots/9-settings.png",     "sizes": "1080x1920", "type": "image/png", "form_factor": "narrow", "label": "Settings" }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Table",
+      "short_name": "New Table",
+      "description": "Start a new game table",
+      "url": "/mahjong-scoreboard/?action=new",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

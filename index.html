@@ -3,12 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Mahjong Scoreboard</title>
+  <title>Mahjong Scoreboard — Hong Kong Style</title>
+  <meta name="description" content="Track scores for Hong Kong-style Mahjong. Fan calculator, round history, seat rotation, settlement and more. Free, offline-ready PWA.">
+  <meta name="keywords" content="mahjong, hong kong mahjong, score tracker, fan calculator, HK mahjong, 麻雀">
+  <meta name="author" content="Rawrben">
+
+  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0c1a0c">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Mahjong">
+  <meta name="apple-mobile-web-app-title" content="Mahjong HK">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Open Graph (for sharing) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mahjong Scoreboard — Hong Kong Style">
+  <meta property="og:description" content="Free Hong Kong Mahjong score tracker with fan calculator, round history, settlement and more.">
+  <meta property="og:image" content="icon-512.png">
+
   <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');</script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
