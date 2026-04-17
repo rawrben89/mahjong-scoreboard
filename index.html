@@ -1432,8 +1432,8 @@
         <button class="spin-open-btn" id="btn-open-combined">📊 Scores</button>
         <button class="spin-open-btn" id="btn-open-spinner">🎲 Spin/Dice</button>
         <button class="spin-open-btn" id="btn-open-stats">📈 Stats</button>
-        <button class="help-open-btn" id="btn-help">❓ Help</button>
         <button class="spin-open-btn" id="btn-settlement">💸 Settle</button>
+        <button class="help-open-btn" id="btn-help">❓ Help</button>
       </div>
     </div>
 
@@ -4420,7 +4420,7 @@ function showSettlement(tid) {
         <span class="settle-from">${esc(tr.from)}</span>
         <span class="settle-arrow">→</span>
         <span class="settle-to">${esc(tr.to)}</span>
-        <span class="settle-amt">${stake >= 1 ? '$' + tr.amount.toFixed(2) : tr.amount.toFixed(2) + ' pts'}</span>
+        <span class="settle-amt">$${tr.amount.toFixed(2)}</span>
       </div>`
     ).join('');
   }
