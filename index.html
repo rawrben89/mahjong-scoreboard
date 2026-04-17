@@ -927,7 +927,7 @@
       background: rgba(0,0,0,.82);
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
-      z-index: 200;
+      z-index: 950;
       align-items: flex-end;
       justify-content: center;
       padding-bottom: env(safe-area-inset-bottom, 0);
@@ -1539,10 +1539,7 @@
     </div>
 
     <div class="main-sticky-bar">
-      <div style="display:flex;gap:8px">
-        <button class="add-table-btn" id="btn-new-table" data-i18n="main.new_table" style="flex:1">＋ New Table</button>
-        <button class="add-table-btn" id="btn-open-spinner" style="flex:0;padding:0 16px;background:var(--surface2);border-color:var(--border2);color:var(--dim)">🎲</button>
-      </div>
+      <button class="add-table-btn" id="btn-new-table" data-i18n="main.new_table">＋ New Table</button>
       <div id="global-totals" class="global-totals" style="display:none">
         <div class="gt-item pos-sum">
           <span class="lbl" data-i18n="main.all_pos">All Positive</span>
@@ -2682,8 +2679,9 @@ function renderMain() {
         </div>
         <div class="table-scores-grid">${cells}</div>
         <div class="table-card-footer">
-          <button class="open-table-btn"   data-action="open"   data-id="${t.id}">Open Table →</button>
-          <button class="delete-table-btn" data-action="delete" data-id="${t.id}">Delete</button>
+          <button class="open-table-btn"   data-action="open"    data-id="${t.id}" style="flex:1">Open Table →</button>
+          <button class="open-table-btn"   data-action="spinner" data-id="${t.id}" style="flex:0;padding:0 14px;background:var(--surface2);color:var(--dim);border-color:var(--border2)" title="Spin/Dice">🎲</button>
+          <button class="delete-table-btn" data-action="delete"  data-id="${t.id}">Delete</button>
         </div>
       </div>`;
   }).join('');
@@ -2696,6 +2694,8 @@ function renderMain() {
       const tbl = tableById(id);
       if (btn.dataset.action === 'open') {
         showDetail(id);
+      } else if (btn.dataset.action === 'spinner') {
+        showSpinner();
       } else if (btn.dataset.action === 'delete') {
         showConfirm(`Delete "${tbl.name}"?`, 'All scores and history for this table will be permanently removed.', () => {
           S.tables = S.tables.filter(t => t.id !== id);
@@ -3458,7 +3458,7 @@ function showSpinner() {
   drawWheel(wheelRot);
 }
 
-document.getElementById('btn-open-spinner').addEventListener('click', showSpinner);
+document.getElementById('btn-open-spinner')?.addEventListener('click', showSpinner);
 document.getElementById('btn-spinner-back').addEventListener('click', showMain);
 document.getElementById('btn-open-combined').addEventListener('click', showCombined);
 document.getElementById('btn-combined-back').addEventListener('click', showMain);
