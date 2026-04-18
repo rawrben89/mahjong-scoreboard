@@ -96,6 +96,7 @@
       -moz-osx-font-smoothing: grayscale;
       padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
     }
+    /* ── Desktop layout ─────────────────────────────────────── */
     @media (min-width: 700px) {
       html {
         background: #060e06;
@@ -103,25 +104,73 @@
           radial-gradient(ellipse 70% 50% at 50% 0%, rgba(34,80,34,.22) 0%, transparent 65%),
           repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,.013) 40px);
         min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 24px 20px 100px;
       }
       body {
-        max-width: 520px;
-        /* border-radius clips the body background; no overflow:hidden needed
-           (fixed children are viewport-relative and scroll is unaffected) */
-        border-radius: 20px;
-        box-shadow: 0 0 0 1px rgba(78,201,82,.08), 0 8px 60px rgba(0,0,0,.9);
+        /* Fluid: grows from 600px up to 960px with the browser window */
+        width: 100%;
+        max-width: 960px;
+        min-width: 600px;
+        margin: 0;
+        border-radius: 16px;
+        box-shadow: 0 0 0 1px rgba(78,201,82,.08), 0 8px 48px rgba(0,0,0,.85);
+        /* Keep padding-bottom for fixed nav */
+        padding-bottom: calc(72px + 24px);
       }
-      /* Scale up key text for comfortable desktop reading */
-      .p-score    { font-size: 36px; }
-      .p-name     { font-size: 14px; }
-      .ts-score   { font-size: 22px; }
-      .summary-val { font-size: 26px; }
-      .app-header h1 { font-size: 20px; }
+
+      /* ── Nav bars match fluid width ── */
+      #bottom-nav, .tab-bar {
+        max-width: 960px;
+        min-width: 600px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      /* ── Main view: 2-column table card grid ── */
+      #main-body { padding: 16px 20px 100px; }
+      #tables-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        align-items: start;
+      }
+      #tables-container .table-card { margin-bottom: 0; }
+      #archives-container { margin-top: 8px; }
+
+      /* ── Detail view: 4-column player grid ── */
       .players-grid  { grid-template-columns: repeat(4, 1fr) !important; }
-      .combo-card    { break-inside: avoid; }
-      #hpane-wins, #hpane-calc { columns: 2; column-gap: 14px; }
-      /* Align fixed nav to the card width */
-      #bottom-nav, .tab-bar { max-width: 520px; }
+      .tab-pane      { padding: 18px 24px 100px; }
+
+      /* ── Scale up key elements ── */
+      .p-score        { font-size: 38px; }
+      .p-name         { font-size: 14px; }
+      .p-money        { font-size: 13px; }
+      .ts-score       { font-size: 24px; }
+      .ts-name        { font-size: 13px; }
+      .summary-val    { font-size: 28px; }
+      .app-header h1  { font-size: 20px; }
+      .table-name     { font-size: 17px; }
+      .nav-btn        { font-size: 11px; }
+      .nav-btn .nav-icon { font-size: 22px; }
+      .tab-btn span:first-child { font-size: 22px; }
+
+      /* ── Wider modal for desktop ── */
+      .modal-box      { max-width: 540px; }
+
+      /* ── Help / calculator multi-column ── */
+      .combo-card     { break-inside: avoid; }
+      #hpane-wins, #hpane-calc { columns: 2; column-gap: 16px; }
+    }
+
+    /* Extra wide: use even more space */
+    @media (min-width: 1100px) {
+      body           { max-width: 1100px; }
+      #bottom-nav, .tab-bar { max-width: 1100px; }
+      #tables-container { grid-template-columns: repeat(3, 1fr); }
+      .players-grid  { grid-template-columns: repeat(4, 1fr) !important; }
     }
 
 
