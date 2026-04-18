@@ -463,72 +463,74 @@
       transition: opacity .5s ease;
     }
     #splash-screen.fade-out { opacity: 0; pointer-events: none; }
-    /* Single shared entrance animation — everything rises together */
+    /* ── Splash entrance keyframes ── */
     @keyframes splash-rise {
-      from { opacity: 0; transform: translateY(18px) scale(.97); }
+      from { opacity: 0; transform: translateY(22px) scale(.96); }
       to   { opacity: 1; transform: translateY(0)    scale(1);   }
+    }
+    @keyframes splash-fadein {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* The whole centre block (tile + title + sub + tagline) rises as ONE unit.
+       No individual animations on the children — zero relative motion. */
+    .splash-content {
+      display: flex; flex-direction: column; align-items: center;
+      animation: splash-rise .72s cubic-bezier(.22,.68,0,1.08) .08s both;
     }
     .splash-tile-wrap {
       position: relative;
       margin-bottom: 22px;
-      animation: splash-rise .65s cubic-bezier(.22,.68,0,1.2) .05s both;
     }
     .splash-tile-wrap svg {
       display: block;
       filter: drop-shadow(0 0 28px rgba(78,201,82,.4)) drop-shadow(0 6px 18px rgba(0,0,0,.7));
-      animation: tile-breathe 3s 1s ease-in-out infinite;
+      animation: tile-breathe 3s .8s ease-in-out infinite;
     }
     @keyframes tile-breathe {
       0%, 100% { filter: drop-shadow(0 0 28px rgba(78,201,82,.4)) drop-shadow(0 6px 18px rgba(0,0,0,.7)); }
-      50%       { filter: drop-shadow(0 0 52px rgba(78,201,82,.7)) drop-shadow(0 6px 18px rgba(0,0,0,.7)); }
+      50%       { filter: drop-shadow(0 0 56px rgba(78,201,82,.75)) drop-shadow(0 6px 18px rgba(0,0,0,.7)); }
     }
     .splash-title {
       font-size: 26px; font-weight: 800; color: #ecf7ec;
       letter-spacing: .5px; text-align: center;
-      animation: splash-rise .6s cubic-bezier(.22,.68,0,1.1) .12s both;
     }
     .splash-sub {
       font-size: 11px; color: rgba(201,168,64,.75);
       letter-spacing: 2px; text-transform: uppercase;
       margin-top: 7px; text-align: center;
-      animation: splash-rise .6s cubic-bezier(.22,.68,0,1.1) .2s both;
     }
     .splash-tagline {
       font-size: 13px; color: rgba(110,160,112,.7);
       font-style: italic; letter-spacing: .3px;
       margin-top: 14px; text-align: center; padding: 0 32px;
-      animation: splash-rise .6s cubic-bezier(.22,.68,0,1.1) .28s both;
       line-height: 1.5;
     }
+    /* Secondary elements fade in softly after the main block lands */
     .splash-credit {
       position: absolute; bottom: 32px;
       font-size: 11px; font-weight: 500;
       color: rgba(110,160,112,.55);
       letter-spacing: 1px;
-      animation: splash-rise .5s ease .35s both;
+      animation: splash-fadein .5s ease .55s both;
     }
     .splash-version {
       position: absolute; bottom: 38px; right: 20px;
       font-size: 10px; color: rgba(110,160,112,.4);
       letter-spacing: .5px; font-weight: 600;
-      animation: splash-rise .5s ease .35s both;
+      animation: splash-fadein .5s ease .55s both;
     }
     .splash-progress-wrap {
       position: absolute; bottom: 0; left: 0; right: 0;
-      height: 3px;
-      background: rgba(255,255,255,.06);
-      animation: splash-rise .4s ease .1s both;
+      height: 3px; background: rgba(255,255,255,.06);
+      animation: splash-fadein .4s ease .1s both;
     }
     .splash-progress-bar {
-      height: 100%;
-      width: 0%;
+      height: 100%; width: 0%;
       background: linear-gradient(90deg, var(--accent), #a8e6ab);
       border-radius: 0 2px 2px 0;
       transition: width .1s linear;
-    }
-    @keyframes splash-fadein {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
     }
     /* Floating bg tiles */
     .splash-bg-tiles {
@@ -1830,17 +1832,20 @@
     <div class="splash-bg-tile" style="bottom:40%;right:4%;animation:tile-float-up .7s .3s ease both">🀌</div>
   </div>
 
-  <div class="splash-tile-wrap">
-    <!-- Red Dragon tile — self-hosted inline SVG, no external dependency -->
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 96" width="110" height="110" role="img" aria-label="Red Dragon Mahjong Tile">
-      <rect x="2"  y="2"  width="68" height="92" rx="9"  ry="9"  fill="#f5ead4" stroke="#b8864a" stroke-width="2"/>
-      <rect x="6"  y="6"  width="60" height="84" rx="6"  ry="6"  fill="none"    stroke="#d4a060" stroke-width="1"/>
-      <text x="36" y="72" text-anchor="middle" font-family="'Noto Serif SC','Noto Serif','serif'" font-size="56" font-weight="900" fill="#c41e1e" style="font-style:normal">中</text>
-    </svg>
+  <!-- All centre content in one block so it animates as a single unit -->
+  <div class="splash-content">
+    <div class="splash-tile-wrap">
+      <!-- Red Dragon tile — self-hosted inline SVG, no external dependency -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 96" width="110" height="110" role="img" aria-label="Red Dragon Mahjong Tile">
+        <rect x="2"  y="2"  width="68" height="92" rx="9"  ry="9"  fill="#f5ead4" stroke="#b8864a" stroke-width="2"/>
+        <rect x="6"  y="6"  width="60" height="84" rx="6"  ry="6"  fill="none"    stroke="#d4a060" stroke-width="1"/>
+        <text x="36" y="72" text-anchor="middle" font-family="'Noto Serif SC','Noto Serif','serif'" font-size="56" font-weight="900" fill="#c41e1e" style="font-style:normal">中</text>
+      </svg>
+    </div>
+    <div class="splash-title">🀄 Mahjong Scoreboard</div>
+    <div class="splash-sub">Hong Kong Style</div>
+    <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
-  <div class="splash-title">🀄 Mahjong Scoreboard</div>
-  <div class="splash-sub">Hong Kong Style</div>
-  <div class="splash-tagline">May the tiles be in your favor.</div>
   <div class="splash-credit">Made by Rawrben</div>
   <div class="splash-version">v1.0.1</div>
   <div class="splash-progress-wrap">
