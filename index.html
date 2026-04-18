@@ -1863,7 +1863,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">Made by Rawrben</div>
-  <div class="splash-version">v1.0.9</div>
+  <div class="splash-version">v1.0.10</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2843,7 +2843,7 @@
   <button class="nav-btn" id="btn-open-calc"><span class="nav-icon">🧮</span><span data-i18n="nav.calc">Calculator</span></button>
   <button class="nav-btn" id="btn-open-combined"><span class="nav-icon">🏆</span><span data-i18n="nav.scores">Leaderboard</span></button>
   <button class="nav-btn" id="btn-open-stats"><span class="nav-icon">📈</span><span data-i18n="nav.stats">Stats</span></button>
-  <button class="nav-btn" id="btn-settlement"><span class="nav-icon">💸</span><span data-i18n="nav.settle">Settle</span></button>
+  <button class="nav-btn" id="btn-open-spinner"><span class="nav-icon">🎲</span><span data-i18n="nav.spin">Spin/Dice</span></button>
   <button class="nav-btn" id="btn-settings"><span class="nav-icon">⚙️</span><span data-i18n="nav.settings">Settings</span></button>
 </nav>
 
@@ -3098,7 +3098,6 @@ function renderMain() {
         <div class="table-scores-grid">${cells}</div>
         <div class="table-card-footer">
           <button class="open-table-btn"   data-action="open"    data-id="${t.id}" style="flex:1">Open Table →</button>
-          <button class="table-spin-btn" data-action="spinner" data-id="${t.id}"><span class="spin-icon">🎲</span><span>Spin/Dice</span></button>
           <button class="delete-table-btn" data-action="delete"  data-id="${t.id}">Delete</button>
         </div>
       </div>`;
@@ -5509,7 +5508,6 @@ document.getElementById('btn-rotate-ok').addEventListener('click', () => {
   document.getElementById('modal-rotate').classList.remove('show');
 });
 
-document.getElementById('btn-settlement').addEventListener('click', () => showSettlement(null));
 document.getElementById('btn-settle-table').addEventListener('click', () => showSettlement(currentId));
 document.getElementById('ms-close').addEventListener('click', () => {
   document.getElementById('modal-settlement').classList.remove('show');
