@@ -2736,6 +2736,22 @@ function esc(s) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function fmt(n) { return (n > 0 ? '+' : '') + n; }
+
+// Smoothly count a numeric display from `from` → `to` over `duration` ms
+function animateCounter(el, from, to, duration) {
+  if (!el || from === to) return;
+  const start = performance.now();
+  const diff  = to - from;
+  function tick(now) {
+    const p    = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);          // easeOutCubic
+    const val  = p < 1 ? Math.round(from + diff * ease) : to;
+    el.textContent = fmt(val);
+    el.classList.toggle('neg', val < 0);           // keep colour in sync
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
 function fmtMoney(pts, stake, forceShow = false) {
   if (!stake || stake === 0) return '';
   if (!forceShow && localStorage.getItem('hk-show-money') === 'false') return '';
@@ -3133,7 +3149,7 @@ function renderDScores() {
         <span class="p-rank">#${rank}</span>
         ${wBadge}
         <div class="p-name">${esc(p)}${streakHtml}</div>
-        <div class="p-score ${sc < 0 ? 'neg' : ''}">${fmt(sc)}</div>
+        <div class="p-score ${sc < 0 ? 'neg' : ''}" data-player="${esc(p)}">${fmt(sc)}</div>
         ${money ? `<div class="p-money">${money}</div>` : ''}
       </div>`;
   }).join('');
@@ -3313,6 +3329,9 @@ document.getElementById('d-submit-btn').addEventListener('click', () => {
   const winnerName   = t.players[F.winner];
   const discarderName = F.discarder !== null ? t.players[F.discarder] : null;
 
+  // Snapshot scores before applying changes (for animation)
+  const prevScores = Object.fromEntries(t.players.map(p => [p, t.scores[p] || 0]));
+
   // Apply
   t.players.forEach((p,i) => { t.scores[p] = (t.scores[p] || 0) + changes[i]; });
 
@@ -3362,6 +3381,23 @@ document.getElementById('d-submit-btn').addEventListener('click', () => {
   if (navigator.vibrate) navigator.vibrate(50);
 
   switchDTab('scores');
+
+  // Animate score counters from previous → new values
+  const ANIM_DUR = 700;
+  t.players.forEach(p => {
+    const el = document.querySelector(`#d-players-grid .p-score[data-player="${CSS.escape(p)}"]`);
+    animateCounter(el, prevScores[p], t.scores[p], ANIM_DUR);
+  });
+  // Animate summary totals
+  const allNew    = t.players.map(p => t.scores[p] || 0);
+  const allOld    = t.players.map(p => prevScores[p] || 0);
+  const newPos    = allNew.filter(s => s > 0).reduce((a,b) => a+b, 0);
+  const oldPos    = allOld.filter(s => s > 0).reduce((a,b) => a+b, 0);
+  const newNeg    = allNew.filter(s => s < 0).reduce((a,b) => a+b, 0);
+  const oldNeg    = allOld.filter(s => s < 0).reduce((a,b) => a+b, 0);
+  animateCounter(document.getElementById('d-sum-pos-pts'), oldPos, newPos, ANIM_DUR);
+  animateCounter(document.getElementById('d-sum-neg-pts'), oldNeg, newNeg, ANIM_DUR);
+
   toast(`Round ${roundNum} — ${esc(winnerName)} wins! 🎉`);
   // Show seat rotation reminder if needed
   const tAfter = tableById(currentId);
