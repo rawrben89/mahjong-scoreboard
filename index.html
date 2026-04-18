@@ -1203,6 +1203,10 @@
       color: var(--gold); border-color: rgba(255,204,68,.35);
       background: rgba(255,204,68,.07);
     }
+    .nt-step.done {
+      color: var(--accent); border-color: rgba(78,201,82,.3);
+      background: rgba(78,201,82,.07);
+    }
     .nt-step-sep { font-size: 10px; color: var(--dim2); opacity: .5; }
 
     /* Confirm modal (small, centered) */
@@ -1847,7 +1851,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">Made by Rawrben</div>
-  <div class="splash-version">v1.0.1</div>
+  <div class="splash-version">v1.0.3</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2622,43 +2626,61 @@
   <div class="modal-box">
     <div class="modal-drag"></div>
     <div class="nt-steps">
-      <span class="nt-step active">① Create Table</span>
+      <span class="nt-step active" id="nt-stp1">① Create Table</span>
       <span class="nt-step-sep">›</span>
-      <span class="nt-step">② Set Winds</span>
+      <span class="nt-step" id="nt-stp2">② Set Winds</span>
       <span class="nt-step-sep">›</span>
-      <span class="nt-step">③ Score</span>
+      <span class="nt-step" id="nt-stp3">③ Score</span>
     </div>
-    <h3 data-i18n="nt.title">Create New Table</h3>
-    <div style="margin-bottom:8px">
-      <input id="nt-name" class="modal-input full" placeholder="Table name (e.g. Table 1)" maxlength="30">
+
+    <!-- ─ Step 1: Table details ─ -->
+    <div id="nt-step1">
+      <h3 data-i18n="nt.title">Create New Table</h3>
+      <div style="margin-bottom:8px">
+        <input id="nt-name" class="modal-input full" placeholder="Table name (e.g. Table 1)" maxlength="30">
+      </div>
+      <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:12px;color:var(--dim);flex:1">Bet per fan ($)</span>
+        <input id="nt-stake" type="number" class="modal-input" style="width:90px;text-align:center;color:var(--gold)" placeholder="0.25" min="0.25" step="0.25" inputmode="decimal">
+      </div>
+      <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:12px;color:var(--dim);flex:1">Minimum fan to win</span>
+        <select id="nt-minfan" class="modal-input" style="width:90px;text-align:center;color:var(--accent)">
+          <option value="1">1 fan</option>
+          <option value="2">2 fan</option>
+          <option value="3" selected>3 fan</option>
+          <option value="4">4 fan</option>
+          <option value="5">5 fan</option>
+        </select>
+      </div>
+      <div class="modal-input-grid">
+        <input id="nt-p1" class="modal-input" placeholder="Player 1" maxlength="20">
+        <input id="nt-p2" class="modal-input" placeholder="Player 2" maxlength="20">
+        <input id="nt-p3" class="modal-input" placeholder="Player 3" maxlength="20">
+        <input id="nt-p4" class="modal-input" placeholder="Player 4" maxlength="20">
+      </div>
+      <div id="nt-saved-row" style="display:none">
+        <div style="font-size:11px;color:var(--dim);margin-bottom:4px" data-i18n="nt.saved_label">Saved players — tap to fill:</div>
+        <div id="nt-saved-chips" class="saved-players-row"></div>
+      </div>
+      <div class="modal-btns">
+        <button class="m-cancel" id="nt-cancel" data-i18n="nt.cancel">Cancel</button>
+        <button class="m-confirm" id="nt-next">Set Winds →</button>
+      </div>
     </div>
-    <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
-      <span style="font-size:12px;color:var(--dim);flex:1">Bet per fan ($)</span>
-      <input id="nt-stake" type="number" class="modal-input" style="width:90px;text-align:center;color:var(--gold)" placeholder="0.25" min="0.25" step="0.25" inputmode="decimal">
-    </div>
-    <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
-      <span style="font-size:12px;color:var(--dim);flex:1">Minimum fan to win</span>
-      <select id="nt-minfan" class="modal-input" style="width:90px;text-align:center;color:var(--accent)">
-        <option value="1">1 fan</option>
-        <option value="2">2 fan</option>
-        <option value="3" selected>3 fan</option>
-        <option value="4">4 fan</option>
-        <option value="5">5 fan</option>
-      </select>
-    </div>
-    <div class="modal-input-grid">
-      <input id="nt-p1" class="modal-input" placeholder="Player 1" maxlength="20">
-      <input id="nt-p2" class="modal-input" placeholder="Player 2" maxlength="20">
-      <input id="nt-p3" class="modal-input" placeholder="Player 3" maxlength="20">
-      <input id="nt-p4" class="modal-input" placeholder="Player 4" maxlength="20">
-    </div>
-    <div id="nt-saved-row" style="display:none">
-      <div style="font-size:11px;color:var(--dim);margin-bottom:4px" data-i18n="nt.saved_label">Saved players — tap to fill:</div>
-      <div id="nt-saved-chips" class="saved-players-row"></div>
-    </div>
-    <div class="modal-btns">
-      <button class="m-cancel"  id="nt-cancel" data-i18n="nt.cancel">Cancel</button>
-      <button class="m-confirm" id="nt-create" data-i18n="nt.create">Create Table</button>
+
+    <!-- ─ Step 2: Wind assignment ─ -->
+    <div id="nt-step2" style="display:none">
+      <h3 style="margin-bottom:6px">🧭 Set Winds</h3>
+      <p style="font-size:12px;color:var(--dim);margin-bottom:10px;line-height:1.5">
+        Assign seat winds. The player with <strong style="color:var(--accent)">東 East</strong> is the first dealer.
+      </p>
+      <div id="nt-wind-rows" style="margin-bottom:10px"></div>
+      <button id="nt-randomize" style="width:100%;padding:10px;border-radius:10px;border:1.5px dashed var(--border);background:transparent;color:var(--dim);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;letter-spacing:.2px">🎲 Randomize Winds</button>
+      <div class="modal-btns">
+        <button class="m-cancel" id="nt-back">← Back</button>
+        <button class="m-confirm" id="nt-create">Create Table</button>
+      </div>
     </div>
   </div>
 </div>
@@ -3123,14 +3145,58 @@ function renderSavedPlayerChips() {
   });
 }
 
+// ── New Table multi-step state ──
+let ntWindDraft = [0, 1, 2, 3]; // ntWindDraft[playerIdx] = wind (0=E,1=S,2=W,3=N)
+
+function ntShowStep(n) {
+  document.getElementById('nt-step1').style.display = n === 1 ? '' : 'none';
+  document.getElementById('nt-step2').style.display = n === 2 ? '' : 'none';
+  ['nt-stp1','nt-stp2','nt-stp3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.toggle('active', i + 1 === n);
+    el.classList.toggle('done',   i + 1 < n);
+  });
+}
+
+function ntRenderWindRows(players) {
+  const WLBL = ['東','南','西','北'];
+  const WCLS = ['east','south','west','north'];
+  const WENL = ['East','South','West','North'];
+  document.getElementById('nt-wind-rows').innerHTML = players.map((p, pi) => {
+    const btns = WLBL.map((lbl, wi) =>
+      `<button class="wind-assign-btn ${ntWindDraft[pi]===wi?'on wind-'+WCLS[wi]:''}" data-pi="${pi}" data-wi="${wi}">${lbl}<span class="w-en">${WENL[wi]}</span></button>`
+    ).join('');
+    return `<div class="wind-assign-row">
+      <span class="wind-assign-name">${esc(p)}</span>
+      <div class="wind-assign-sel">${btns}</div>
+    </div>`;
+  }).join('');
+}
+
+function ntValidateStep1() {
+  const name = document.getElementById('nt-name').value.trim();
+  const p1   = document.getElementById('nt-p1').value.trim();
+  const p2   = document.getElementById('nt-p2').value.trim();
+  const p3   = document.getElementById('nt-p3').value.trim();
+  const p4   = document.getElementById('nt-p4').value.trim();
+  if (!name)           { toast('Please enter a table name.'); return null; }
+  if (!p1||!p2||!p3||!p4) { toast('Please fill in all 4 player names.'); return null; }
+  const players = [p1, p2, p3, p4];
+  if (new Set(players.map(p => p.toLowerCase())).size < 4) { toast('Player names must be unique.'); return null; }
+  return players;
+}
+
 document.getElementById('btn-new-table').addEventListener('click', () => {
   ['nt-name','nt-p1','nt-p2','nt-p3','nt-p4'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('nt-stake').value  = '1';
   document.getElementById('nt-minfan').value = '3';
+  ntWindDraft = [0, 1, 2, 3];
+  ntShowStep(1);
   renderSavedPlayerChips();
   document.getElementById('modal-newtable').classList.add('show');
   document.getElementById('nt-name').focus();
 });
+
 document.getElementById('nt-cancel').addEventListener('click', () => {
   document.getElementById('modal-newtable').classList.remove('show');
 });
@@ -3139,26 +3205,62 @@ document.getElementById('modal-newtable').addEventListener('click', e => {
     document.getElementById('modal-newtable').classList.remove('show');
 });
 
-document.getElementById('nt-create').addEventListener('click', createTable);
-['nt-name','nt-stake','nt-p1','nt-p2','nt-p3','nt-p4'].forEach(id => {
-  document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') createTable(); });
+// Step 1 → Step 2
+document.getElementById('nt-next').addEventListener('click', () => {
+  const players = ntValidateStep1();
+  if (!players) return;
+  ntWindDraft = [0, 1, 2, 3]; // default: P1=East, P2=South, P3=West, P4=North
+  ntRenderWindRows(players);
+  ntShowStep(2);
 });
+
+// Enter key in step 1 fields advances to step 2
+['nt-name','nt-stake','nt-p1','nt-p2','nt-p3','nt-p4'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('nt-next').click();
+  });
+});
+
+// Step 2 → Step 1
+document.getElementById('nt-back').addEventListener('click', () => ntShowStep(1));
+
+// Wind button clicks in step 2
+document.getElementById('nt-wind-rows').addEventListener('click', e => {
+  const btn = e.target.closest('.wind-assign-btn');
+  if (!btn) return;
+  const pi = parseInt(btn.dataset.pi);
+  const wi = parseInt(btn.dataset.wi);
+  const prevOwner = ntWindDraft.indexOf(wi);
+  if (prevOwner >= 0 && prevOwner !== pi) ntWindDraft[prevOwner] = ntWindDraft[pi];
+  ntWindDraft[pi] = wi;
+  const players = ['nt-p1','nt-p2','nt-p3','nt-p4'].map(id => document.getElementById(id).value.trim());
+  ntRenderWindRows(players);
+});
+
+// Randomize winds
+document.getElementById('nt-randomize').addEventListener('click', () => {
+  const arr = [0,1,2,3];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  ntWindDraft = arr;
+  const players = ['nt-p1','nt-p2','nt-p3','nt-p4'].map(id => document.getElementById(id).value.trim());
+  ntRenderWindRows(players);
+});
+
+// Step 2 → Create table
+document.getElementById('nt-create').addEventListener('click', createTable);
 
 function createTable() {
   const name   = document.getElementById('nt-name').value.trim();
   const stake  = parseFloat(document.getElementById('nt-stake').value) || 0.25;
   const minFan = parseInt(document.getElementById('nt-minfan').value) || 3;
-  const p1    = document.getElementById('nt-p1').value.trim();
-  const p2    = document.getElementById('nt-p2').value.trim();
-  const p3    = document.getElementById('nt-p3').value.trim();
-  const p4    = document.getElementById('nt-p4').value.trim();
-
-  if (!name)                    { toast('Please enter a table name.'); return; }
-  if (!p1||!p2||!p3||!p4)      { toast('Please fill in all 4 player names.'); return; }
-
+  const p1     = document.getElementById('nt-p1').value.trim();
+  const p2     = document.getElementById('nt-p2').value.trim();
+  const p3     = document.getElementById('nt-p3').value.trim();
+  const p4     = document.getElementById('nt-p4').value.trim();
   const players = [p1, p2, p3, p4];
-  const unique  = new Set(players.map(p => p.toLowerCase()));
-  if (unique.size < 4)          { toast('Player names must be unique.'); return; }
 
   const t = {
     id: S.nextTableId++,
@@ -3168,10 +3270,10 @@ function createTable() {
     players,
     scores:    Object.fromEntries(players.map(p => [p, 0])),
     history:   [],
-    nextRound: 1
+    nextRound: 1,
+    eastIdx:   ntWindDraft.indexOf(0) >= 0 ? ntWindDraft.indexOf(0) : 0
   };
   S.tables.push(t);
-  // Save player names for future use
   if (!S.savedPlayers) S.savedPlayers = [];
   players.forEach(p => {
     if (p && !S.savedPlayers.includes(p)) S.savedPlayers.push(p);
@@ -3179,7 +3281,8 @@ function createTable() {
   saveState();
   document.getElementById('modal-newtable').classList.remove('show');
   renderMain();
-  toast(`${name} created!`);
+  showDetail(t.id);
+  toast(`${name} created! 🀄`);
 }
 
 /* ═══════════════════════════════════════
