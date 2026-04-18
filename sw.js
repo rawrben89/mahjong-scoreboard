@@ -1,4 +1,4 @@
-const CACHE = 'mahjong-v1.0.10';
+const CACHE = 'mahjong-v1.0.11';
 const ASSETS = [
   '/mahjong-scoreboard/',
   '/mahjong-scoreboard/index.html'
