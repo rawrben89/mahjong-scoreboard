@@ -4028,19 +4028,47 @@ document.getElementById('btn-backup-restore-code').addEventListener('click', () 
 });
 
 /* ═══════════════════════════════════════
-   TILE BUILDER — self-hosted tile images in /tiles/
+   TILE BUILDER — image tiles from Wikimedia Commons
 ═══════════════════════════════════════ */
-const _T = k => `tiles/${k}.png`;
 const TILE_IMG = {
-  s1:_T('s1'), s2:_T('s2'), s3:_T('s3'), s4:_T('s4'), s5:_T('s5'),
-  s6:_T('s6'), s7:_T('s7'), s8:_T('s8'), s9:_T('s9'),
-  t1:_T('t1'), t2:_T('t2'), t3:_T('t3'), t4:_T('t4'), t5:_T('t5'),
-  t6:_T('t6'), t7:_T('t7'), t8:_T('t8'), t9:_T('t9'),
-  w1:_T('w1'), w2:_T('w2'), w3:_T('w3'), w4:_T('w4'), w5:_T('w5'),
-  w6:_T('w6'), w7:_T('w7'), w8:_T('w8'), w9:_T('w9'),
-  fe:_T('fe'), fs:_T('fs'), fw:_T('fw'), fn:_T('fn'),
-  dr:_T('dr'), dg:_T('dg'), dw:_T('dw'),
-  h1:_T('h1'), h2:_T('h2'), h3:_T('h3'), h4:_T('h4'),
+  s1:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/MJs1-.svg/60px-MJs1-.svg.png',
+  s2:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/MJs2-.svg/60px-MJs2-.svg.png',
+  s3:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/MJs3-.svg/60px-MJs3-.svg.png',
+  s4:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/MJs4-.svg/60px-MJs4-.svg.png',
+  s5:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/MJs5-.svg/60px-MJs5-.svg.png',
+  s6:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/MJs6-.svg/60px-MJs6-.svg.png',
+  s7:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/MJs7-.svg/60px-MJs7-.svg.png',
+  s8:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/MJs8-.svg/60px-MJs8-.svg.png',
+  s9:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/MJs9-.svg/60px-MJs9-.svg.png',
+  t1:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/MJt1-.svg/60px-MJt1-.svg.png',
+  t2:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/MJt2-.svg/60px-MJt2-.svg.png',
+  t3:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/MJt3-.svg/60px-MJt3-.svg.png',
+  t4:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/MJt4-.svg/60px-MJt4-.svg.png',
+  t5:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/MJt5-.svg/60px-MJt5-.svg.png',
+  t6:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/MJt6-.svg/60px-MJt6-.svg.png',
+  t7:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/MJt7-.svg/60px-MJt7-.svg.png',
+  t8:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/MJt8-.svg/60px-MJt8-.svg.png',
+  t9:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/MJt9-.svg/60px-MJt9-.svg.png',
+  w1:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/MJw1-.svg/60px-MJw1-.svg.png',
+  w2:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/MJw2-.svg/60px-MJw2-.svg.png',
+  w3:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/MJw3-.svg/60px-MJw3-.svg.png',
+  w4:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/MJw4-.svg/60px-MJw4-.svg.png',
+  w5:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/MJw5-.svg/60px-MJw5-.svg.png',
+  w6:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/MJw6-.svg/60px-MJw6-.svg.png',
+  w7:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/MJw7-.svg/60px-MJw7-.svg.png',
+  w8:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/MJw8-.svg/60px-MJw8-.svg.png',
+  w9:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/MJw9-.svg/60px-MJw9-.svg.png',
+  fe:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/MJf1-.svg/60px-MJf1-.svg.png',
+  fs:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/MJf2-.svg/60px-MJf2-.svg.png',
+  fw:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/MJf3-.svg/60px-MJf3-.svg.png',
+  fn:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/MJf4-.svg/60px-MJf4-.svg.png',
+  dr:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/MJd1-.svg/60px-MJd1-.svg.png',
+  dg:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/MJd2-.svg/60px-MJd2-.svg.png',
+  dw:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/MJd3-.svg/60px-MJd3-.svg.png',
+  h1:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/MJh1-.svg/60px-MJh1-.svg.png',
+  h2:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/MJh2-.svg/60px-MJh2-.svg.png',
+  h3:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/MJh3-.svg/60px-MJh3-.svg.png',
+  h4:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/MJh4-.svg/60px-MJh4-.svg.png',
 };
 
 function makeTile(key, lbl) {
