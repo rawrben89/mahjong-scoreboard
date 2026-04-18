@@ -97,12 +97,28 @@
       padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
     }
     @media (min-width: 700px) {
-      html { background: #0a1208; }
-      body { max-width: 680px; box-shadow: 0 0 60px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.03); }
+      html {
+        background: #060e06;
+        background-image:
+          radial-gradient(ellipse 70% 50% at 50% 0%, rgba(34,80,34,.22) 0%, transparent 65%),
+          repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,.013) 40px);
+        min-height: 100vh;
+      }
+      body {
+        max-width: 480px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        min-height: calc(100vh - 40px);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 0 0 1px rgba(78,201,82,.08), 0 8px 60px rgba(0,0,0,.9), 0 0 120px rgba(0,0,0,.6);
+      }
       .players-grid { grid-template-columns: repeat(4, 1fr) !important; }
       .summary-val  { font-size: 22px; }
       .combo-card   { break-inside: avoid; }
       #hpane-wins, #hpane-calc { columns: 2; column-gap: 14px; }
+      /* Fixed elements need to be scoped to body width on desktop */
+      #bottom-nav, .tab-bar { max-width: 480px; border-radius: 0 0 20px 20px; }
     }
 
 
@@ -546,19 +562,22 @@
       left: 50%;
       transform: translateX(-50%);
       width: 100%;
-      max-width: 500px;
-      background: linear-gradient(180deg, rgba(12,24,12,.98) 0%, rgba(6,14,6,1) 100%);
-      border-top: 1px solid rgba(40,66,40,.55);
+      max-width: 540px;
+      background: var(--surface2);
+      border-top: 1px solid var(--border2);
       display: flex;
       z-index: 100;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       padding-bottom: env(safe-area-inset-bottom, 0);
-      box-shadow: 0 -4px 24px rgba(0,0,0,.5);
+      box-shadow: 0 -4px 20px rgba(0,0,0,.35);
       transition: background .2s, border-color .2s;
     }
     body.light .tab-bar {
-      background: linear-gradient(180deg, rgba(255,255,255,.98) 0%, rgba(244,248,244,1) 100%);
+      background: #ffffff;
+      border-top-color: var(--border);
+      box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+    }
+    body.light #bottom-nav {
+      background: #ffffff;
       border-top-color: var(--border);
       box-shadow: 0 -4px 16px rgba(0,0,0,.08);
     }
@@ -887,7 +906,7 @@
     body.light .p-rank { background: rgba(0,0,0,.08); color: var(--dim); }
     .player-card.top .p-rank { color: var(--gold2); background: rgba(230,168,24,.12); }
     body.light .player-card.top .p-rank { color: var(--gold); background: rgba(160,104,0,.1); }
-    .p-name  { font-size: 12px; color: var(--dim); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+    .p-name  { font-size: 13px; color: var(--dim); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
     .p-score { font-size: 32px; font-weight: 900; color: var(--accent2); line-height: 1.1; letter-spacing: -.6px; }
     .p-score.neg { color: var(--red); }
     .p-money { font-size: 12px; color: var(--gold); margin-top: 5px; font-weight: 600; }
@@ -902,14 +921,14 @@
       box-shadow: var(--shadow-sm);
     }
     .section-label {
-      font-size: 10px;
-      color: var(--dim);
+      font-size: 11px;
+      color: var(--dim2);
       text-transform: uppercase;
-      letter-spacing: .8px;
-      margin-bottom: 9px;
-      font-weight: 700;
-      padding-left: 8px;
-      border-left: 2px solid var(--accent);
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      font-weight: 800;
+      padding-left: 9px;
+      border-left: 3px solid var(--accent);
       line-height: 1.4;
     }
     .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -1116,6 +1135,22 @@
     .m-cancel  { background: var(--surface3); color: var(--dim); border: 1px solid var(--border2) !important; }
     .m-confirm { background: linear-gradient(135deg, var(--accent) 0%, #3daa42 100%); color: #000; box-shadow: 0 2px 8px rgba(82,200,86,.3); }
     .m-danger  { background: linear-gradient(135deg, #f55 0%, var(--red) 100%); color: #fff; box-shadow: 0 2px 8px rgba(232,69,69,.3); }
+
+    /* ── New Table — setup steps breadcrumb ── */
+    .nt-steps {
+      display: flex; align-items: center; justify-content: center;
+      gap: 5px; margin-bottom: 16px; flex-wrap: nowrap;
+    }
+    .nt-step {
+      font-size: 11px; font-weight: 600; color: var(--dim2);
+      white-space: nowrap; padding: 3px 8px;
+      border-radius: 20px; border: 1px solid var(--border);
+    }
+    .nt-step.active {
+      color: var(--gold); border-color: rgba(255,204,68,.35);
+      background: rgba(255,204,68,.07);
+    }
+    .nt-step-sep { font-size: 10px; color: var(--dim2); opacity: .5; }
 
     /* Confirm modal (small, centered) */
     #modal-confirm .modal-box {
@@ -1535,7 +1570,23 @@
     .fan-pts-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0 2px; border-top: 1px solid var(--border); margin-top: 4px; font-size: 12px; }
     .fan-pts-val { font-weight: 700; color: var(--gold); font-size: 15px; }
     .fan-pts-warn { font-size: 11px; color: var(--red); }
-    .expand-combos-btn { font-size: 12px; padding: 6px 12px; background: none; border: 1px solid var(--border); color: var(--accent2); border-radius: 8px; cursor: pointer; margin-top: 8px; width: 100%; }
+    .expand-combos-btn {
+      font-size: 13px; font-weight: 700; letter-spacing: .2px;
+      padding: 11px 14px;
+      background: var(--gold-dim);
+      border: 1.5px solid rgba(255,204,68,.35);
+      color: var(--gold);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%;
+      transition: background .15s, border-color .15s, box-shadow .15s;
+    }
+    .expand-combos-btn:hover {
+      background: rgba(255,204,68,.14);
+      border-color: var(--gold);
+      box-shadow: 0 2px 12px rgba(255,204,68,.2);
+    }
     .full-combo-grp-hdr { font-size: 10px; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: .5px; padding: 8px 0 2px; }
     .full-combo-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 12px; cursor: pointer; border-bottom: 1px solid var(--border); user-select: none; }
     .full-combo-item:last-child { border-bottom: none; }
@@ -1729,7 +1780,12 @@
   </div>
 
   <div class="splash-tile-wrap">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/MJd1-.svg/60px-MJd1-.svg.png" alt="Red Dragon">
+    <!-- Red Dragon tile — self-hosted inline SVG, no external dependency -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 96" width="110" height="110" role="img" aria-label="Red Dragon Mahjong Tile">
+      <rect x="2"  y="2"  width="68" height="92" rx="9"  ry="9"  fill="#f5ead4" stroke="#b8864a" stroke-width="2"/>
+      <rect x="6"  y="6"  width="60" height="84" rx="6"  ry="6"  fill="none"    stroke="#d4a060" stroke-width="1"/>
+      <text x="36" y="72" text-anchor="middle" font-family="'Noto Serif SC','Noto Serif','serif'" font-size="56" font-weight="900" fill="#c41e1e" style="font-style:normal">中</text>
+    </svg>
   </div>
   <div class="splash-title">🀄 Mahjong Scoreboard</div>
   <div class="splash-sub">Hong Kong Style</div>
@@ -2509,6 +2565,13 @@
 <div id="modal-newtable" class="modal-bg">
   <div class="modal-box">
     <div class="modal-drag"></div>
+    <div class="nt-steps">
+      <span class="nt-step active">① Create Table</span>
+      <span class="nt-step-sep">›</span>
+      <span class="nt-step">② Set Winds</span>
+      <span class="nt-step-sep">›</span>
+      <span class="nt-step">③ Score</span>
+    </div>
     <h3 data-i18n="nt.title">Create New Table</h3>
     <div style="margin-bottom:8px">
       <input id="nt-name" class="modal-input full" placeholder="Table name (e.g. Table 1)" maxlength="30">
@@ -3965,47 +4028,19 @@ document.getElementById('btn-backup-restore-code').addEventListener('click', () 
 });
 
 /* ═══════════════════════════════════════
-   TILE BUILDER — image tiles from Wikimedia Commons
+   TILE BUILDER — self-hosted tile images in /tiles/
 ═══════════════════════════════════════ */
+const _T = k => `tiles/${k}.png`;
 const TILE_IMG = {
-  s1:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/MJs1-.svg/60px-MJs1-.svg.png',
-  s2:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/MJs2-.svg/60px-MJs2-.svg.png',
-  s3:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/MJs3-.svg/60px-MJs3-.svg.png',
-  s4:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/MJs4-.svg/60px-MJs4-.svg.png',
-  s5:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/MJs5-.svg/60px-MJs5-.svg.png',
-  s6:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/MJs6-.svg/60px-MJs6-.svg.png',
-  s7:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/MJs7-.svg/60px-MJs7-.svg.png',
-  s8:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/MJs8-.svg/60px-MJs8-.svg.png',
-  s9:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/MJs9-.svg/60px-MJs9-.svg.png',
-  t1:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/MJt1-.svg/60px-MJt1-.svg.png',
-  t2:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/MJt2-.svg/60px-MJt2-.svg.png',
-  t3:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/MJt3-.svg/60px-MJt3-.svg.png',
-  t4:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/MJt4-.svg/60px-MJt4-.svg.png',
-  t5:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/MJt5-.svg/60px-MJt5-.svg.png',
-  t6:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/MJt6-.svg/60px-MJt6-.svg.png',
-  t7:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/MJt7-.svg/60px-MJt7-.svg.png',
-  t8:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/MJt8-.svg/60px-MJt8-.svg.png',
-  t9:'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/MJt9-.svg/60px-MJt9-.svg.png',
-  w1:'https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/MJw1-.svg/60px-MJw1-.svg.png',
-  w2:'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/MJw2-.svg/60px-MJw2-.svg.png',
-  w3:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/MJw3-.svg/60px-MJw3-.svg.png',
-  w4:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/MJw4-.svg/60px-MJw4-.svg.png',
-  w5:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/MJw5-.svg/60px-MJw5-.svg.png',
-  w6:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/MJw6-.svg/60px-MJw6-.svg.png',
-  w7:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/MJw7-.svg/60px-MJw7-.svg.png',
-  w8:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/MJw8-.svg/60px-MJw8-.svg.png',
-  w9:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/MJw9-.svg/60px-MJw9-.svg.png',
-  fe:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/MJf1-.svg/60px-MJf1-.svg.png',
-  fs:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/MJf2-.svg/60px-MJf2-.svg.png',
-  fw:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/MJf3-.svg/60px-MJf3-.svg.png',
-  fn:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/MJf4-.svg/60px-MJf4-.svg.png',
-  dr:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/MJd1-.svg/60px-MJd1-.svg.png',
-  dg:'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/MJd2-.svg/60px-MJd2-.svg.png',
-  dw:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/MJd3-.svg/60px-MJd3-.svg.png',
-  h1:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/MJh1-.svg/60px-MJh1-.svg.png',
-  h2:'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/MJh2-.svg/60px-MJh2-.svg.png',
-  h3:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/MJh3-.svg/60px-MJh3-.svg.png',
-  h4:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/MJh4-.svg/60px-MJh4-.svg.png',
+  s1:_T('s1'), s2:_T('s2'), s3:_T('s3'), s4:_T('s4'), s5:_T('s5'),
+  s6:_T('s6'), s7:_T('s7'), s8:_T('s8'), s9:_T('s9'),
+  t1:_T('t1'), t2:_T('t2'), t3:_T('t3'), t4:_T('t4'), t5:_T('t5'),
+  t6:_T('t6'), t7:_T('t7'), t8:_T('t8'), t9:_T('t9'),
+  w1:_T('w1'), w2:_T('w2'), w3:_T('w3'), w4:_T('w4'), w5:_T('w5'),
+  w6:_T('w6'), w7:_T('w7'), w8:_T('w8'), w9:_T('w9'),
+  fe:_T('fe'), fs:_T('fs'), fw:_T('fw'), fn:_T('fn'),
+  dr:_T('dr'), dg:_T('dg'), dw:_T('dw'),
+  h1:_T('h1'), h2:_T('h2'), h3:_T('h3'), h4:_T('h4'),
 };
 
 function makeTile(key, lbl) {
