@@ -105,20 +105,23 @@
         min-height: 100vh;
       }
       body {
-        max-width: 480px;
-        margin-top: 20px;
-        margin-bottom: 20px;
-        min-height: calc(100vh - 40px);
+        max-width: 520px;
+        /* border-radius clips the body background; no overflow:hidden needed
+           (fixed children are viewport-relative and scroll is unaffected) */
         border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 0 0 1px rgba(78,201,82,.08), 0 8px 60px rgba(0,0,0,.9), 0 0 120px rgba(0,0,0,.6);
+        box-shadow: 0 0 0 1px rgba(78,201,82,.08), 0 8px 60px rgba(0,0,0,.9);
       }
-      .players-grid { grid-template-columns: repeat(4, 1fr) !important; }
-      .summary-val  { font-size: 22px; }
-      .combo-card   { break-inside: avoid; }
+      /* Scale up key text for comfortable desktop reading */
+      .p-score    { font-size: 36px; }
+      .p-name     { font-size: 14px; }
+      .ts-score   { font-size: 22px; }
+      .summary-val { font-size: 26px; }
+      .app-header h1 { font-size: 20px; }
+      .players-grid  { grid-template-columns: repeat(4, 1fr) !important; }
+      .combo-card    { break-inside: avoid; }
       #hpane-wins, #hpane-calc { columns: 2; column-gap: 14px; }
-      /* Fixed elements need to be scoped to body width on desktop */
-      #bottom-nav, .tab-bar { max-width: 480px; border-radius: 0 0 20px 20px; }
+      /* Align fixed nav to the card width */
+      #bottom-nav, .tab-bar { max-width: 520px; }
     }
 
 
