@@ -1915,7 +1915,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.33</div>
+  <div class="splash-version">v1.0.34</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2877,7 +2877,7 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.33</span>
+      <span class="settings-version-num" id="settings-version">v1.0.34</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
@@ -5622,6 +5622,7 @@ document.querySelectorAll('[data-ctab]').forEach(btn =>
   let startY = 0, pulling = false, triggered = false;
 
   function isMainViewActive() {
+    if (document.querySelector('.modal-bg.show')) return false;
     return document.getElementById('view-main').style.display !== 'none';
   }
 
