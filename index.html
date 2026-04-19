@@ -1453,6 +1453,9 @@
       border-radius: 50%;
       flex-shrink: 0;
     }
+    .spinner-table-row { display:flex; align-items:center; gap:8px; width:100%; max-width:280px; margin-bottom:6px; }
+    .spinner-table-lbl { font-size:12px; color:var(--dim); white-space:nowrap; }
+    .spinner-table-sel { flex:1; background:var(--surface2); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-size:13px; padding:6px 8px; }
     .apply-table-btn { margin-top:10px; padding:8px 18px; border-radius:8px; border:none; background:var(--accent); color:#000; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .15s; }
     .apply-table-btn:hover { opacity:.85; }
     .seat-draw-section { width:100%; max-width:280px; display:flex; flex-direction:column; align-items:center; gap:8px; margin-top:8px; }
@@ -1914,7 +1917,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.26</div>
+  <div class="splash-version">v1.0.27</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2116,6 +2119,10 @@
   </div>
 
   <div class="spinner-body">
+    <div id="spinner-table-row" class="spinner-table-row" style="display:none">
+      <span class="spinner-table-lbl">Table:</span>
+      <select id="spinner-table-sel" class="spinner-table-sel"></select>
+    </div>
     <p class="spinner-subtitle" id="spin-subtitle">Press <strong>SPIN</strong> to randomly pick<br>who becomes the first 東 East dealer.</p>
 
     <div class="wheel-wrap">
@@ -3794,16 +3801,38 @@ const WINDS = [
 // Brighter versions for drawing on canvas
 const WIND_COLORS = ['#e74c3c', '#e67e22', '#27ae60', '#2980b9'];
 
-let wheelRot      = 0;
-let isSpinning    = false;
-let lastSpinWind  = null;  // index 0-3 of last spin result
-let lastSeatDraw  = null;  // array of {playerIdx, windIdx}
-let diceCount     = 1;
-let diceHistory   = [];
+let wheelRot       = 0;
+let isSpinning     = false;
+let lastSpinWind   = null;
+let lastSeatDraw   = null;
+let diceCount      = 1;
+let diceHistory    = [];
+let spinnerTableId = null;
 
+function getSpinnerTable() {
+  const id = spinnerTableId !== null ? spinnerTableId : currentId;
+  return id !== null ? tableById(id) : null;
+}
 function getSpinnerPlayers() {
-  const t = currentId ? tableById(currentId) : null;
+  const t = getSpinnerTable();
   return (t && t.players && t.players.length === 4) ? t.players : null;
+}
+function refreshSpinnerUI() {
+  const players = getSpinnerPlayers();
+  const sub = document.getElementById('spin-subtitle');
+  if (sub) sub.innerHTML = players
+    ? 'Press <strong>SPIN</strong> to randomly assign who becomes the first 東 East dealer.'
+    : 'Press <strong>SPIN</strong> to randomly pick who becomes the first 東 East dealer.';
+  const seatBtn = document.getElementById('btn-seat-draw');
+  if (seatBtn) seatBtn.style.display = players ? 'block' : 'none';
+  // Reset results when table changes
+  document.getElementById('spin-result-card').style.display = 'none';
+  document.getElementById('spin-placeholder').style.display = 'block';
+  document.getElementById('spin-placeholder').textContent = 'Spin to pick a starting wind!';
+  document.getElementById('seat-draw-result').style.display = 'none';
+  document.getElementById('btn-apply-seats').style.display = 'none';
+  lastSpinWind = null; lastSeatDraw = null;
+  drawWheel(wheelRot);
 }
 
 function drawWheel(rot) {
@@ -3985,22 +4014,34 @@ function showSpinner() {
   document.getElementById('view-combined').style.display = 'none';
   document.getElementById('view-calc').style.display     = 'none';
   document.getElementById('view-spinner').style.display  = 'block';
-  const players = getSpinnerPlayers();
-  const sub = document.getElementById('spin-subtitle');
-  if (sub) sub.innerHTML = players
-    ? 'Press <strong>SPIN</strong> to randomly assign<br>who becomes the first 東 East dealer.'
-    : 'Press <strong>SPIN</strong> to randomly pick<br>who becomes the first 東 East dealer.';
-  const seatBtn = document.getElementById('btn-seat-draw');
-  if (seatBtn) seatBtn.style.display = players ? 'block' : 'none';
-  drawWheel(wheelRot);
+
+  // Build table selector
+  const tables = (S.tables || []).filter(t => t.players && t.players.length === 4);
+  const row = document.getElementById('spinner-table-row');
+  const sel = document.getElementById('spinner-table-sel');
+  if (tables.length > 0) {
+    sel.innerHTML = '<option value="">— No table —</option>' +
+      tables.map(t => `<option value="${t.id}"${t.id === currentId ? ' selected' : ''}>${esc(t.name)}</option>`).join('');
+    spinnerTableId = currentId !== null ? currentId : null;
+    row.style.display = 'flex';
+  } else {
+    spinnerTableId = null;
+    row.style.display = 'none';
+  }
+
+  refreshSpinnerUI();
   initShakeToRoll();
 }
 
 document.getElementById('btn-open-spinner')?.addEventListener('click', showSpinner);
 document.getElementById('btn-spinner-back').addEventListener('click', showMain);
+document.getElementById('spinner-table-sel').addEventListener('change', e => {
+  spinnerTableId = e.target.value ? +e.target.value : null;
+  refreshSpinnerUI();
+});
 
 document.getElementById('btn-apply-spin').addEventListener('click', () => {
-  const t = currentId ? tableById(currentId) : null;
+  const t = getSpinnerTable();
   if (!t || lastSpinWind === null) return;
   t.eastIdx = lastSpinWind;
   saveState();
@@ -4026,7 +4067,7 @@ document.getElementById('btn-seat-draw').addEventListener('click', () => {
 });
 
 document.getElementById('btn-apply-seats').addEventListener('click', () => {
-  const t = currentId ? tableById(currentId) : null;
+  const t = getSpinnerTable();
   if (!t || !lastSeatDraw) return;
   // East wind winner (windIdx===0) becomes the east player
   const eastEntry = lastSeatDraw.find(x => x.windIdx === 0);
