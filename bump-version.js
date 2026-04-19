@@ -15,18 +15,22 @@ pkg.version  = newVer;
 fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 console.log(`Version bumped to v${newVer}`);
 
-// ── Update splash screen in index.html ───────────────────────────────────────
+// ── Update splash screen + settings version in index.html ────────────────────
 let html = fs.readFileSync(idxPath, 'utf8');
 const htmlBefore = html;
 html = html.replace(
   /<div class="splash-version">v[\d.]+<\/div>/,
   `<div class="splash-version">v${newVer}</div>`
 );
+html = html.replace(
+  /<span class="settings-version-num" id="settings-version">v[\d.]+<\/span>/,
+  `<span class="settings-version-num" id="settings-version">v${newVer}</span>`
+);
 if (html === htmlBefore) {
   console.warn('⚠️  splash-version not found in index.html — check the pattern');
 } else {
   fs.writeFileSync(idxPath, html);
-  console.log(`index.html → splash version updated to v${newVer}`);
+  console.log(`index.html → splash + settings version updated to v${newVer}`);
 }
 
 // ── Update service worker cache key in sw.js ─────────────────────────────────

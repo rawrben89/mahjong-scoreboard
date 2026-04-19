@@ -386,6 +386,13 @@
       color: var(--dim); margin: 14px 0 4px;
     }
     .backup-btn-row { display: flex; gap: 8px; margin-bottom: 4px; }
+    .settings-version-row { display:flex; align-items:center; justify-content:space-between; padding:6px 0 4px; }
+    .settings-version-num { font-size:14px; font-weight:700; color:var(--accent2); }
+    .settings-changelog-toggle { background:none; border:none; color:var(--accent); font-size:12px; font-weight:600; cursor:pointer; padding:4px 0; }
+    .changelog-entry { padding:7px 0; border-bottom:1px solid var(--border); }
+    .changelog-entry:last-child { border-bottom:none; }
+    .changelog-ver { font-size:11px; font-weight:700; color:var(--gold); margin-bottom:2px; }
+    .changelog-desc { font-size:12px; color:var(--dim); line-height:1.4; }
     .backup-btn {
       flex: 1; padding: 11px 6px; border-radius: var(--radius-sm);
       border: 1.5px solid var(--border2); background: var(--surface2);
@@ -1906,7 +1913,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.31</div>
+  <div class="splash-version">v1.0.32</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2864,6 +2871,51 @@
 
     <!-- Hidden file input -->
     <input type="file" id="backup-file-input" accept=".json" style="display:none">
+
+    <!-- App Version & Changelog -->
+    <div class="backup-section-lbl">📋 About</div>
+    <div class="settings-version-row">
+      <span class="settings-version-num" id="settings-version">v1.0.32</span>
+      <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
+    </div>
+    <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.31</div>
+        <div class="changelog-desc">Default dice count set to 2 on Spin/Dice screen.</div>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.30</div>
+        <div class="changelog-desc">English wind names now shown on wheel segments when a table is selected.</div>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.29</div>
+        <div class="changelog-desc">Wind legend shows player names when a table is selected on Spin screen.</div>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.28</div>
+        <div class="changelog-desc">Removed Draw All Seats from Spin/Dice screen.</div>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.26–27</div>
+        <div class="changelog-desc">Spin/Dice: player names on wheel, Apply to Table after spin, table selector, dice count (1/2/3), dice history, shake to roll.</div>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.25</div>
+        <div class="changelog-desc">Win method badges in round history. Recent winning hands shown in Player Stats.</div>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.24</div>
+        <div class="changelog-desc">Win Method section in Add Round now collapsed by default — tap to expand.</div>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.22</div>
+        <div class="changelog-desc">Add Round: optional Win Method section (Concealed Hand, Win by Kong, Fishing Moon, etc.) auto-adds fan.</div>
+      </div>
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.21</div>
+        <div class="changelog-desc">Stats tab: improved spacing and light mode background fix. Splash tiles repositioned above copyright.</div>
+      </div>
+    </div>
 
     </div>
     <div class="modal-btns" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
@@ -4143,6 +4195,13 @@ document.getElementById('modal-settings').addEventListener('click', e => {
 document.getElementById('settings-open-help').addEventListener('click', () => {
   document.getElementById('modal-settings').classList.remove('show');
   showHelp();
+});
+document.getElementById('btn-changelog-toggle').addEventListener('click', () => {
+  const el  = document.getElementById('settings-changelog');
+  const btn = document.getElementById('btn-changelog-toggle');
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  btn.textContent  = open ? "What's new ›" : "Hide ‹";
 });
 document.getElementById('toggle-dark-mode').addEventListener('change', e => {
   document.body.classList.toggle('light', !e.target.checked);
