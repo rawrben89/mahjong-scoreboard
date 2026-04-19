@@ -1868,7 +1868,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.18</div>
+  <div class="splash-version">v1.0.19</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2626,14 +2626,14 @@
     <button class="header-action danger" id="btn-reset-stats" style="font-size:12px;padding:6px 10px">Reset</button>
   </div>
   <div class="help-tab-bar">
-    <button class="help-tab-btn active" data-ctab="leaderboard">🏆 Leaderboard</button>
-    <button class="help-tab-btn"        data-ctab="stats">📊 Player Stats</button>
+    <button class="help-tab-btn active" data-ctab="stats">📊 Player Stats</button>
+    <button class="help-tab-btn"        data-ctab="leaderboard">🏆 Leaderboard</button>
   </div>
-  <div id="cpane-leaderboard" class="tab-pane active" style="padding:0 14px 40px">
-    <div id="combined-body"></div>
-  </div>
-  <div id="cpane-stats" class="tab-pane" style="padding:14px 14px 80px">
+  <div id="cpane-stats" class="tab-pane active" style="padding:14px 14px 80px">
     <div id="stats-body"></div>
+  </div>
+  <div id="cpane-leaderboard" class="tab-pane" style="padding:0 14px 40px">
+    <div id="combined-body"></div>
   </div>
 </div>
 
@@ -4267,7 +4267,7 @@ function showCombined(tab) {
   document.getElementById('view-help').style.display     = 'none';
   document.getElementById('view-spinner').style.display  = 'none';
   document.getElementById('view-combined').style.display = 'block';
-  switchCTab(tab || 'leaderboard');
+  switchCTab(tab || 'stats');
 }
 
 document.getElementById('btn-reset-stats').addEventListener('click', () => {
