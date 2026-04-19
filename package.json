@@ -1,6 +1,6 @@
 {
   "name": "mahjong-scoreboard",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "Hong Kong Mahjong score tracker PWA",
   "private": true
 }
