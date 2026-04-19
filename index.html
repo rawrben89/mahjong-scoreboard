@@ -267,7 +267,6 @@
     @keyframes ptr-spin     { to { transform: translateX(-50%) rotate(360deg); } }
 
     /* ── Player Stats view ── */
-    #view-stats { display:none; }
     .stats-player-card {
       background: linear-gradient(160deg, var(--surface2) 0%, var(--surface) 100%);
       border: 1px solid var(--border2);
@@ -1864,12 +1863,12 @@
         <text x="36" y="72" text-anchor="middle" font-family="'Noto Serif SC','Noto Serif','serif'" font-size="56" font-weight="900" fill="#c41e1e" style="font-style:normal">中</text>
       </svg>
     </div>
-    <div class="splash-title">🀄 Mahjong Scoreboard</div>
+    <div class="splash-title">Mahjong Scoreboard</div>
     <div class="splash-sub">Hong Kong Style</div>
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.17</div>
+  <div class="splash-version">v1.0.18</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2054,14 +2053,6 @@
 <!-- ═══════════════════════════════════
      STATS VIEW
 ═══════════════════════════════════ -->
-<div id="view-stats">
-  <div class="app-header">
-    <button class="back-btn" id="btn-stats-back">← Back</button>
-    <div class="title"><h1>📈 Player Stats</h1></div>
-    <div style="width:60px"></div>
-  </div>
-  <div style="padding:14px 14px 80px" id="stats-body"></div>
-</div>
 
 <!-- ═══════════════════════════════════
      SPINNER VIEW
@@ -2631,10 +2622,19 @@
 <div id="view-combined">
   <div class="app-header">
     <button class="back-btn" id="btn-combined-back">← Back</button>
-    <div class="title"><h1>🏆 Leaderboard</h1></div>
+    <div class="title"><h1>🏆 Stats</h1></div>
     <button class="header-action danger" id="btn-reset-stats" style="font-size:12px;padding:6px 10px">Reset</button>
   </div>
-  <div id="combined-body" style="padding:0 14px 40px"></div>
+  <div class="help-tab-bar">
+    <button class="help-tab-btn active" data-ctab="leaderboard">🏆 Leaderboard</button>
+    <button class="help-tab-btn"        data-ctab="stats">📊 Player Stats</button>
+  </div>
+  <div id="cpane-leaderboard" class="tab-pane active" style="padding:0 14px 40px">
+    <div id="combined-body"></div>
+  </div>
+  <div id="cpane-stats" class="tab-pane" style="padding:14px 14px 80px">
+    <div id="stats-body"></div>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════
@@ -2822,8 +2822,7 @@
 ═══════════════════════════════════ -->
 <nav id="bottom-nav">
   <button class="nav-btn" id="btn-open-calc"><span class="nav-icon">🧮</span><span data-i18n="nav.calc">Calculator</span></button>
-  <button class="nav-btn" id="btn-open-combined"><span class="nav-icon">🏆</span><span data-i18n="nav.scores">Leaderboard</span></button>
-  <button class="nav-btn" id="btn-open-stats"><span class="nav-icon">📈</span><span data-i18n="nav.stats">Stats</span></button>
+  <button class="nav-btn" id="btn-open-combined"><span class="nav-icon">🏆</span><span>Stats</span></button>
   <button class="nav-btn" id="btn-open-spinner"><span class="nav-icon">🎲</span><span data-i18n="nav.spin">Spin/Dice</span></button>
   <button class="nav-btn" id="btn-settings"><span class="nav-icon">⚙️</span><span data-i18n="nav.settings">Settings</span></button>
 </nav>
@@ -2944,7 +2943,6 @@ function showMain() {
   document.getElementById('view-spinner').style.display  = 'none';
   document.getElementById('view-combined').style.display = 'none';
   document.getElementById('view-calc').style.display     = 'none';
-  document.getElementById('view-stats').style.display    = 'none';
   setNavVisible(true);
   currentId = null;
   renderMain();
@@ -4254,14 +4252,22 @@ function initHelpPanes() {
 /* ═══════════════════════════════════════
    LEADERBOARD
 ═══════════════════════════════════════ */
-function showCombined() {
+function switchCTab(tab) {
+  document.getElementById('cpane-leaderboard').classList.toggle('active', tab === 'leaderboard');
+  document.getElementById('cpane-stats').classList.toggle('active',       tab === 'stats');
+  document.querySelectorAll('[data-ctab]').forEach(b => b.classList.toggle('active', b.dataset.ctab === tab));
+  if (tab === 'leaderboard') renderLeaderboard();
+  else                       renderStats();
+}
+
+function showCombined(tab) {
   setNavVisible(false);
   document.getElementById('view-main').style.display     = 'none';
   document.getElementById('view-detail').style.display   = 'none';
   document.getElementById('view-help').style.display     = 'none';
   document.getElementById('view-spinner').style.display  = 'none';
   document.getElementById('view-combined').style.display = 'block';
-  renderLeaderboard();
+  switchCTab(tab || 'leaderboard');
 }
 
 document.getElementById('btn-reset-stats').addEventListener('click', () => {
@@ -5251,17 +5257,9 @@ function renderStats() {
     }).join('');
 }
 
-function showStats() {
-  setNavVisible(false);
-  ['view-main','view-detail','view-help','view-spinner','view-combined','view-calc'].forEach(id => {
-    document.getElementById(id).style.display = 'none';
-  });
-  document.getElementById('view-stats').style.display = 'block';
-  renderStats();
-}
-
-document.getElementById('btn-open-stats').addEventListener('click', showStats);
-document.getElementById('btn-stats-back').addEventListener('click', showMain);
+document.querySelectorAll('[data-ctab]').forEach(btn =>
+  btn.addEventListener('click', () => switchCTab(btn.dataset.ctab))
+);
 
 /* ═══════════════════════════════════════
    PULL-TO-REFRESH + REFRESH BUTTON
