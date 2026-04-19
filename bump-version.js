@@ -1,5 +1,6 @@
-const fs = require('fs');
-const path = require('path');
+const fs           = require('fs');
+const path         = require('path');
+const { execSync } = require('child_process');
 
 const root    = __dirname;
 const pkgPath = path.join(root, 'package.json');
@@ -8,16 +9,30 @@ const swPath  = path.join(root, 'sw.js');
 
 // ── Bump patch version ───────────────────────────────────────────────────────
 const pkg    = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-const parts  = pkg.version.split('.').map(Number);
-parts[2]++;                         // bump patch: 1.0.0 → 1.0.1
+const oldVer = pkg.version;
+const parts  = oldVer.split('.').map(Number);
+parts[2]++;
 const newVer = parts.join('.');
 pkg.version  = newVer;
 fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
 console.log(`Version bumped to v${newVer}`);
 
-// ── Update splash screen + settings version in index.html ────────────────────
+// ── Get last commit message for changelog ────────────────────────────────────
+let commitMsg = '';
+try {
+  commitMsg = execSync('git log -1 --pretty=%s', { cwd: root }).toString().trim();
+  // Strip conventional commit prefixes for readability
+  commitMsg = commitMsg.replace(/^(feat|fix|chore|refactor|style|docs|test|perf|remove):\s*/i, '');
+  // Capitalise first letter
+  commitMsg = commitMsg.charAt(0).toUpperCase() + commitMsg.slice(1);
+} catch (e) {
+  commitMsg = 'New update.';
+}
+
+// ── Update splash + settings version + prepend changelog in index.html ───────
 let html = fs.readFileSync(idxPath, 'utf8');
 const htmlBefore = html;
+
 html = html.replace(
   /<div class="splash-version">v[\d.]+<\/div>/,
   `<div class="splash-version">v${newVer}</div>`
@@ -26,11 +41,22 @@ html = html.replace(
   /<span class="settings-version-num" id="settings-version">v[\d.]+<\/span>/,
   `<span class="settings-version-num" id="settings-version">v${newVer}</span>`
 );
+
+// Prepend new changelog entry after the opening <div id="settings-changelog">
+const changelogOpen = '<div id="settings-changelog" style="display:none">';
+const newEntry =
+  `<div class="changelog-entry">\n` +
+  `        <div class="changelog-ver">v${newVer}</div>\n` +
+  `        <div class="changelog-desc">${commitMsg}</div>\n` +
+  `      </div>`;
+html = html.replace(changelogOpen, `${changelogOpen}\n      ${newEntry}`);
+
 if (html === htmlBefore) {
-  console.warn('⚠️  splash-version not found in index.html — check the pattern');
+  console.warn('⚠️  patterns not found in index.html — check the selectors');
 } else {
   fs.writeFileSync(idxPath, html);
-  console.log(`index.html → splash + settings version updated to v${newVer}`);
+  console.log(`index.html → version + changelog updated to v${newVer}`);
+  console.log(`  Changelog entry: "${commitMsg}"`);
 }
 
 // ── Update service worker cache key in sw.js ─────────────────────────────────
