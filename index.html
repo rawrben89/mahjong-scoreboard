@@ -1869,7 +1869,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.16</div>
+  <div class="splash-version">v1.0.17</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -5413,6 +5413,9 @@ document.getElementById('modal-settlement').addEventListener('click', e => {
 (function() {
   const splash = document.getElementById('splash-screen');
   if (!splash) return;
+  // Force dark background via JS — CSS cascade can be overridden by light mode on some browsers
+  splash.style.backgroundColor = '#040a04';
+  splash.style.backgroundImage = 'radial-gradient(ellipse 60% 50% at 50% 48%, #0c1f0c 0%, #040a04 70%)';
   const bar = document.getElementById('splash-progress');
   const duration = 2500; // ms before dismiss
   const interval = 30;
