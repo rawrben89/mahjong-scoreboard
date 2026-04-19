@@ -1906,7 +1906,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.30</div>
+  <div class="splash-version">v1.0.31</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2140,14 +2140,14 @@
       <div class="dice-header-row">
         <span class="dice-title">🎲 Roll Dice</span>
         <div class="dice-count-toggle">
-          <button class="dice-cnt-btn on" data-cnt="1">1</button>
-          <button class="dice-cnt-btn" data-cnt="2">2</button>
+          <button class="dice-cnt-btn" data-cnt="1">1</button>
+          <button class="dice-cnt-btn on" data-cnt="2">2</button>
           <button class="dice-cnt-btn" data-cnt="3">3</button>
         </div>
       </div>
       <div class="dice-faces" id="dice-faces-wrap">
         <div class="die-face" id="dice-1">⚀</div>
-        <div class="die-face" id="dice-2" style="display:none">⚁</div>
+        <div class="die-face" id="dice-2">⚁</div>
         <div class="die-face" id="dice-3" style="display:none">⚄</div>
       </div>
       <div class="dice-total" id="dice-total"></div>
@@ -3783,7 +3783,7 @@ const WIND_COLORS = ['#e74c3c', '#e67e22', '#27ae60', '#2980b9'];
 let wheelRot       = 0;
 let isSpinning     = false;
 let lastSpinWind   = null;
-let diceCount      = 1;
+let diceCount      = 2;
 let diceHistory    = [];
 let spinnerTableId = null;
 
