@@ -1906,7 +1906,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.28</div>
+  <div class="splash-version">v1.0.29</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2132,11 +2132,7 @@
     <button class="spin-btn" id="btn-spin">🌀  S P I N !</button>
 
 
-    <div class="wind-legend">
-      <div class="wind-legend-item"><div class="wind-dot" style="background:#e74c3c"></div><span>東 East</span></div>
-      <div class="wind-legend-item"><div class="wind-dot" style="background:#e67e22"></div><span>南 South</span></div>
-      <div class="wind-legend-item"><div class="wind-dot" style="background:#27ae60"></div><span>西 West</span></div>
-      <div class="wind-legend-item"><div class="wind-dot" style="background:#2980b9"></div><span>北 North</span></div>
+    <div class="wind-legend" id="wind-legend">
     </div>
 
     <!-- ── Dice Roller ── -->
@@ -3810,6 +3806,19 @@ function refreshSpinnerUI() {
   document.getElementById('spin-placeholder').style.display = 'block';
   document.getElementById('spin-placeholder').textContent = 'Spin to pick a starting wind!';
   lastSpinWind = null;
+
+  // Update wind legend
+  const legend = document.getElementById('wind-legend');
+  if (legend) {
+    legend.innerHTML = WINDS.map((w, i) => {
+      const playerLabel = players ? ` — <strong>${esc(players[i])}</strong>` : '';
+      return `<div class="wind-legend-item">
+        <div class="wind-dot" style="background:${WIND_COLORS[i]}"></div>
+        <span>${w.name} ${w.eng}${playerLabel}</span>
+      </div>`;
+    }).join('');
+  }
+
   drawWheel(wheelRot);
 }
 
