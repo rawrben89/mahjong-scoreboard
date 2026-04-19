@@ -1906,7 +1906,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.29</div>
+  <div class="splash-version">v1.0.30</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -3864,20 +3864,24 @@ function drawWheel(rot) {
     ctx.shadowColor = 'rgba(0,0,0,.5)';
 
     if (players) {
-      // Show player name + wind character
       const name = players[i];
       const maxW = r * 0.85;
+      // Player name
       ctx.font = 'bold 13px sans-serif';
       ctx.shadowBlur = 3;
-      // Truncate name to fit
       let label = name;
       while (ctx.measureText(label).width > maxW && label.length > 1) label = label.slice(0, -1);
       if (label !== name) label += '…';
-      ctx.fillText(label, 0, -8);
+      ctx.fillText(label, 0, -16);
       ctx.shadowBlur = 0;
-      ctx.font = 'bold 20px sans-serif';
-      ctx.fillStyle = 'rgba(255,255,255,.75)';
-      ctx.fillText(WINDS[i].name, 0, 12);
+      // Chinese wind character
+      ctx.font = 'bold 18px sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,.9)';
+      ctx.fillText(WINDS[i].name, 0, 1);
+      // English wind name
+      ctx.font = '11px sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,.7)';
+      ctx.fillText(WINDS[i].eng, 0, 17);
     } else {
       ctx.font = 'bold 34px sans-serif';
       ctx.shadowBlur = 4;
