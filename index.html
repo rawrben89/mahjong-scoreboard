@@ -1480,17 +1480,18 @@
 
     .help-tab-bar {
       display: flex;
-      background: rgba(10,22,10,.98);
+      background: var(--surface2);
       border-bottom: 1px solid var(--border);
       position: sticky;
       top: 52px;
       z-index: 99;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      padding: 4px 0;
     }
     .help-tab-btn {
       flex: 1;
-      padding: 12px 4px;
+      padding: 14px 4px;
       background: none;
       border: none;
       color: var(--dim2);
@@ -1849,8 +1850,8 @@
     <div class="splash-bg-tile" style="bottom:34%;left:5%;animation:tile-float-up .7s .5s ease both">🀆</div>
     <div class="splash-bg-tile" style="bottom:32%;right:6%;animation:tile-float-up .7s .3s ease both">🀌</div>
     <!-- bottom strip — center -->
-    <div class="splash-bg-tile" style="bottom:4%;left:34%;animation:tile-float-up .7s .4s ease both">🀏</div>
-    <div class="splash-bg-tile" style="bottom:4%;right:30%;animation:tile-float-up .7s .65s ease both">🀔</div>
+    <div class="splash-bg-tile" style="bottom:12%;left:34%;animation:tile-float-up .7s .4s ease both">🀏</div>
+    <div class="splash-bg-tile" style="bottom:12%;right:30%;animation:tile-float-up .7s .65s ease both">🀔</div>
   </div>
 
   <!-- All centre content in one block so it animates as a single unit -->
@@ -1868,7 +1869,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.20</div>
+  <div class="splash-version">v1.0.21</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
