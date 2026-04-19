@@ -1880,7 +1880,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.23</div>
+  <div class="splash-version">v1.0.24</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -1995,8 +1995,8 @@
     </div>
 
     <div class="form-card">
-      <div class="section-label">Win Method <span style="font-size:10px;color:var(--dim);font-weight:400">(optional)</span></div>
-      <div id="d-win-method-list"></div>
+      <button id="d-expand-winmethod" class="expand-combos-btn">＋ Win Method (optional)</button>
+      <div id="d-win-method-list" style="display:none;margin-top:6px"></div>
     </div>
 
     <div class="form-card">
@@ -2987,6 +2987,10 @@ function resetRoundForm() {
   if (fullList) fullList.style.display = 'none';
   const expandBtn = document.getElementById('d-expand-combos');
   if (expandBtn) expandBtn.textContent = '＋ Edit combinations';
+  const wmList = document.getElementById('d-win-method-list');
+  if (wmList) wmList.style.display = 'none';
+  const wmBtn = document.getElementById('d-expand-winmethod');
+  if (wmBtn) wmBtn.textContent = '＋ Win Method (optional)';
   renderFanUI(); // recomputes with current winType (shows Zimo +1 immediately)
 }
 
@@ -4736,6 +4740,14 @@ function initRoundTilePicker() {
     if (!open) renderFullComboList();
   });
 
+  document.getElementById('d-expand-winmethod').addEventListener('click', () => {
+    const list = document.getElementById('d-win-method-list');
+    const open = list.style.display !== 'none';
+    list.style.display = open ? 'none' : 'block';
+    document.getElementById('d-expand-winmethod').textContent = open ? '＋ Win Method (optional)' : '－ Hide Win Method';
+    if (!open) renderWinMethod();
+  });
+
   document.getElementById('d-active-combo-chips').addEventListener('click', e => {
     const chip = e.target.closest('.combo-chip');
     if (!chip) return;
@@ -4995,7 +5007,8 @@ function renderFanUI() {
 
   const fullList = document.getElementById('d-full-combo-list');
   if (fullList.style.display !== 'none') renderFullComboList();
-  renderWinMethod();
+  const wmList = document.getElementById('d-win-method-list');
+  if (wmList && wmList.style.display !== 'none') renderWinMethod();
 }
 
 function renderWinMethod() {
