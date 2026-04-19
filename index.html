@@ -1453,6 +1453,29 @@
       border-radius: 50%;
       flex-shrink: 0;
     }
+    .apply-table-btn { margin-top:10px; padding:8px 18px; border-radius:8px; border:none; background:var(--accent); color:#000; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .15s; }
+    .apply-table-btn:hover { opacity:.85; }
+    .seat-draw-section { width:100%; max-width:280px; display:flex; flex-direction:column; align-items:center; gap:8px; margin-top:8px; }
+    .seat-draw-btn { width:100%; padding:12px; border-radius:var(--radius); border:1.5px solid var(--border2); background:var(--surface2); color:var(--text); font-size:15px; font-weight:700; cursor:pointer; transition:background .15s; letter-spacing:.5px; }
+    .seat-draw-btn:hover { background:var(--surface3); }
+    .seat-draw-result-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; width:100%; }
+    .seat-draw-item { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; border:1.5px solid var(--border); background:var(--surface); font-size:13px; }
+    .seat-draw-item .sd-wind { font-size:18px; font-weight:900; }
+    .seat-draw-item .sd-name { flex:1; font-weight:600; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .seat-draw-item.wind-east  { border-color:#e74c3c33; } .seat-draw-item .sd-wind.east  { color:#e74c3c; }
+    .seat-draw-item.wind-south { border-color:#e67e2233; } .seat-draw-item .sd-wind.south { color:#e67e22; }
+    .seat-draw-item.wind-west  { border-color:#27ae6033; } .seat-draw-item .sd-wind.west  { color:#27ae60; }
+    .seat-draw-item.wind-north { border-color:#2980b933; } .seat-draw-item .sd-wind.north { color:#2980b9; }
+    .dice-header-row { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:260px; margin-bottom:8px; }
+    .dice-title { font-size:14px; font-weight:700; color:var(--text); }
+    .dice-count-toggle { display:flex; gap:4px; }
+    .dice-cnt-btn { width:32px; height:28px; border-radius:6px; border:1.5px solid var(--border2); background:var(--surface2); color:var(--dim); font-size:13px; font-weight:700; cursor:pointer; transition:all .12s; }
+    .dice-cnt-btn.on { background:var(--accent); border-color:var(--accent); color:#000; }
+    .shake-hint { font-size:11px; color:var(--dim); margin:4px 0 0; }
+    .dice-history { width:100%; max-width:260px; margin-top:10px; display:flex; flex-direction:column; gap:4px; }
+    .dice-hist-row { display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--dim); background:var(--surface2); border-radius:6px; padding:4px 10px; }
+    .dice-hist-faces { font-size:14px; letter-spacing:2px; }
+    .dice-hist-total { font-weight:700; color:var(--text); }
 
     /* ═══ HELP VIEW ═══ */
     #view-help { display: none; overflow-x: hidden; }
@@ -1891,7 +1914,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.25</div>
+  <div class="splash-version">v1.0.26</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2093,7 +2116,7 @@
   </div>
 
   <div class="spinner-body">
-    <p class="spinner-subtitle">Press <strong>SPIN</strong> to randomly pick<br>who becomes the first 東 East dealer.</p>
+    <p class="spinner-subtitle" id="spin-subtitle">Press <strong>SPIN</strong> to randomly pick<br>who becomes the first 東 East dealer.</p>
 
     <div class="wheel-wrap">
       <div class="wheel-arrow"></div>
@@ -2105,11 +2128,19 @@
         <div class="res-wind" id="res-wind-tile"></div>
         <div class="res-name" id="res-wind-name"></div>
         <div class="res-sub"  id="res-wind-sub"></div>
+        <button class="apply-table-btn" id="btn-apply-spin" style="display:none">✓ Apply to Table</button>
       </div>
       <div id="spin-placeholder" style="font-size:13px;color:var(--dim)">Spin to pick a starting wind!</div>
     </div>
 
     <button class="spin-btn" id="btn-spin">🌀  S P I N !</button>
+
+    <!-- ── Full Seat Draw ── -->
+    <div class="seat-draw-section">
+      <button class="seat-draw-btn" id="btn-seat-draw">🀄 Draw All Seats</button>
+      <div id="seat-draw-result" style="display:none"></div>
+      <button class="apply-table-btn" id="btn-apply-seats" style="display:none">✓ Apply to Table</button>
+    </div>
 
     <div class="wind-legend">
       <div class="wind-legend-item"><div class="wind-dot" style="background:#e74c3c"></div><span>東 East</span></div>
@@ -2120,13 +2151,23 @@
 
     <!-- ── Dice Roller ── -->
     <div class="dice-section">
-      <p class="spinner-subtitle" style="margin-bottom:4px">🎲 Roll 2 Dice</p>
-      <div class="dice-faces">
-        <div class="die-face" id="dice-1">⚁</div>
-        <div class="die-face" id="dice-2">⚄</div>
+      <div class="dice-header-row">
+        <span class="dice-title">🎲 Roll Dice</span>
+        <div class="dice-count-toggle">
+          <button class="dice-cnt-btn on" data-cnt="1">1</button>
+          <button class="dice-cnt-btn" data-cnt="2">2</button>
+          <button class="dice-cnt-btn" data-cnt="3">3</button>
+        </div>
+      </div>
+      <div class="dice-faces" id="dice-faces-wrap">
+        <div class="die-face" id="dice-1">⚀</div>
+        <div class="die-face" id="dice-2" style="display:none">⚁</div>
+        <div class="die-face" id="dice-3" style="display:none">⚄</div>
       </div>
       <div class="dice-total" id="dice-total"></div>
       <button class="roll-btn" id="btn-roll-dice">🎲  R O L L !</button>
+      <p class="shake-hint" id="shake-hint" style="display:none">📳 Shake to roll</p>
+      <div class="dice-history" id="dice-history"></div>
     </div>
   </div>
 </div>
@@ -3753,25 +3794,33 @@ const WINDS = [
 // Brighter versions for drawing on canvas
 const WIND_COLORS = ['#e74c3c', '#e67e22', '#27ae60', '#2980b9'];
 
-let wheelRot    = 0;   // current canvas rotation in radians
-let isSpinning  = false;
+let wheelRot      = 0;
+let isSpinning    = false;
+let lastSpinWind  = null;  // index 0-3 of last spin result
+let lastSeatDraw  = null;  // array of {playerIdx, windIdx}
+let diceCount     = 1;
+let diceHistory   = [];
+
+function getSpinnerPlayers() {
+  const t = currentId ? tableById(currentId) : null;
+  return (t && t.players && t.players.length === 4) ? t.players : null;
+}
 
 function drawWheel(rot) {
   const canvas = document.getElementById('wheel-canvas');
   if (!canvas) return;
-  const ctx = canvas.getContext('2d');
+  const ctx  = canvas.getContext('2d');
   const size = canvas.width;
-  const cx = size / 2;
-  const cy = size / 2;
-  const r  = cx - 6;
+  const cx   = size / 2;
+  const cy   = size / 2;
+  const r    = cx - 6;
+  const players = getSpinnerPlayers();
 
   ctx.clearRect(0, 0, size, size);
-
   ctx.save();
   ctx.translate(cx, cy);
   ctx.rotate(rot);
 
-  // Draw 4 sectors — segment i starts at -π/2 so East (i=0) is at top initially
   for (let i = 0; i < 4; i++) {
     const start = -Math.PI / 2 + i * (Math.PI / 2);
     const end   = start + Math.PI / 2;
@@ -3786,7 +3835,6 @@ function drawWheel(rot) {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Text label
     const mid = start + Math.PI / 4;
     const tr  = r * 0.60;
     const tx  = Math.cos(mid) * tr;
@@ -3797,18 +3845,35 @@ function drawWheel(rot) {
     ctx.fillStyle = 'rgba(255,255,255,.95)';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = 'bold 34px sans-serif';
-    ctx.shadowColor = 'rgba(0,0,0,.4)';
-    ctx.shadowBlur = 4;
-    ctx.fillText(WINDS[i].name, 0, -10);
-    ctx.shadowBlur = 0;
-    ctx.font = '13px sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,.8)';
-    ctx.fillText(WINDS[i].eng, 0, 14);
+    ctx.shadowColor = 'rgba(0,0,0,.5)';
+
+    if (players) {
+      // Show player name + wind character
+      const name = players[i];
+      const maxW = r * 0.85;
+      ctx.font = 'bold 13px sans-serif';
+      ctx.shadowBlur = 3;
+      // Truncate name to fit
+      let label = name;
+      while (ctx.measureText(label).width > maxW && label.length > 1) label = label.slice(0, -1);
+      if (label !== name) label += '…';
+      ctx.fillText(label, 0, -8);
+      ctx.shadowBlur = 0;
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,.75)';
+      ctx.fillText(WINDS[i].name, 0, 12);
+    } else {
+      ctx.font = 'bold 34px sans-serif';
+      ctx.shadowBlur = 4;
+      ctx.fillText(WINDS[i].name, 0, -10);
+      ctx.shadowBlur = 0;
+      ctx.font = '13px sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,.8)';
+      ctx.fillText(WINDS[i].eng, 0, 14);
+    }
     ctx.restore();
   }
 
-  // Divider lines
   for (let i = 0; i < 4; i++) {
     const a = -Math.PI / 2 + i * (Math.PI / 2);
     ctx.beginPath();
@@ -3819,7 +3884,6 @@ function drawWheel(rot) {
     ctx.stroke();
   }
 
-  // Center hub
   ctx.beginPath();
   ctx.arc(0, 0, 20, 0, Math.PI * 2);
   ctx.fillStyle = '#0c1a0c';
@@ -3828,7 +3892,6 @@ function drawWheel(rot) {
   ctx.lineWidth = 2.5;
   ctx.stroke();
 
-  // Center dot
   ctx.beginPath();
   ctx.arc(0, 0, 5, 0, Math.PI * 2);
   ctx.fillStyle = '#ffd54f';
@@ -3836,7 +3899,6 @@ function drawWheel(rot) {
 
   ctx.restore();
 
-  // Outer ring (fixed, not rotating)
   ctx.beginPath();
   ctx.arc(cx, cy, r + 3, 0, Math.PI * 2);
   ctx.strokeStyle = '#ffd54f';
@@ -3845,14 +3907,26 @@ function drawWheel(rot) {
 }
 
 function showSpinResult(index) {
-  const w    = WINDS[index];
-  const card = document.getElementById('spin-result-card');
+  const w       = WINDS[index];
+  const players = getSpinnerPlayers();
+  lastSpinWind  = index;
+  const card    = document.getElementById('spin-result-card');
   document.getElementById('spin-placeholder').style.display = 'none';
-  card.style.display  = 'block';
-  card.className      = 'spin-result-card ' + w.cls;
+  card.style.display = 'block';
+  card.className     = 'spin-result-card ' + w.cls;
   document.getElementById('res-wind-tile').textContent = w.name;
-  document.getElementById('res-wind-name').textContent = w.eng + ' Wind ('+w.name+')';
-  document.getElementById('res-wind-sub').textContent  = w.sub;
+
+  if (players) {
+    const playerName = players[index];
+    document.getElementById('res-wind-name').textContent = playerName + ' → ' + w.eng + ' ('+w.name+')';
+    document.getElementById('res-wind-sub').textContent  = playerName + ' is the first dealer!';
+    const applyBtn = document.getElementById('btn-apply-spin');
+    applyBtn.style.display = 'inline-block';
+  } else {
+    document.getElementById('res-wind-name').textContent = w.eng + ' Wind ('+w.name+')';
+    document.getElementById('res-wind-sub').textContent  = w.sub;
+    document.getElementById('btn-apply-spin').style.display = 'none';
+  }
 }
 
 function spinWheel() {
@@ -3905,15 +3979,98 @@ function spinWheel() {
 
 function showSpinner() {
   setNavVisible(false);
-  document.getElementById('view-main').style.display    = 'none';
-  document.getElementById('view-detail').style.display  = 'none';
-  document.getElementById('view-help').style.display    = 'none';
-  document.getElementById('view-spinner').style.display = 'block';
+  document.getElementById('view-main').style.display     = 'none';
+  document.getElementById('view-detail').style.display   = 'none';
+  document.getElementById('view-help').style.display     = 'none';
+  document.getElementById('view-combined').style.display = 'none';
+  document.getElementById('view-calc').style.display     = 'none';
+  document.getElementById('view-spinner').style.display  = 'block';
+  const players = getSpinnerPlayers();
+  const sub = document.getElementById('spin-subtitle');
+  if (sub) sub.innerHTML = players
+    ? 'Press <strong>SPIN</strong> to randomly assign<br>who becomes the first 東 East dealer.'
+    : 'Press <strong>SPIN</strong> to randomly pick<br>who becomes the first 東 East dealer.';
+  const seatBtn = document.getElementById('btn-seat-draw');
+  if (seatBtn) seatBtn.style.display = players ? 'block' : 'none';
   drawWheel(wheelRot);
+  initShakeToRoll();
 }
 
 document.getElementById('btn-open-spinner')?.addEventListener('click', showSpinner);
 document.getElementById('btn-spinner-back').addEventListener('click', showMain);
+
+document.getElementById('btn-apply-spin').addEventListener('click', () => {
+  const t = currentId ? tableById(currentId) : null;
+  if (!t || lastSpinWind === null) return;
+  t.eastIdx = lastSpinWind;
+  saveState();
+  toast('East dealer set to ' + t.players[lastSpinWind] + ' 東');
+  document.getElementById('btn-apply-spin').style.display = 'none';
+});
+
+document.getElementById('btn-seat-draw').addEventListener('click', () => {
+  const players = getSpinnerPlayers();
+  if (!players) return;
+  const shuffled = [...players].sort(() => Math.random() - 0.5);
+  lastSeatDraw = shuffled.map((p, wi) => ({ player: p, windIdx: wi, playerIdx: players.indexOf(p) }));
+  const clsMap = ['east','south','west','north'];
+  document.getElementById('seat-draw-result').style.display = 'block';
+  document.getElementById('seat-draw-result').innerHTML =
+    `<div class="seat-draw-result-grid">${lastSeatDraw.map(({player, windIdx}) =>
+      `<div class="seat-draw-item wind-${clsMap[windIdx]}">
+        <span class="sd-wind ${clsMap[windIdx]}">${WINDS[windIdx].name}</span>
+        <span class="sd-name">${esc(player)}</span>
+      </div>`
+    ).join('')}</div>`;
+  document.getElementById('btn-apply-seats').style.display = 'inline-block';
+});
+
+document.getElementById('btn-apply-seats').addEventListener('click', () => {
+  const t = currentId ? tableById(currentId) : null;
+  if (!t || !lastSeatDraw) return;
+  // East wind winner (windIdx===0) becomes the east player
+  const eastEntry = lastSeatDraw.find(x => x.windIdx === 0);
+  if (eastEntry) { t.eastIdx = eastEntry.playerIdx; saveState(); }
+  // Reorder players to match wind assignments
+  const newOrder = [0,1,2,3].map(wi => lastSeatDraw.find(x => x.windIdx === wi).player);
+  t.players = newOrder;
+  t.eastIdx = 0;
+  // Rebuild scores map to preserve values
+  const oldScores = t.scores;
+  t.scores = Object.fromEntries(newOrder.map(p => [p, oldScores[p] || 0]));
+  saveState();
+  toast('Seats applied! Winds assigned to all players.');
+  document.getElementById('btn-apply-seats').style.display = 'none';
+});
+
+let shakeInitialised = false;
+function initShakeToRoll() {
+  const hint = document.getElementById('shake-hint');
+  if (shakeInitialised) { if (hint) hint.style.display = 'block'; return; }
+  if (typeof DeviceMotionEvent === 'undefined') return;
+  const request = DeviceMotionEvent.requestPermission;
+  function attachShake() {
+    let lastShake = 0;
+    window.addEventListener('devicemotion', e => {
+      const a = e.accelerationIncludingGravity;
+      if (!a) return;
+      const force = Math.abs(a.x) + Math.abs(a.y) + Math.abs(a.z);
+      const now = Date.now();
+      if (force > 30 && now - lastShake > 1000) {
+        lastShake = now;
+        if (document.getElementById('view-spinner').style.display !== 'none') rollDice();
+      }
+    });
+    shakeInitialised = true;
+    if (hint) hint.style.display = 'block';
+  }
+  if (typeof request === 'function') {
+    // iOS 13+ requires permission
+    DeviceMotionEvent.requestPermission().then(r => { if (r === 'granted') attachShake(); }).catch(() => {});
+  } else {
+    attachShake();
+  }
+}
 document.getElementById('btn-open-combined').addEventListener('click', () => showCombined());
 document.getElementById('btn-combined-back').addEventListener('click', showMain);
 document.getElementById('btn-spin').addEventListener('click', spinWheel);
@@ -4441,35 +4598,64 @@ function rollDice() {
   diceRolling = true;
   document.getElementById('btn-roll-dice').disabled = true;
   document.getElementById('dice-total').textContent = '';
-  const d1 = document.getElementById('dice-1');
-  const d2 = document.getElementById('dice-2');
-  d1.classList.add('rolling');
-  d2.classList.add('rolling');
+
+  const dice = [];
+  for (let i = 1; i <= diceCount; i++) {
+    const el = document.getElementById('dice-' + i);
+    el.classList.add('rolling');
+    dice.push(el);
+  }
 
   let count = 0;
   const frames = 18 + Math.floor(Math.random() * 10);
   function tick() {
-    d1.textContent = DICE_FACES[Math.floor(Math.random() * 6)];
-    d2.textContent = DICE_FACES[Math.floor(Math.random() * 6)];
+    dice.forEach(d => d.textContent = DICE_FACES[Math.floor(Math.random() * 6)]);
     count++;
     if (count < frames) {
       setTimeout(tick, 40 + count * 5);
     } else {
-      const v1 = 1 + Math.floor(Math.random() * 6);
-      const v2 = 1 + Math.floor(Math.random() * 6);
-      d1.textContent = DICE_FACES[v1 - 1];
-      d2.textContent = DICE_FACES[v2 - 1];
-      d1.classList.remove('rolling');
-      d2.classList.remove('rolling');
-      document.getElementById('dice-total').textContent = `Total: ${v1 + v2}`;
+      const values = dice.map(() => 1 + Math.floor(Math.random() * 6));
+      dice.forEach((d, i) => { d.textContent = DICE_FACES[values[i] - 1]; d.classList.remove('rolling'); });
+      const total = values.reduce((a, b) => a + b, 0);
+      document.getElementById('dice-total').textContent = diceCount > 1 ? `Total: ${total}` : '';
       diceRolling = false;
       document.getElementById('btn-roll-dice').disabled = false;
+      // Add to history
+      diceHistory.unshift({ faces: values.map(v => DICE_FACES[v-1]), total });
+      if (diceHistory.length > 5) diceHistory.pop();
+      renderDiceHistory();
     }
   }
   tick();
 }
 
+function renderDiceHistory() {
+  const el = document.getElementById('dice-history');
+  if (!el) return;
+  el.innerHTML = diceHistory.map(h =>
+    `<div class="dice-hist-row">
+      <span class="dice-hist-faces">${h.faces.join(' ')}</span>
+      ${h.faces.length > 1 ? `<span class="dice-hist-total">= ${h.total}</span>` : ''}
+    </div>`
+  ).join('');
+}
+
 document.getElementById('btn-roll-dice').addEventListener('click', rollDice);
+
+document.querySelectorAll('.dice-cnt-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    diceCount = +btn.dataset.cnt;
+    document.querySelectorAll('.dice-cnt-btn').forEach(b => b.classList.toggle('on', b === btn));
+    for (let i = 1; i <= 3; i++) {
+      document.getElementById('dice-' + i).style.display = i <= diceCount ? 'inline-flex' : 'none';
+    }
+    document.getElementById('dice-total').textContent = '';
+    // Reset face to neutral
+    for (let i = 1; i <= diceCount; i++) {
+      document.getElementById('dice-' + i).textContent = DICE_FACES[i - 1];
+    }
+  });
+});
 
 /* ═══════════════════════════════════════
    FAN CALCULATOR
