@@ -1868,7 +1868,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.19</div>
+  <div class="splash-version">v1.0.20</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -3871,7 +3871,7 @@ function showSpinner() {
 
 document.getElementById('btn-open-spinner')?.addEventListener('click', showSpinner);
 document.getElementById('btn-spinner-back').addEventListener('click', showMain);
-document.getElementById('btn-open-combined').addEventListener('click', showCombined);
+document.getElementById('btn-open-combined').addEventListener('click', () => showCombined());
 document.getElementById('btn-combined-back').addEventListener('click', showMain);
 document.getElementById('btn-spin').addEventListener('click', spinWheel);
 
