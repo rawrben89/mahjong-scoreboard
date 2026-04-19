@@ -1458,17 +1458,6 @@
     .spinner-table-sel { flex:1; background:var(--surface2); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-size:13px; padding:6px 8px; }
     .apply-table-btn { margin-top:10px; padding:8px 18px; border-radius:8px; border:none; background:var(--accent); color:#000; font-size:13px; font-weight:700; cursor:pointer; transition:opacity .15s; }
     .apply-table-btn:hover { opacity:.85; }
-    .seat-draw-section { width:100%; max-width:280px; display:flex; flex-direction:column; align-items:center; gap:8px; margin-top:8px; }
-    .seat-draw-btn { width:100%; padding:12px; border-radius:var(--radius); border:1.5px solid var(--border2); background:var(--surface2); color:var(--text); font-size:15px; font-weight:700; cursor:pointer; transition:background .15s; letter-spacing:.5px; }
-    .seat-draw-btn:hover { background:var(--surface3); }
-    .seat-draw-result-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; width:100%; }
-    .seat-draw-item { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:8px; border:1.5px solid var(--border); background:var(--surface); font-size:13px; }
-    .seat-draw-item .sd-wind { font-size:18px; font-weight:900; }
-    .seat-draw-item .sd-name { flex:1; font-weight:600; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .seat-draw-item.wind-east  { border-color:#e74c3c33; } .seat-draw-item .sd-wind.east  { color:#e74c3c; }
-    .seat-draw-item.wind-south { border-color:#e67e2233; } .seat-draw-item .sd-wind.south { color:#e67e22; }
-    .seat-draw-item.wind-west  { border-color:#27ae6033; } .seat-draw-item .sd-wind.west  { color:#27ae60; }
-    .seat-draw-item.wind-north { border-color:#2980b933; } .seat-draw-item .sd-wind.north { color:#2980b9; }
     .dice-header-row { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:260px; margin-bottom:8px; }
     .dice-title { font-size:14px; font-weight:700; color:var(--text); }
     .dice-count-toggle { display:flex; gap:4px; }
@@ -1917,7 +1906,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.27</div>
+  <div class="splash-version">v1.0.28</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2142,12 +2131,6 @@
 
     <button class="spin-btn" id="btn-spin">🌀  S P I N !</button>
 
-    <!-- ── Full Seat Draw ── -->
-    <div class="seat-draw-section">
-      <button class="seat-draw-btn" id="btn-seat-draw">🀄 Draw All Seats</button>
-      <div id="seat-draw-result" style="display:none"></div>
-      <button class="apply-table-btn" id="btn-apply-seats" style="display:none">✓ Apply to Table</button>
-    </div>
 
     <div class="wind-legend">
       <div class="wind-legend-item"><div class="wind-dot" style="background:#e74c3c"></div><span>東 East</span></div>
@@ -3804,7 +3787,6 @@ const WIND_COLORS = ['#e74c3c', '#e67e22', '#27ae60', '#2980b9'];
 let wheelRot       = 0;
 let isSpinning     = false;
 let lastSpinWind   = null;
-let lastSeatDraw   = null;
 let diceCount      = 1;
 let diceHistory    = [];
 let spinnerTableId = null;
@@ -3823,15 +3805,11 @@ function refreshSpinnerUI() {
   if (sub) sub.innerHTML = players
     ? 'Press <strong>SPIN</strong> to randomly assign who becomes the first 東 East dealer.'
     : 'Press <strong>SPIN</strong> to randomly pick who becomes the first 東 East dealer.';
-  const seatBtn = document.getElementById('btn-seat-draw');
-  if (seatBtn) seatBtn.style.display = players ? 'block' : 'none';
   // Reset results when table changes
   document.getElementById('spin-result-card').style.display = 'none';
   document.getElementById('spin-placeholder').style.display = 'block';
   document.getElementById('spin-placeholder').textContent = 'Spin to pick a starting wind!';
-  document.getElementById('seat-draw-result').style.display = 'none';
-  document.getElementById('btn-apply-seats').style.display = 'none';
-  lastSpinWind = null; lastSeatDraw = null;
+  lastSpinWind = null;
   drawWheel(wheelRot);
 }
 
@@ -4049,40 +4027,6 @@ document.getElementById('btn-apply-spin').addEventListener('click', () => {
   document.getElementById('btn-apply-spin').style.display = 'none';
 });
 
-document.getElementById('btn-seat-draw').addEventListener('click', () => {
-  const players = getSpinnerPlayers();
-  if (!players) return;
-  const shuffled = [...players].sort(() => Math.random() - 0.5);
-  lastSeatDraw = shuffled.map((p, wi) => ({ player: p, windIdx: wi, playerIdx: players.indexOf(p) }));
-  const clsMap = ['east','south','west','north'];
-  document.getElementById('seat-draw-result').style.display = 'block';
-  document.getElementById('seat-draw-result').innerHTML =
-    `<div class="seat-draw-result-grid">${lastSeatDraw.map(({player, windIdx}) =>
-      `<div class="seat-draw-item wind-${clsMap[windIdx]}">
-        <span class="sd-wind ${clsMap[windIdx]}">${WINDS[windIdx].name}</span>
-        <span class="sd-name">${esc(player)}</span>
-      </div>`
-    ).join('')}</div>`;
-  document.getElementById('btn-apply-seats').style.display = 'inline-block';
-});
-
-document.getElementById('btn-apply-seats').addEventListener('click', () => {
-  const t = getSpinnerTable();
-  if (!t || !lastSeatDraw) return;
-  // East wind winner (windIdx===0) becomes the east player
-  const eastEntry = lastSeatDraw.find(x => x.windIdx === 0);
-  if (eastEntry) { t.eastIdx = eastEntry.playerIdx; saveState(); }
-  // Reorder players to match wind assignments
-  const newOrder = [0,1,2,3].map(wi => lastSeatDraw.find(x => x.windIdx === wi).player);
-  t.players = newOrder;
-  t.eastIdx = 0;
-  // Rebuild scores map to preserve values
-  const oldScores = t.scores;
-  t.scores = Object.fromEntries(newOrder.map(p => [p, oldScores[p] || 0]));
-  saveState();
-  toast('Seats applied! Winds assigned to all players.');
-  document.getElementById('btn-apply-seats').style.display = 'none';
-});
 
 let shakeInitialised = false;
 function initShakeToRoll() {
