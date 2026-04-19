@@ -456,11 +456,17 @@
     /* ── Splash Screen ── */
     #splash-screen {
       position: fixed; inset: 0; z-index: 9999;
-      background: #040a04 radial-gradient(ellipse 60% 50% at 50% 48%, #0c1f0c 0%, #040a04 70%);
+      background-color: #040a04;
+      background-image: radial-gradient(ellipse 60% 50% at 50% 48%, #0c1f0c 0%, #040a04 70%);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: 0;
       transition: opacity .5s ease;
+    }
+    /* Force dark splash regardless of light mode */
+    body.light #splash-screen {
+      background-color: #040a04 !important;
+      background-image: radial-gradient(ellipse 60% 50% at 50% 48%, #0c1f0c 0%, #040a04 70%) !important;
     }
     #splash-screen.fade-out { opacity: 0; pointer-events: none; }
     /* ── Splash entrance keyframes ── */
@@ -544,18 +550,18 @@
     }
     @keyframes tile-float-left {
       0%   { opacity: 0; transform: translateX(-70px) rotate(-18deg) scale(.65); }
-      35%  { opacity: .45; }
-      100% { opacity: .28; transform: translateX(0)   rotate(-10deg) scale(1); }
+      35%  { opacity: .6; }
+      100% { opacity: .45; transform: translateX(0)   rotate(-10deg) scale(1); }
     }
     @keyframes tile-float-right {
       0%   { opacity: 0; transform: translateX(70px)  rotate(18deg)  scale(.65); }
-      35%  { opacity: .45; }
-      100% { opacity: .28; transform: translateX(0)   rotate(10deg)  scale(1); }
+      35%  { opacity: .6; }
+      100% { opacity: .45; transform: translateX(0)   rotate(10deg)  scale(1); }
     }
     @keyframes tile-float-up {
       0%   { opacity: 0; transform: translateY(50px)  rotate(-6deg)  scale(.65); }
-      35%  { opacity: .40; }
-      100% { opacity: .22; transform: translateY(0)   rotate(4deg)   scale(1); }
+      35%  { opacity: .55; }
+      100% { opacity: .38; transform: translateY(0)   rotate(4deg)   scale(1); }
     }
 
     .chip-zh { font-size: 13px; font-weight: 700; line-height: 1.2; }
@@ -1863,7 +1869,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.14</div>
+  <div class="splash-version">v1.0.15</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
