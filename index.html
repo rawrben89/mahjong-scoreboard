@@ -1191,6 +1191,8 @@
       padding-bottom: env(safe-area-inset-bottom, 0);
     }
     .modal-bg.show { display: flex; }
+    .modal-bg.show ~ * { pointer-events: none; }
+    body.modal-open { overflow: hidden; touch-action: none; }
     .modal-box {
       background: linear-gradient(180deg, var(--surface2) 0%, var(--surface) 100%);
       border: 1px solid rgba(42,66,42,.8);
@@ -1913,7 +1915,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.32</div>
+  <div class="splash-version">v1.0.33</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2806,7 +2808,7 @@
   <div class="modal-box" style="max-width:340px">
     <div class="modal-drag"></div>
     <h3 data-i18n="settings.title" style="margin-bottom:12px">⚙️ Settings</h3>
-    <div style="overflow-y:auto;max-height:60vh;margin:0 -4px;padding:0 4px">
+    <div style="overflow-y:auto;max-height:60vh;margin:0 -4px;padding:0 4px;overscroll-behavior:contain">
 
     <!-- Dark Mode -->
     <div class="settings-row">
@@ -2875,7 +2877,7 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.32</span>
+      <span class="settings-version-num" id="settings-version">v1.0.33</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
@@ -5661,6 +5663,15 @@ document.querySelectorAll('[data-ctab]').forEach(btn =>
 /* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
+// Lock body scroll whenever any modal is open
+(function() {
+  const update = () => {
+    const anyOpen = document.querySelector('.modal-bg.show') !== null;
+    document.body.classList.toggle('modal-open', anyOpen);
+  };
+  new MutationObserver(update).observe(document.body, { subtree: true, attributeFilter: ['class'] });
+})();
+
 // Apply theme: saved preference, or fall back to system preference
 (function() {
   const saved = localStorage.getItem('hk-theme');
