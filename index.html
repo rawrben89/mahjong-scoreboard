@@ -1915,7 +1915,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.34</div>
+  <div class="splash-version">v1.0.35</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2877,7 +2877,7 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.34</span>
+      <span class="settings-version-num" id="settings-version">v1.0.35</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
@@ -3862,12 +3862,15 @@ function refreshSpinnerUI() {
   lastSpinWind = null;
 
   // Update wind legend
+  const t = getSpinnerTable();
+  const eastIdx = (t && t.eastIdx != null) ? t.eastIdx : 0;
   const legend = document.getElementById('wind-legend');
   if (legend) {
-    legend.innerHTML = WINDS.map((w, i) => {
-      const playerLabel = players ? ` — <strong>${esc(players[i])}</strong>` : '';
+    legend.innerHTML = WINDS.map((w, wi) => {
+      // wi=0 is East: the player at (eastIdx + wi) % 4 holds this wind
+      const playerLabel = players ? ` — <strong>${esc(players[(eastIdx + wi) % 4])}</strong>` : '';
       return `<div class="wind-legend-item">
-        <div class="wind-dot" style="background:${WIND_COLORS[i]}"></div>
+        <div class="wind-dot" style="background:${WIND_COLORS[wi]}"></div>
         <span>${w.name} ${w.eng}${playerLabel}</span>
       </div>`;
     }).join('');
@@ -4092,7 +4095,23 @@ document.getElementById('btn-apply-spin').addEventListener('click', () => {
   saveState();
   toast('East dealer set to ' + t.players[lastSpinWind] + ' 東');
   document.getElementById('btn-apply-spin').style.display = 'none';
+  refreshSpinnerLegend();
 });
+
+function refreshSpinnerLegend() {
+  const players = getSpinnerPlayers();
+  const t = getSpinnerTable();
+  const eastIdx = (t && t.eastIdx != null) ? t.eastIdx : 0;
+  const legend = document.getElementById('wind-legend');
+  if (!legend) return;
+  legend.innerHTML = WINDS.map((w, wi) => {
+    const playerLabel = players ? ` — <strong>${esc(players[(eastIdx + wi) % 4])}</strong>` : '';
+    return `<div class="wind-legend-item">
+      <div class="wind-dot" style="background:${WIND_COLORS[wi]}"></div>
+      <span>${w.name} ${w.eng}${playerLabel}</span>
+    </div>`;
+  }).join('');
+}
 
 
 let shakeInitialised = false;
