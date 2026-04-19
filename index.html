@@ -300,6 +300,15 @@
     .stats-win-bar-fill { height:100%; border-radius:3px; background:linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%); transition:width .6s ease; min-width:2px; }
     .stats-empty { text-align:center; color:var(--dim); font-size:14px; padding:60px 20px; line-height:1.7; }
     .stats-section-lbl { font-size:10px; color:var(--dim); padding:16px 0 8px; letter-spacing:.7px; text-transform:uppercase; font-weight:700; border-left:2px solid var(--accent); padding-left:8px; margin-bottom:4px; }
+    .stats-recent-hdr { font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:.5px; font-weight:700; margin-top:10px; padding-top:8px; border-top:1px solid var(--border); }
+    .stats-recent-list { margin-top:6px; display:flex; flex-direction:column; gap:5px; }
+    .stats-win-entry { display:flex; flex-wrap:wrap; align-items:center; gap:5px; font-size:11px; padding:5px 0; border-bottom:1px dashed var(--border); }
+    .stats-win-entry:last-child { border-bottom:none; }
+    .stats-win-round { background:var(--surface2); border-radius:6px; padding:2px 6px; color:var(--dim); font-weight:600; flex-shrink:0; }
+    .stats-win-type { color:var(--dim); flex-shrink:0; }
+    .stats-win-fan { color:var(--gold); font-weight:700; flex-shrink:0; }
+    .stats-wm-chip { background:rgba(78,201,82,.1); border:1px solid rgba(78,201,82,.3); color:var(--accent2); border-radius:8px; padding:1px 7px; font-size:10px; font-weight:600; }
+    .stats-win-combos { color:var(--dim2); font-size:10px; font-style:italic; }
 
     /* ── Settlement Modal ── */
     .settle-transfer {
@@ -1108,6 +1117,8 @@
     .del-btn      { background: none; border: none; color: var(--dim2); font-size: 18px; cursor: pointer; line-height: 1; padding: 0 2px; transition: color .15s; }
     .del-btn:hover { color: var(--red); }
     .win-sub      { font-size: 11px; color: var(--dim); margin-bottom: 7px; }
+    .history-wm-row { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:7px; }
+    .history-wm-badge { font-size:10px; padding:2px 8px; border-radius:10px; background:rgba(78,201,82,.1); border:1px solid rgba(78,201,82,.3); color:var(--accent2); font-weight:600; }
     .chip-list    { display: flex; flex-wrap: wrap; gap: 6px; }
     .chip-sm { font-size: 11px; padding: 3px 9px; border-radius: 10px; background: var(--surface2); border: 1px solid var(--border); }
     .chip-sm.pos  { color: var(--accent2); border-color: rgba(126,216,128,.2); }
@@ -1880,7 +1891,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.24</div>
+  <div class="splash-version">v1.0.25</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -3568,6 +3579,8 @@ function renderDHistory() {
     return;
   }
 
+  const WIN_METHOD_IDS = new Set(CALC_GROUPS[0].items.map(x => x.id));
+
   list.innerHTML = [...t.history].reverse().map(h => {
     const typeLabel = h.winType === 'zimo'
       ? '🀄 Zimo (Self-draw)'
@@ -3579,6 +3592,14 @@ function renderDHistory() {
       return `<span class="chip-sm ${cls}">${esc(p)}: ${fmt(c)}${money ? ' ('+money+')' : ''}</span>`;
     }).join('');
     const ptsMoneyLabel = stake ? ` · ${fmtMoney(h.pts, stake)}/payer` : '';
+
+    const winMethods = (h.combos || [])
+      .filter(cid => WIN_METHOD_IDS.has(cid))
+      .map(cid => {
+        const item = ALL_COMBOS_FLAT.find(x => x.id === cid);
+        return item ? `<span class="history-wm-badge">✦ ${item.name}</span>` : '';
+      }).join('');
+
     return `
       <div class="history-card">
         <div class="history-head">
@@ -3587,6 +3608,7 @@ function renderDHistory() {
           <button class="del-btn" data-hid="${h.id}">✕</button>
         </div>
         <div class="win-sub">${typeLabel} · ${h.pts} pts/payer${ptsMoneyLabel}</div>
+        ${winMethods ? `<div class="history-wm-row">${winMethods}</div>` : ''}
         <div class="chip-list">${chips}</div>
       </div>`;
   }).join('');
@@ -5234,7 +5256,7 @@ function computePlayerStats() {
 
   const stats = {};
   playerSet.forEach(p => {
-    stats[p] = { wins: 0, totalRounds: 0, totalFan: 0, comboCount: {} };
+    stats[p] = { wins: 0, totalRounds: 0, totalFan: 0, comboCount: {}, recentWins: [] };
   });
 
   allRounds.forEach(({ r, tablePlayers }) => {
@@ -5248,7 +5270,13 @@ function computePlayerStats() {
       (r.combos || []).forEach(cid => {
         ws.comboCount[cid] = (ws.comboCount[cid] || 0) + 1;
       });
+      ws.recentWins.push({ round: r.round, fan: r.fan || 0, winType: r.winType, combos: r.combos || [] });
     }
+  });
+
+  // Keep only last 5 wins per player, most recent first
+  playerSet.forEach(p => {
+    if (stats[p]) stats[p].recentWins = stats[p].recentWins.slice(-5).reverse();
   });
 
   return stats;
@@ -5291,6 +5319,26 @@ function renderStats() {
       const rankIdx   = players.indexOf(p);
       const rankIcon  = rankIdx < 3 ? rankIcons[rankIdx] : '';
 
+      const WIN_METHOD_IDS = new Set(CALC_GROUPS[0].items.map(x => x.id));
+      const recentWinsHtml = s.recentWins.length ? s.recentWins.map(w => {
+        const typeTag = w.winType === 'zimo' ? '🀄 Zimo' : '🎴 Discard';
+        const methods = w.combos.filter(cid => WIN_METHOD_IDS.has(cid)).map(cid => {
+          const item = ALL_COMBOS_FLAT.find(x => x.id === cid);
+          return item ? `<span class="stats-wm-chip">${item.name.split(' ').slice(1).join(' ')}</span>` : '';
+        }).join('');
+        const handCombos = w.combos.filter(cid => !WIN_METHOD_IDS.has(cid)).map(cid => {
+          const item = ALL_COMBOS_FLAT.find(x => x.id === cid);
+          return item ? item.name.split(' ').slice(1).join(' ') : null;
+        }).filter(Boolean).join(', ');
+        return `<div class="stats-win-entry">
+          <span class="stats-win-round">Rnd ${w.round}</span>
+          <span class="stats-win-type">${typeTag}</span>
+          <span class="stats-win-fan">${w.fan} fan</span>
+          ${methods}
+          ${handCombos ? `<span class="stats-win-combos">${handCombos}</span>` : ''}
+        </div>`;
+      }).join('') : '';
+
       return `<div class="stats-player-card">
         <div class="stats-player-name">
           ${rankIcon ? `<span class="stats-player-rank">${rankIcon}</span>` : ''}
@@ -5309,6 +5357,9 @@ function renderStats() {
           <span class="stats-lbl">Favourite Hand</span>
           <span class="stats-val">${topCombo}</span>
         </div>
+        ${recentWinsHtml ? `
+        <div class="stats-recent-hdr">Recent Wins</div>
+        <div class="stats-recent-list">${recentWinsHtml}</div>` : ''}
       </div>`;
     }).join('');
 }
