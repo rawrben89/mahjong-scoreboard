@@ -1025,6 +1025,17 @@
     .win-type-btn:hover { color: var(--text); border-color: var(--dim2); }
     .win-type-btn.on { background: linear-gradient(135deg, #5ed466 0%, var(--accent) 50%, #38aa42 100%); border-color: var(--accent); color: #000; font-weight: 700; box-shadow: 0 2px 14px rgba(78,201,82,.4), inset 0 1px 0 rgba(255,255,255,.12); }
 
+    /* Win Method section */
+    .wm-item { display:flex; align-items:center; gap:10px; padding:9px 6px; border-bottom:1px solid var(--border); cursor:pointer; border-radius:6px; user-select:none; transition:background .12s; }
+    .wm-item:last-child { border-bottom:none; }
+    .wm-item.on { background:var(--accent-dim); }
+    .wm-item-check { width:18px; height:18px; border-radius:4px; border:1.5px solid var(--border2); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:11px; transition:all .12s; }
+    .wm-item.on .wm-item-check { background:var(--accent); border-color:var(--accent); color:#000; }
+    .wm-item-info { flex:1; min-width:0; }
+    .wm-item-name { font-size:12px; font-weight:600; color:var(--text); }
+    .wm-item-desc { font-size:10px; color:var(--dim); margin-top:1px; line-height:1.3; }
+    .wm-fan-badge { font-size:13px; font-weight:700; color:var(--gold); white-space:nowrap; }
+
     .points-input {
       width: 100%;
       padding: 12px;
@@ -1869,7 +1880,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.21</div>
+  <div class="splash-version">v1.0.22</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -1981,6 +1992,11 @@
     <div id="d-discard-card" class="form-card" style="display:none">
       <div class="section-label" data-i18n="round.discarder">Who Discarded? 🃏</div>
       <div id="d-discard-chips" class="chip-row"></div>
+    </div>
+
+    <div class="form-card">
+      <div class="section-label">Win Method <span style="font-size:10px;color:var(--dim);font-weight:400">(optional)</span></div>
+      <div id="d-win-method-list"></div>
     </div>
 
     <div class="form-card">
@@ -4740,6 +4756,16 @@ function initRoundTilePicker() {
     renderFullComboList();
     calcDPreview();
   });
+
+  document.getElementById('d-win-method-list').addEventListener('click', e => {
+    const item = e.target.closest('.wm-item');
+    if (!item) return;
+    const id = item.dataset.wmid;
+    if (F.fanSel.has(id)) { F.fanSel.delete(id); F.fanManual.delete(id); }
+    else { F.fanSel.add(id); F.fanManual.add(id); }
+    renderFanUI();
+    calcDPreview();
+  });
 }
 
 function updateHandDisplay() {
@@ -4969,6 +4995,22 @@ function renderFanUI() {
 
   const fullList = document.getElementById('d-full-combo-list');
   if (fullList.style.display !== 'none') renderFullComboList();
+  renderWinMethod();
+}
+
+function renderWinMethod() {
+  const el = document.getElementById('d-win-method-list');
+  if (!el) return;
+  el.innerHTML = CALC_GROUPS[0].items.map(item =>
+    `<div class="wm-item ${F.fanSel.has(item.id) ? 'on' : ''}" data-wmid="${item.id}">
+      <div class="wm-item-check">${F.fanSel.has(item.id) ? '✓' : ''}</div>
+      <div class="wm-item-info">
+        <div class="wm-item-name">${item.name}</div>
+        <div class="wm-item-desc">${item.desc}</div>
+      </div>
+      <div class="wm-fan-badge">+${item.fan}</div>
+    </div>`
+  ).join('');
 }
 
 function renderFullComboList() {
