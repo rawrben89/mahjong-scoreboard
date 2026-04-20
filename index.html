@@ -984,6 +984,7 @@
     .p-score { font-size: 32px; font-weight: 900; color: var(--accent2); line-height: 1.1; letter-spacing: -.6px; }
     .p-score.neg { color: var(--red); }
     .p-money { font-size: 12px; color: var(--gold); margin-top: 5px; font-weight: 600; }
+    .p-sparkline { display:block; margin: 7px auto 0; opacity:.75; }
 
     /* Form */
     .form-card {
@@ -1703,6 +1704,15 @@
     .full-combo-check { font-size: 14px; color: var(--dim); flex-shrink: 0; }
     .full-combo-item.on .full-combo-check { color: var(--accent); }
     .full-combo-fan { font-size: 12px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
+    .calc-counters-row { display:flex; gap:8px; margin-bottom:10px; }
+    .calc-counter-item { flex:1; background:var(--surface2); border:1px solid var(--border2); border-radius:var(--radius-sm); padding:10px 8px; display:flex; flex-direction:column; align-items:center; gap:4px; }
+    .calc-counter-lbl { font-size:12px; font-weight:700; color:var(--text); }
+    .calc-counter-ctrl { display:flex; align-items:center; gap:10px; }
+    .calc-cnt-btn { width:28px; height:28px; border-radius:6px; border:1.5px solid var(--border2); background:var(--surface3); color:var(--text); font-size:18px; font-weight:700; cursor:pointer; line-height:1; transition:background .12s; display:flex; align-items:center; justify-content:center; }
+    .calc-cnt-btn:active { background:var(--accent-dim); }
+    .calc-cnt-val { font-size:20px; font-weight:900; color:var(--gold); min-width:24px; text-align:center; }
+    .calc-counter-sub { font-size:10px; color:var(--dim); }
+
     .calc-result-bar {
       position: fixed;
       bottom: 0; left: 50%;
@@ -1915,7 +1925,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.36</div>
+  <div class="splash-version">v1.0.37</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2663,6 +2673,27 @@
       <label>💰 Bet per fan ($)</label>
       <input id="calc-stake" type="number" class="stake-input" min="0.25" step="0.25" inputmode="decimal" value="0.25">
     </div>
+    <!-- Kong + Bonus counters -->
+    <div class="calc-counters-row">
+      <div class="calc-counter-item">
+        <span class="calc-counter-lbl">槓 Kongs</span>
+        <div class="calc-counter-ctrl">
+          <button class="calc-cnt-btn" id="calc-kong-minus">−</button>
+          <span class="calc-cnt-val" id="calc-kong-val">0</span>
+          <button class="calc-cnt-btn" id="calc-kong-plus">+</button>
+        </div>
+        <span class="calc-counter-sub">+1 fan each</span>
+      </div>
+      <div class="calc-counter-item">
+        <span class="calc-counter-lbl">🌸 Bonus Tiles</span>
+        <div class="calc-counter-ctrl">
+          <button class="calc-cnt-btn" id="calc-bonus-minus">−</button>
+          <span class="calc-cnt-val" id="calc-bonus-val">0</span>
+          <button class="calc-cnt-btn" id="calc-bonus-plus">+</button>
+        </div>
+        <span class="calc-counter-sub">+1 fan each</span>
+      </div>
+    </div>
     <!-- Calc groups injected by JS -->
   </div>
 
@@ -2877,10 +2908,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.36</span>
+      <span class="settings-version-num" id="settings-version">v1.0.37</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.37</div>
+        <div class="changelog-desc">Auto-bump CI skip when already bumped locally, changelog auto-updates on bump</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.36</div>
         <div class="changelog-desc">Update wind legend immediately after applying spin result to table</div>
@@ -3338,6 +3373,19 @@ document.getElementById('btn-delete-table').addEventListener('click', () => {
 /* ═══════════════════════════════════════
    DETAIL — SCORES
 ═══════════════════════════════════════ */
+function sparklineSVG(points) {
+  const W = 64, H = 22, P = 2;
+  if (!points || points.length < 2) return '';
+  const min = Math.min(...points), max = Math.max(...points);
+  const range = max - min || 1;
+  const xs = points.map((_, i) => P + i * (W - P * 2) / (points.length - 1));
+  const ys = points.map(v => H - P - (v - min) / range * (H - P * 2));
+  const d  = xs.map((x, i) => (i ? 'L' : 'M') + x.toFixed(1) + ',' + ys[i].toFixed(1)).join(' ');
+  const trend = points[points.length - 1] - points[0];
+  const col = trend > 0 ? '#6ec46e' : trend < 0 ? '#e84545' : '#888888';
+  return `<svg class="p-sparkline" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><path d="${d}" fill="none" stroke="${col}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+
 function renderDScores() {
   const t = tableById(currentId);
   if (!t) return;
@@ -3376,6 +3424,17 @@ function renderDScores() {
   const WENGL = ['East','South','West','North'];
   const WCLS  = ['east','south','west','north'];
   const ei = t.eastIdx || 0;
+
+  // Cumulative score trajectory per player for sparklines
+  const cumul = {};
+  t.players.forEach(p => { cumul[p] = [0]; });
+  (t.history || []).forEach(r => {
+    t.players.forEach(p => {
+      const last = cumul[p][cumul[p].length - 1];
+      cumul[p].push(last + (r.changes?.[p] || 0));
+    });
+  });
+
   document.getElementById('d-players-grid').innerHTML = t.players.map((p, i) => {
     const sc     = t.scores[p] || 0;
     const rank   = sorted.indexOf(p) + 1;
@@ -3386,6 +3445,7 @@ function renderDScores() {
     const st = streaks[p] || { current: 0, longest: 0 };
     const streakHtml = st.current >= 2
       ? `<span class="streak-badge">🔥 ${st.current} in a row</span>` : '';
+    const sparkline = sparklineSVG(cumul[p]);
     return `
       <div class="player-card ${cls}">
         <span class="p-rank">#${rank}</span>
@@ -3393,6 +3453,7 @@ function renderDScores() {
         <div class="p-name">${esc(p)}${streakHtml}</div>
         <div class="p-score ${sc < 0 ? 'neg' : ''}" data-player="${esc(p)}">${fmt(sc)}</div>
         ${money ? `<div class="p-money">${money}</div>` : ''}
+        ${sparkline}
       </div>`;
   }).join('');
 }
@@ -4817,6 +4878,8 @@ const CALC_GROUPS = [
 
 let calcState   = {};
 let calcWinType = 'zimo';
+let calcKongs   = 0;
+let calcBonus   = 0;
 
 function renderEx(keys) {
   if (!keys || !keys.length) return '<div class="calc-ex-none">No bonus tiles — clean hand ✓</div>';
@@ -4884,7 +4947,7 @@ function initCalcItems() {
 }
 
 function calcTotalFan() {
-  let total = 0;
+  let total = calcKongs + calcBonus;
   CALC_GROUPS.forEach(grp => grp.items.forEach(item => {
     if (calcState[item.id]) total += item.fan;
   }));
@@ -4920,10 +4983,14 @@ function updateCalcResult() {
 
 function resetCalc() {
   calcState = {};
+  calcKongs = 0;
+  calcBonus = 0;
   document.querySelectorAll('.calc-item').forEach(el => {
     el.classList.remove('on');
     el.querySelector('.calc-item-check').textContent = '☐';
   });
+  document.getElementById('calc-kong-val').textContent  = '0';
+  document.getElementById('calc-bonus-val').textContent = '0';
   updateCalcResult();
 }
 
@@ -4942,6 +5009,19 @@ document.getElementById('btn-open-calc').addEventListener('click', showCalc);
 document.getElementById('btn-calc-back').addEventListener('click', showMain);
 document.getElementById('btn-calc-reset').addEventListener('click', resetCalc);
 document.getElementById('calc-stake').addEventListener('input', updateCalcResult);
+
+document.getElementById('calc-kong-minus').addEventListener('click', () => {
+  if (calcKongs > 0) { calcKongs--; document.getElementById('calc-kong-val').textContent = calcKongs; updateCalcResult(); }
+});
+document.getElementById('calc-kong-plus').addEventListener('click', () => {
+  if (calcKongs < 4) { calcKongs++; document.getElementById('calc-kong-val').textContent = calcKongs; updateCalcResult(); }
+});
+document.getElementById('calc-bonus-minus').addEventListener('click', () => {
+  if (calcBonus > 0) { calcBonus--; document.getElementById('calc-bonus-val').textContent = calcBonus; updateCalcResult(); }
+});
+document.getElementById('calc-bonus-plus').addEventListener('click', () => {
+  if (calcBonus < 8) { calcBonus++; document.getElementById('calc-bonus-val').textContent = calcBonus; updateCalcResult(); }
+});
 document.getElementById('calc-win-type').addEventListener('click', e => {
   const btn = e.target.closest('[data-wtype]');
   if (!btn) return;
