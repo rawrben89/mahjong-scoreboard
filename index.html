@@ -628,16 +628,6 @@
       transition: opacity .15s;
     }
     .header-action:hover { opacity: 1; }
-    .share-icon-btn { background:none; border:1px solid var(--border2); border-radius:20px; padding:4px 10px; font-size:15px; cursor:pointer; color:var(--text); line-height:1; transition:background .15s; }
-    .share-icon-btn:active { background:var(--surface3); }
-    .share-qr-wrap { display:flex; justify-content:center; padding:10px 0 6px; }
-    .share-qr-wrap canvas, .share-qr-wrap img { border-radius:8px; border:3px solid #fff; }
-    .share-url-row { display:flex; gap:6px; margin:8px 0 4px; }
-    .share-url-txt { flex:1; font-size:11px; padding:7px 8px; border-radius:6px; border:1px solid var(--border2); background:var(--surface3); color:var(--dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
-    .share-copy-btn { padding:7px 14px; border-radius:6px; border:none; background:var(--accent); color:#fff; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; }
-    .share-note { font-size:11px; color:var(--dim); text-align:center; padding:4px 0 8px; line-height:1.4; }
-    #view-share { display:none; min-height:100vh; }
-    .share-view-footer { text-align:center; font-size:11px; color:var(--dim); margin-top:16px; line-height:1.6; padding-bottom:24px; }
 
     /* ── Bottom Tab Bar ── */
     .tab-bar {
@@ -1935,7 +1925,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.39</div>
+  <div class="splash-version">v1.0.38</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -1987,10 +1977,7 @@
     <div class="title">
       <h1 id="detail-title">Table</h1>
     </div>
-    <div style="display:flex;gap:6px;align-items:center">
-      <button class="share-icon-btn" id="btn-share-table" title="Share table">📤</button>
-      <button class="header-action" id="btn-delete-table" data-i18n="detail.delete">Delete</button>
-    </div>
+    <button class="header-action" id="btn-delete-table" data-i18n="detail.delete">Delete</button>
   </div>
 
   <!-- Scores pane -->
@@ -2921,14 +2908,10 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.39</span>
+      <span class="settings-version-num" id="settings-version">v1.0.38</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
-      <div class="changelog-entry">
-        <div class="changelog-ver">v1.0.39</div>
-        <div class="changelog-desc">Score sparkline from player cards</div>
-      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.38</div>
         <div class="changelog-desc">Revert "feat: Add Round smart assists — seat/round wind auto-suggest, fan progress bar, pattern label"</div>
@@ -2997,38 +2980,6 @@
 </nav>
 
 <div id="toast" class="toast"></div>
-
-<!-- ═══════════════════════════════════
-     MODAL — Share Table
-═══════════════════════════════════ -->
-<div id="modal-share" class="modal-bg">
-  <div class="modal-box" style="max-width:320px">
-    <div class="modal-drag"></div>
-    <h3 style="text-align:center;margin-bottom:2px">📤 Share Table</h3>
-    <p style="font-size:12px;color:var(--dim);text-align:center;margin:0 0 4px">Others can scan to view current scores</p>
-    <div class="share-qr-wrap" id="share-qr-container"></div>
-    <div class="share-url-row">
-      <input class="share-url-txt" id="share-url-input" readonly>
-      <button class="share-copy-btn" id="share-copy-btn">Copy</button>
-    </div>
-    <p class="share-note">Snapshot only — re-open the QR after each round for latest scores</p>
-    <button class="modal-close-btn" id="share-modal-close">Close</button>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════
-     VIEW — Share Read-only
-═══════════════════════════════════ -->
-<div id="view-share">
-  <div class="app-header">
-    <div class="title" style="flex:1;text-align:center"><h1 id="share-view-title">Scores</h1></div>
-  </div>
-  <div style="padding:0 16px 16px">
-    <div id="share-view-banner" class="rw-banner" style="display:none"></div>
-    <div id="share-view-grid" class="players-grid" style="margin-top:12px"></div>
-    <div class="share-view-footer">📸 This is a snapshot<br>Scan a new QR code for latest scores</div>
-  </div>
-</div>
 
 <script>
 'use strict';
@@ -5923,113 +5874,6 @@ document.getElementById('modal-settlement').addEventListener('click', e => {
     }
   }, interval);
 })();
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script>
-/* ═══════════════════════════════════════
-   SHARE — Table QR code + read-only view
-═══════════════════════════════════════ */
-function generateShareURL(t) {
-  const data = {
-    n:  t.name,
-    p:  t.players,
-    s:  t.scores,
-    rw: t.roundWind || 0,
-    ei: t.eastIdx   || 0,
-    st: t.stake      || 0,
-    r:  (t.nextRound || 1) - 1
-  };
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  return location.origin + location.pathname + '?view=' + encoded;
-}
-
-function openShareModal() {
-  const t = tableById(currentId);
-  if (!t) return;
-  const url = generateShareURL(t);
-  document.getElementById('share-url-input').value = url;
-  const container = document.getElementById('share-qr-container');
-  container.innerHTML = '';
-  new QRCode(container, {
-    text: url, width: 200, height: 200,
-    colorDark: '#000000', colorLight: '#ffffff'
-  });
-  document.getElementById('modal-share').classList.add('show');
-}
-
-document.getElementById('btn-share-table').addEventListener('click', openShareModal);
-
-document.getElementById('share-modal-close').addEventListener('click', () => {
-  document.getElementById('modal-share').classList.remove('show');
-});
-document.getElementById('modal-share').addEventListener('click', e => {
-  if (e.target === document.getElementById('modal-share'))
-    document.getElementById('modal-share').classList.remove('show');
-});
-
-document.getElementById('share-copy-btn').addEventListener('click', () => {
-  const url = document.getElementById('share-url-input').value;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(url).then(() => toast('Link copied!'));
-  } else {
-    document.getElementById('share-url-input').select();
-    document.execCommand('copy');
-    toast('Link copied!');
-  }
-});
-
-// Read-only share view — shown when ?view= param is present
-(function checkShareView() {
-  const params  = new URLSearchParams(location.search);
-  const encoded = params.get('view');
-  if (!encoded) return;
-  try {
-    const data = JSON.parse(decodeURIComponent(escape(atob(encoded))));
-    renderShareView(data);
-  } catch (e) { /* invalid param — just load app normally */ }
-})();
-
-function renderShareView(data) {
-  document.getElementById('view-main').style.display   = 'none';
-  document.getElementById('view-detail').style.display = 'none';
-  document.getElementById('view-share').style.display  = 'block';
-
-  document.getElementById('share-view-title').textContent = data.n || 'Scores';
-
-  const WLBL_F = ['東','南','西','北'];
-  const WENL_F = ['East','South','West','North'];
-  const banner = document.getElementById('share-view-banner');
-  banner.style.display = '';
-  banner.innerHTML = `<span class="rw-badge">${WLBL_F[data.rw||0]}局</span>
-    <div class="rw-label"><strong>${WENL_F[data.rw||0]} Round</strong><span>${data.r || 0} round${data.r === 1 ? '' : 's'} played</span></div>`;
-
-  const WLBL = ['東','南','西','北'];
-  const WENGL = ['East','South','West','North'];
-  const WCLS  = ['east','south','west','north'];
-  const players  = data.p || [];
-  const scores   = data.s || {};
-  const ei       = data.ei || 0;
-  const stake    = data.st || 0;
-  const sorted   = [...players].sort((a, b) => (scores[b] || 0) - (scores[a] || 0));
-  const topScore = scores[sorted[0]] || 0;
-
-  document.getElementById('share-view-grid').innerHTML = players.map((p, i) => {
-    const sc    = scores[p] || 0;
-    const rank  = sorted.indexOf(p) + 1;
-    const cls   = (sc === topScore && sc > 0) ? 'top' : sc < 0 ? 'losing' : '';
-    const wOff  = (i - ei + 4) % 4;
-    const wBadge = `<span class="wind-badge wind-${WCLS[wOff]}">${WLBL[wOff]} ${WENGL[wOff]}</span>`;
-    const money = fmtMoney(sc, stake);
-    return `
-      <div class="player-card ${cls}">
-        <span class="p-rank">#${rank}</span>
-        ${wBadge}
-        <div class="p-name">${esc(p)}</div>
-        <div class="p-score ${sc < 0 ? 'neg' : ''}">${fmt(sc)}</div>
-        ${money ? `<div class="p-money">${money}</div>` : ''}
-      </div>`;
-  }).join('');
-}
 </script>
 </body>
 </html>
