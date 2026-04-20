@@ -984,7 +984,7 @@
     .p-score { font-size: 32px; font-weight: 900; color: var(--accent2); line-height: 1.1; letter-spacing: -.6px; }
     .p-score.neg { color: var(--red); }
     .p-money { font-size: 12px; color: var(--gold); margin-top: 5px; font-weight: 600; }
-    .p-sparkline { display:block; margin: 7px auto 0; opacity:.75; }
+
 
     /* Form */
     .form-card {
@@ -1925,7 +1925,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.37</div>
+  <div class="splash-version">v1.0.38</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2908,10 +2908,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.37</span>
+      <span class="settings-version-num" id="settings-version">v1.0.38</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.38</div>
+        <div class="changelog-desc">Revert "feat: Add Round smart assists — seat/round wind auto-suggest, fan progress bar, pattern label"</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.37</div>
         <div class="changelog-desc">Auto-bump CI skip when already bumped locally, changelog auto-updates on bump</div>
@@ -3373,18 +3377,6 @@ document.getElementById('btn-delete-table').addEventListener('click', () => {
 /* ═══════════════════════════════════════
    DETAIL — SCORES
 ═══════════════════════════════════════ */
-function sparklineSVG(points) {
-  const W = 64, H = 22, P = 2;
-  if (!points || points.length < 2) return '';
-  const min = Math.min(...points), max = Math.max(...points);
-  const range = max - min || 1;
-  const xs = points.map((_, i) => P + i * (W - P * 2) / (points.length - 1));
-  const ys = points.map(v => H - P - (v - min) / range * (H - P * 2));
-  const d  = xs.map((x, i) => (i ? 'L' : 'M') + x.toFixed(1) + ',' + ys[i].toFixed(1)).join(' ');
-  const trend = points[points.length - 1] - points[0];
-  const col = trend > 0 ? '#6ec46e' : trend < 0 ? '#e84545' : '#888888';
-  return `<svg class="p-sparkline" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><path d="${d}" fill="none" stroke="${col}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-}
 
 function renderDScores() {
   const t = tableById(currentId);
@@ -3425,16 +3417,6 @@ function renderDScores() {
   const WCLS  = ['east','south','west','north'];
   const ei = t.eastIdx || 0;
 
-  // Cumulative score trajectory per player for sparklines
-  const cumul = {};
-  t.players.forEach(p => { cumul[p] = [0]; });
-  (t.history || []).forEach(r => {
-    t.players.forEach(p => {
-      const last = cumul[p][cumul[p].length - 1];
-      cumul[p].push(last + (r.changes?.[p] || 0));
-    });
-  });
-
   document.getElementById('d-players-grid').innerHTML = t.players.map((p, i) => {
     const sc     = t.scores[p] || 0;
     const rank   = sorted.indexOf(p) + 1;
@@ -3445,7 +3427,6 @@ function renderDScores() {
     const st = streaks[p] || { current: 0, longest: 0 };
     const streakHtml = st.current >= 2
       ? `<span class="streak-badge">🔥 ${st.current} in a row</span>` : '';
-    const sparkline = sparklineSVG(cumul[p]);
     return `
       <div class="player-card ${cls}">
         <span class="p-rank">#${rank}</span>
@@ -3453,7 +3434,6 @@ function renderDScores() {
         <div class="p-name">${esc(p)}${streakHtml}</div>
         <div class="p-score ${sc < 0 ? 'neg' : ''}" data-player="${esc(p)}">${fmt(sc)}</div>
         ${money ? `<div class="p-money">${money}</div>` : ''}
-        ${sparkline}
       </div>`;
   }).join('');
 }
