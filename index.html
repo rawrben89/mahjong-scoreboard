@@ -1678,6 +1678,12 @@
     .combo-chip .chip-rm { color: var(--dim); font-size: 12px; margin-left: 1px; }
     .combo-empty-hint { font-size: 11px; color: var(--dim); padding: 4px 0; }
     .fan-pts-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0 2px; border-top: 1px solid var(--border); margin-top: 4px; font-size: 12px; }
+    #d-pattern-label { font-size:13px; font-weight:800; color:var(--accent2); text-align:center; padding:3px 0 6px; letter-spacing:.2px; display:none; }
+    #d-fan-progress { padding:4px 0 2px; display:none; }
+    .fan-prog-bar-wrap { height:4px; background:var(--surface3); border-radius:2px; overflow:hidden; margin-bottom:4px; }
+    .fan-prog-bar { height:100%; background:var(--accent); border-radius:2px; transition:width .3s; }
+    .fan-prog-lbl { font-size:10px; color:var(--dim); }
+    .fan-prog-ok { font-size:11px; color:#6ec46e; font-weight:700; }
     .fan-pts-val { font-weight: 700; color: var(--gold); font-size: 15px; }
     .fan-pts-warn { font-size: 11px; color: var(--red); }
     .expand-combos-btn {
@@ -1925,7 +1931,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.37</div>
+  <div class="splash-version">v1.0.38</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2061,9 +2067,11 @@
         <span class="section-label" style="margin-bottom:0" data-i18n="round.fan">Fan Combinations</span>
         <span id="d-fan-count-badge" style="font-size:12px;color:var(--gold);font-weight:700">0 fan</span>
       </div>
+      <div id="d-pattern-label"></div>
       <div id="d-active-combo-chips" class="active-combo-chips">
         <span class="combo-empty-hint">No combinations selected yet</span>
       </div>
+      <div id="d-fan-progress"></div>
       <div class="fan-pts-row">
         <span style="color:var(--dim)">Base pts / payer:</span>
         <span id="d-base-pts-label" class="fan-pts-val">—</span>
@@ -2908,10 +2916,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.37</span>
+      <span class="settings-version-num" id="settings-version">v1.0.38</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.38</div>
+        <div class="changelog-desc">Calculator kong/bonus counters + score sparklines</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.37</div>
         <div class="changelog-desc">Auto-bump CI skip when already bumped locally, changelog auto-updates on bump</div>
@@ -5287,6 +5299,21 @@ function detectFanFromHand(hand) {
 function autoDetectFan() {
   const det = detectFanFromHand(F.hand);
 
+  // Auto-suggest seat wind & round wind pungs based on winner's current wind
+  if (F.winner !== null) {
+    const tbl = tableById(currentId);
+    if (tbl) {
+      const WKEYS = ['fe','fs','fw','fn'];
+      const seatOff = (F.winner - (tbl.eastIdx || 0) + 4) % 4;
+      const seatKey  = WKEYS[seatOff];
+      const roundKey = WKEYS[tbl.roundWind || 0];
+      const hc = {};
+      Object.entries(F.hand).forEach(([k,n]) => { hc[k] = n; });
+      if ((hc[seatKey]  || 0) >= 3) det.c_seat_w  = true;
+      if ((hc[roundKey] || 0) >= 3 && seatKey !== roundKey) det.c_round_w = true;
+    }
+  }
+
   // 大三元 subsumes 小三元; 大四喜 subsumes 小四喜
   if (det.c_b3d) det.c_s3d = false;
   if (det.c_b4w) det.c_s4w = false;
@@ -5330,6 +5357,39 @@ function renderFanUI() {
 
   const hint = document.getElementById('d-fan-hint');
   if (hint) hint.style.display = 'none';
+
+  // Detected pattern label
+  const PATTERN_PRIORITY = ['c_4k','c_t13','c_9g','c_b4w','c_s4w','c_b3d','c_s3d',
+    'c_agreen','c_ablue','c_ared','c_hon','c_full','c_half','c_term','c_7p','c_pung','c_chow'];
+  const mainPattern = PATTERN_PRIORITY.find(id => F.fanSel.has(id));
+  const patternLbl = document.getElementById('d-pattern-label');
+  if (patternLbl) {
+    if (mainPattern) {
+      const item = ALL_COMBOS_FLAT.find(c => c.id === mainPattern);
+      patternLbl.textContent = item ? item.name : '';
+      patternLbl.style.display = '';
+    } else {
+      patternLbl.style.display = 'none';
+    }
+  }
+
+  // Fan-to-minimum progress
+  const progEl = document.getElementById('d-fan-progress');
+  if (progEl) {
+    const tbl2   = tableById(currentId);
+    const minFan = tbl2 ? (tbl2.minFan || 3) : 3;
+    if (fan === 0) {
+      progEl.style.display = 'none';
+    } else if (fan >= minFan) {
+      progEl.style.display = '';
+      progEl.innerHTML = `<span class="fan-prog-ok">✓ Minimum ${minFan} fan met</span>`;
+    } else {
+      const need = minFan - fan;
+      const pct  = Math.round(fan / minFan * 100);
+      progEl.style.display = '';
+      progEl.innerHTML = `<div class="fan-prog-bar-wrap"><div class="fan-prog-bar" style="width:${pct}%"></div></div><span class="fan-prog-lbl">Need ${need} more fan to reach minimum ${minFan}</span>`;
+    }
+  }
 
   const activeList = ALL_COMBOS_FLAT.filter(c => F.fanSel.has(c.id));
   const chipsEl = document.getElementById('d-active-combo-chips');
