@@ -2189,13 +2189,13 @@
   </div>
 
   <div class="help-tab-bar">
-    <button class="help-tab-btn"        data-htab="rules">📖 HK Rules</button>
-    <button class="help-tab-btn active" data-htab="tiles">🀄 Tiles Guide</button>
+    <button class="help-tab-btn active" data-htab="rules">📖 HK Rules</button>
+    <button class="help-tab-btn"        data-htab="tiles">🀄 Tiles Guide</button>
     <button class="help-tab-btn"        data-htab="wins" >🏆 Win Combinations</button>
   </div>
 
   <!-- ── TILES PANE ── -->
-  <div id="hpane-tiles" class="tab-pane active" style="padding-bottom:24px">
+  <div id="hpane-tiles" class="tab-pane" style="padding-bottom:24px">
 
     <div class="help-cat-label">Tile Set Reference Photo</div>
     <img src="https://t3.ftcdn.net/jpg/00/59/61/52/360_F_59615225_ZDcfHzGxyDO8VRNXVyKoJBiEcAn1n20D.jpg"
@@ -2651,7 +2651,7 @@
   </div>
 
   <!-- ── HK RULES PANE ── -->
-  <div id="hpane-rules" class="tab-pane" style="padding-bottom:40px">
+  <div id="hpane-rules" class="tab-pane active" style="padding-bottom:40px">
 
     <div class="help-cat-label">🎲 Table Setup &amp; Dealing</div>
     <div class="combo-card">
@@ -4410,7 +4410,7 @@ function showHelp() {
   document.getElementById('view-spinner').style.display = 'none';
   document.getElementById('view-help').style.display    = 'block';
   window.scrollTo(0, 0);
-  switchHTab('tiles');
+  switchHTab('rules');
 }
 
 function switchHTab(tab) {
