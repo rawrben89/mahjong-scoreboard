@@ -2189,9 +2189,9 @@
   </div>
 
   <div class="help-tab-bar">
+    <button class="help-tab-btn"        data-htab="rules">📖 HK Rules</button>
     <button class="help-tab-btn active" data-htab="tiles">🀄 Tiles Guide</button>
     <button class="help-tab-btn"        data-htab="wins" >🏆 Win Combinations</button>
-    <button class="help-tab-btn"        data-htab="rules">📖 HK Rules</button>
   </div>
 
   <!-- ── TILES PANE ── -->
@@ -2652,6 +2652,61 @@
 
   <!-- ── HK RULES PANE ── -->
   <div id="hpane-rules" class="tab-pane" style="padding-bottom:40px">
+
+    <div class="help-cat-label">🎲 Table Setup &amp; Dealing</div>
+    <div class="combo-card">
+      <div class="combo-desc" style="line-height:1.8">
+        A standard set has <strong>144 tiles</strong> (136 + 8 bonus flowers/seasons). Players sit at the four compass winds — East, South, West, North.<br><br>
+        Each player builds a section of the <strong>wall</strong>: 18 stacks of 2 tiles high (36 tiles each side), forming a square. One player rolls dice to determine East (莊家) and the break point in the wall.<br><br>
+        Dealing: East draws 14 tiles; South, West, North each draw 13. East discards first to begin the game.
+      </div>
+    </div>
+
+    <div class="help-cat-label">🧱 Wall &amp; Dead Wall</div>
+    <div class="combo-card">
+      <div class="combo-desc" style="line-height:1.8">
+        The wall has two sections:<br><br>
+        <strong>Live Wall</strong> — tiles drawn during normal play, proceeding counter-clockwise from the break point.<br><br>
+        <strong>Dead Wall (Kong Box)</strong> — the last <strong>14 tiles</strong> of the wall, set aside and used only as replacement draws after a Kong or for bonus tile replacements. These tiles are never drawn in normal play.
+      </div>
+    </div>
+
+    <div class="help-cat-label">↩️ Turn Order &amp; Play</div>
+    <div class="combo-card">
+      <div class="combo-desc" style="line-height:1.8">
+        Play proceeds <strong>counter-clockwise</strong> (East → North → West → South → East…).<br><br>
+        On your turn: <strong>draw</strong> one tile from the live wall, then <strong>discard</strong> one tile face-up to the center.<br><br>
+        Bonus tiles (flowers 花, seasons 季) are <strong>not kept</strong> — reveal them immediately and draw a replacement tile from the dead wall before discarding.
+      </div>
+    </div>
+
+    <div class="help-cat-label">📢 Calling Priority</div>
+    <div class="combo-card">
+      <div class="combo-desc" style="line-height:1.8">
+        When a tile is discarded, players may claim it. Priority order:<br><br>
+        <strong>1. Win (和/胡)</strong> — any player may claim to win; highest priority.<br>
+        <strong>2. Pung (碰) or Kong (槓)</strong> — any player may claim to form a triplet or quad.<br>
+        <strong>3. Chow (上)</strong> — <em>only the player to the discarder's left</em> may claim to form a sequence.<br><br>
+        A higher-priority claim always beats a lower one. If two players want the same tile for equal-priority claims, the player closer in turn order wins.
+      </div>
+    </div>
+
+    <div class="help-cat-label">🎣 Fishing (Tenpai)</div>
+    <div class="combo-card">
+      <div class="combo-desc" style="line-height:1.8">
+        <strong>Fishing (釣魚 / Tenpai)</strong> means your hand is one tile away from a winning hand.<br><br>
+        You may be waiting on multiple different tiles simultaneously. Any tile that completes your hand — whether drawn from the wall (<strong>Zimo 自摸</strong>) or discarded by another player — allows you to declare a win.<br><br>
+        There is no formal "declare fishing" step in standard HK rules — you simply win when the tile arrives.
+      </div>
+    </div>
+
+    <div class="help-cat-label">💀 Dead Hand &amp; Goulash</div>
+    <div class="combo-card">
+      <div class="combo-desc" style="line-height:1.8">
+        <strong>Dead Hand (荒牌)</strong>: If the live wall is exhausted with no winner, the round ends in a draw. No points are exchanged. The dealer (East) remains East and a new round begins.<br><br>
+        <strong>Goulash (混亂局)</strong>: A special re-deal rule sometimes played after a dead hand. In Goulash, <strong>Chows are forbidden</strong> — only Pungs, Kongs, and pairs are allowed. All tiles are reshuffled and redealt. Rules vary by house — confirm before play.
+      </div>
+    </div>
 
     <div class="help-cat-label">🎯 Objective</div>
     <div class="combo-card">
@@ -3248,6 +3303,7 @@ function showMain() {
   document.getElementById('view-calc').style.display     = 'none';
   setNavVisible(true);
   currentId = null;
+  window.scrollTo(0, 0);
   renderMain();
 }
 
@@ -3286,6 +3342,7 @@ function showDetail(id) {
   setNavVisible(false);
   document.getElementById('view-main').style.display   = 'none';
   document.getElementById('view-detail').style.display = 'block';
+  window.scrollTo(0, 0);
   document.getElementById('detail-title').textContent  = t.name;
   // Reset full form state
   F = { winner: null, discarder: null, winType: 'zimo', hand: {}, bonusTiles: {}, fanSel: new Set(), fanManual: new Set(), basePts: 0 };
@@ -4258,6 +4315,7 @@ function showSpinner() {
   document.getElementById('view-combined').style.display = 'none';
   document.getElementById('view-calc').style.display     = 'none';
   document.getElementById('view-spinner').style.display  = 'block';
+  window.scrollTo(0, 0);
 
   // Build table selector
   const tables = (S.tables || []).filter(t => t.players && t.players.length === 4);
@@ -4351,6 +4409,7 @@ function showHelp() {
   document.getElementById('view-detail').style.display  = 'none';
   document.getElementById('view-spinner').style.display = 'none';
   document.getElementById('view-help').style.display    = 'block';
+  window.scrollTo(0, 0);
   switchHTab('tiles');
 }
 
@@ -4742,6 +4801,7 @@ function showCombined(tab) {
   document.getElementById('view-help').style.display     = 'none';
   document.getElementById('view-spinner').style.display  = 'none';
   document.getElementById('view-combined').style.display = 'block';
+  window.scrollTo(0, 0);
   switchCTab(tab || 'stats');
 }
 
@@ -5134,6 +5194,7 @@ function showCalc() {
   document.getElementById('view-spinner').style.display  = 'none';
   document.getElementById('view-combined').style.display = 'none';
   document.getElementById('view-calc').style.display     = 'block';
+  window.scrollTo(0, 0);
   updateCalcResult();
 }
 
