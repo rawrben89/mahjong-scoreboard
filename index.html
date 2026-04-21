@@ -1925,7 +1925,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.38</div>
+  <div class="splash-version">v1.0.39</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2908,10 +2908,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.38</span>
+      <span class="settings-version-num" id="settings-version">v1.0.39</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.39</div>
+        <div class="changelog-desc">Revert "feat: share table via QR code"</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.38</div>
         <div class="changelog-desc">Revert "feat: Add Round smart assists — seat/round wind auto-suggest, fan progress bar, pattern label"</div>
@@ -5224,7 +5228,7 @@ function detectFanFromHand(hand) {
 
     // Honor / mixed patterns — exclude named color hands
     if (!suitT.length && honorT.length)                                          det.c_hon  = true;
-    if (suits.size === 1 && honorT.length && suitT.length && !det.c_ared && !det.c_ablue)
+    if (suits.size === 1 && honorT.length && suitT.length && !det.c_ared && !det.c_ablue && !det.c_agreen)
                                                                                  det.c_half = true;
 
     // Terminals and Honors: all tiles are 1s, 9s, or honors — must have BOTH types
@@ -5274,6 +5278,10 @@ function autoDetectFan() {
   const colorHands = ['c_agreen','c_ablue','c_ared'];
   const topColor = colorHands.find(id => det[id]);
   colorHands.forEach(id => { if (id !== topColor) det[id] = false; });
+  // Special hands subsume lesser overlapping combos
+  if (det.c_9g)  det.c_full = false;  // Nine Gates is already a pure suit hand
+  if (det.c_4k)  det.c_pung = false;  // Eighteen Arhats (4 kongs) subsumes All Triplets
+  if (det.c_term) det.c_half = false; // Terminals & Honors subsumes Mixed One Suit
 
   // Honor pung bonuses don't apply when a bigger dragon combo covers them,
   // or when the hand type has no honor pungs at all
