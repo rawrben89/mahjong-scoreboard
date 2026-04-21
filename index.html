@@ -1926,7 +1926,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.41</div>
+  <div class="splash-version">v1.0.42</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2762,14 +2762,15 @@
         <table style="width:100%;font-size:12px;border-collapse:collapse;line-height:2">
           <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+1 fan</td><td>Zimo, Concealed Hand, Last Tile, Robbing Kong, each Dragon Pung, Seat Wind Pung, Round Wind Pung, each Kong, each Bonus Tile, Own Flower, Own Season</td></tr>
           <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+2 fan</td><td>Win by Kong (橃上花), Double Wind Pung (seat = round wind), All 4 Flowers, All 4 Seasons</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+6 fan</td><td>Small Four Winds (小四喜)</td></tr>
           <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+3 fan</td><td>All Triplets (碰碰糊), Mixed One Suit (混一色)</td></tr>
           <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+4 fan</td><td>Seven Pairs (七對子)</td></tr>
           <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+5 fan</td><td>Small Three Dragons (小三元)</td></tr>
           <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+7 fan</td><td>Pure Suit (清一色)</td></tr>
           <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+8 fan</td><td>Big Three Dragons (大三元), Double Kong (橃上橃)</td></tr>
-          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+10 fan</td><td>Small Four Winds (小四喜), Terminals & Honors (混么九), All Honors (字一色), Nine Gates (九蓮寶燈), All Green / Blue / Red</td></tr>
-          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+13 fan</td><td>Big Four Winds (大四喜), Thirteen Orphans (十三幺), Heavenly Hand (天糊), Earthly Hand (地糊)</td></tr>
-          <tr><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+18 fan</td><td>Eighteen Arhats (十八羅漢 — 4 kongs + pair)</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+9 fan</td><td>Double Kong (橃上橃)</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+10 fan</td><td>Terminals & Honors (混么九), All Honors (字一色), Nine Gates (九蓮寶燈), All Green / Blue / Red</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+13 fan</td><td>Big Four Winds (大四喜), Thirteen Orphans (十三幺), Heavenly Hand (天糊), Earthly Hand (地糊), Eighteen Arhats (十八羅漢)</td></tr>
         </table>
         <div style="font-size:10px;color:var(--dim);margin-top:8px">Source: Hong Kong Mahjong scoring rules (Wikipedia)</div>
       </div>
@@ -3038,10 +3039,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.41</span>
+      <span class="settings-version-num" id="settings-version">v1.0.42</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.42</div>
+        <div class="changelog-desc">Expand HK Rules tab with East double rule + Wikipedia reference</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.41</div>
         <div class="changelog-desc">Center empty state + add HK Rules tab to Help</div>
@@ -4938,7 +4943,7 @@ const CALC_GROUPS = [
       ex:['w1','w2','w3','|','t4','t5','t6','|','s4','s5','s6','|','w7','w7','w7','|','w9'] },
     { id:'c_rob',   name:'搶橃 Robbing a Kong',       desc:'Steal the tile an opponent adds to an existing kong.',     fan:1,
       ex:['s5','s5','s5','s5','|','w1','w2','w3','|','t6','t7','t8','|','w4','w4','w4','|','t9','t9'] },
-    { id:'c_dkong', name:'橃上橃 Double Kong',        desc:'Win on the supplement tile from a second consecutive kong.', fan:8,
+    { id:'c_dkong', name:'橃上橃 Double Kong',        desc:'Win on the supplement tile from a second consecutive kong.', fan:9,
       ex:['t5','t5','t5','t5','|','s9','s9','s9','s9','|','w1','w2','w3','|','w7','w8','w9','|','w5','w5'] },
     { id:'c_hv',    name:'天糊 Heavenly Hand',        desc:'East wins with the initial draw before anyone discards.',  fan:13,
       ex:['w1','w1','w1','|','w2','w3','w4','|','w5','w6','w7','|','w8','w9','w9','w9','|','w5','w5'] },
@@ -4974,7 +4979,7 @@ const CALC_GROUPS = [
       ex:['dr','dr','dr','|','dg','dg','dg','|','dw','dw'] },
     { id:'c_b3d',   name:'大三元 Big Three Dragons',   desc:'Triplets of all three dragons.',                           fan:8,
       ex:['dr','dr','dr','|','dg','dg','dg','|','dw','dw','dw'] },
-    { id:'c_s4w',   name:'小四喜 Small Four Winds',    desc:'Pungs of 3 winds + pair of the 4th wind.',                fan:10,
+    { id:'c_s4w',   name:'小四喜 Small Four Winds',    desc:'Pungs of 3 winds + pair of the 4th wind.',                fan:6,
       ex:['fe','fe','fe','|','fs','fs','fs','|','fw','fw','fw','|','fn','fn'] },
     { id:'c_b4w',   name:'大四喜 Big Four Winds',      desc:'Triplets of all four winds.',                              fan:13,
       ex:['fe','fe','fe','|','fs','fs','fs','|','fw','fw','fw','|','fn','fn','fn'] },
@@ -4994,7 +4999,7 @@ const CALC_GROUPS = [
       ex:['w1','w2','w3','|','w4','w5','w6','|','w7','w8','w9','|','dr','dr','dr','|','w5','w5'] },
     { id:'c_t13',    name:'十三幺 Thirteen Orphans',     desc:'One each of all 13 terminals & honors + any duplicate.', fan:13,
       ex:['w1','w9','t1','t9','s1','s9','fe','fs','fw','fn','dr','dg','dw','|','w1'] },
-    { id:'c_4k',     name:'十八羅漢 Eighteen Arhats',    desc:'Four kongs and a pair (all kongs in one hand).',         fan:18,
+    { id:'c_4k',     name:'十八羅漢 Eighteen Arhats',    desc:'Four kongs and a pair (all kongs in one hand).',         fan:13,
       ex:['w1','w1','w1','w1','|','t5','t5','t5','t5','|','s9','s9','s9','s9','|','w9','w9','w9','w9','|','s1','s1'] },
   ]},
 ];
