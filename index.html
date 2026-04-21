@@ -1926,7 +1926,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.40</div>
+  <div class="splash-version">v1.0.41</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2656,81 +2656,103 @@
     <div class="help-cat-label">🎯 Objective</div>
     <div class="combo-card">
       <div class="combo-desc" style="line-height:1.8">
-        Be the first player to form a complete winning hand of <strong>14 tiles</strong> (4 sets + 1 pair). Each win scores points from the other players based on the value of your hand in <strong>fan</strong>.
+        Be the first player to form a complete winning hand of <strong>14 tiles</strong> (4 sets + 1 pair, or a special hand). Each win scores points from the other players based on the value of your hand in <strong>fan (番)</strong>. Only the tightest applicable rule counts — no double-counting overlapping conditions.
       </div>
     </div>
 
     <div class="help-cat-label">🃏 Tile Sets</div>
     <div class="combo-card">
       <div class="combo-desc" style="line-height:1.9">
-        <strong>Chow (順子)</strong> — 3 consecutive tiles of the same suit. e.g. 3-4-5 of Bamboo.<br>
-        <strong>Pung (刻子)</strong> — 3 identical tiles. e.g. three 發 Green Dragons.<br>
-        <strong>Kong (槓子)</strong> — 4 identical tiles. Counts as a Pung + draws an extra tile. Adds +1 fan.<br>
-        <strong>Pair (對子)</strong> — 2 identical tiles. Every winning hand needs exactly 1 pair (the "eye").
+        <strong>Chow 順子</strong> — 3 consecutive tiles of the same suit. e.g. 3-4-5 Bamboo. Only non-honor tiles.<br>
+        <strong>Pung 刻子</strong> — 3 identical tiles. e.g. three 發 Green Dragons.<br>
+        <strong>Kong 槓子</strong> — 4 identical tiles. Counts as a Pung + draws a replacement tile from the back of the wall. Each kong adds +1 fan.<br>
+        <strong>Pair 對子</strong> — 2 identical tiles. Every winning hand needs exactly 1 pair (the "eye").
       </div>
     </div>
 
     <div class="help-cat-label">🏆 How to Win</div>
     <div class="combo-card">
       <div class="combo-desc" style="line-height:1.9">
-        <strong>Zimo 自摸 (Self-draw)</strong> — You draw the winning tile yourself from the wall. All 3 opponents each pay you the full fan value. +1 fan bonus.<br><br>
-        <strong>Discard Win (出銃)</strong> — You win off a tile discarded by an opponent. Only the discarder pays you (paying all 3 losers' share).
+        <strong>Zimo 自摸 (Self-draw)</strong> — You draw the winning tile yourself from the wall. All 3 opponents each pay the full fan value. +1 fan bonus.<br><br>
+        <strong>Discard Win 出銃</strong> — You win off a tile someone else discarded. Only the discarder pays (covering all 3 losers' share in one payment).<br><br>
+        <strong>Minimum fan:</strong> A hand must reach the table's minimum fan (usually 3) to be a valid win. A 0-fan hand is called a <em>Chicken Hand (雞糊)</em> and is not accepted.
       </div>
     </div>
 
     <div class="help-cat-label">💰 Payment Calculation</div>
     <div class="combo-card">
       <div class="combo-desc" style="line-height:1.9">
-        Points are calculated per fan. Each table has a <strong>stake</strong> (e.g. $0.25 per fan) and a <strong>minimum fan</strong> (e.g. 3 fan minimum to win).<br><br>
-        <strong>Zimo:</strong> Each loser pays = fan × stake<br>
+        Each table has a <strong>stake</strong> (e.g. $0.25 per fan) and a <strong>minimum fan</strong> to win.<br><br>
+        <strong>Zimo:</strong> Each of the 3 losers pays = fan × stake<br>
         <strong>Discard:</strong> Discarder pays = fan × stake × 3<br><br>
-        <strong>East wind double rule:</strong> When East wins or East loses, the amount is doubled. East pays/receives twice as much as other players.
+        <strong>Example:</strong> 5 fan hand, $0.25 stake → Zimo: each pays $1.25 (total $3.75). Discard: discarder pays $3.75.
       </div>
     </div>
 
-    <div class="help-cat-label">🧭 Winds & Seats</div>
+    <div class="help-cat-label" style="background:rgba(230,168,24,.15);color:var(--gold)">🀀 East Wind Double Rule</div>
+    <div class="combo-card" style="border-color:rgba(230,168,24,.4)">
+      <div class="combo-desc" style="line-height:1.9">
+        East (莊家) always pays and receives <strong>double</strong>:<br><br>
+        <strong>East WINS:</strong> All 3 losers each pay double the normal amount.<br>
+        <strong>East LOSES (Zimo):</strong> East pays double; other losers pay the normal amount.<br>
+        <strong>East DISCARDS:</strong> East pays double the full discard penalty.<br>
+        <strong>East wins by Discard:</strong> The discarder pays double the full amount to East.<br><br>
+        This applies every round regardless of who the current East player is — the seat rotates after each East loss.
+      </div>
+    </div>
+
+    <div class="help-cat-label">🧭 Winds & Seat Rotation</div>
     <div class="combo-card">
       <div class="combo-desc" style="line-height:1.9">
-        Each player is assigned a <strong>seat wind</strong> — East (東), South (南), West (西), North (北).<br><br>
-        <strong>East</strong> is the dealer and goes first. If East wins the round, East keeps their seat. If East loses, all players rotate one seat clockwise.<br><br>
-        After all 4 players have been East, the <strong>prevailing round wind</strong> advances (East Round → South Round → West Round → North Round).<br><br>
-        Having a pung/kong of your own <strong>seat wind</strong> or the <strong>prevailing round wind</strong> earns +1 fan each.
+        Each player holds a <strong>seat wind</strong> — East (東), South (南), West (西), North (北). East is the dealer.<br><br>
+        <strong>East wins →</strong> East keeps their seat, everyone stays put.<br>
+        <strong>East loses →</strong> All players rotate one seat clockwise (new East player).<br><br>
+        After all 4 players have held East, the <strong>prevailing round wind</strong> advances: East Round → South Round → West Round → North Round.<br><br>
+        <strong>Seat wind pung +1 fan</strong> — having a pung/kong of your own seat wind.<br>
+        <strong>Round wind pung +1 fan</strong> — having a pung/kong of the prevailing wind.<br>
+        <strong>Double wind +2 fan</strong> — if your seat wind equals the prevailing wind (e.g. East player in East Round), a pung of that wind scores +2 fan instead of +1.
       </div>
     </div>
 
     <div class="help-cat-label">槓 Kong Rules</div>
     <div class="combo-card">
       <div class="combo-desc" style="line-height:1.9">
-        <strong>Concealed Kong (暗槓)</strong> — Draw 4 of the same tile yourself. Declare it face-down, draw an extra tile. +1 fan.<br><br>
-        <strong>Melded Kong (明槓)</strong> — Add a 4th tile to an existing pung on the table. Draw an extra tile. +1 fan.<br><br>
-        <strong>Robbing a Kong (搶槓)</strong> — If you can win with the tile someone adds to their pung to make a kong, you may steal it to win. +1 fan.<br><br>
-        After each kong, the player draws a replacement tile from the back of the wall (嶺上牌).
+        <strong>Concealed Kong 暗槓</strong> — Draw all 4 of the same tile yourself. Declare it face-down, draw a replacement tile. +1 fan.<br><br>
+        <strong>Melded Kong 明槓</strong> — Add a drawn 4th tile to an existing exposed pung. Draw a replacement tile. +1 fan.<br><br>
+        <strong>Robbing a Kong 搶槓</strong> — If you can win using the tile someone adds to their pung (to upgrade it to a kong), you may steal it immediately to win. +1 fan.<br><br>
+        <strong>Win by Kong 橃上花</strong> — If you win on the replacement tile drawn after declaring a kong. +2 fan.<br><br>
+        <strong>Double Kong 橃上橃</strong> — Win on the replacement tile of a replacement tile (two consecutive kongs). +8 fan.
       </div>
     </div>
 
     <div class="help-cat-label">🌸 Bonus Tiles</div>
     <div class="combo-card">
       <div class="combo-desc" style="line-height:1.9">
-        Flowers (花) and Seasons (季) are bonus tiles. When drawn, they are set aside and replaced immediately with a new tile from the wall.<br><br>
-        Each bonus tile adds <strong>+1 fan</strong> to the winner's hand at the end. They do not count as part of the 14-tile hand structure.
+        Flowers (花) and Seasons (季) are bonus tiles — when drawn, set them aside and draw a replacement immediately. They do not form part of the 14-tile hand.<br><br>
+        <strong>Each bonus tile: +1 fan</strong><br>
+        <strong>Own wind flower: +1 fan</strong> — the flower matching your seat wind (e.g. East player gets the East flower).<br>
+        <strong>Own wind season: +1 fan</strong> — the season matching your seat wind.<br>
+        <strong>All 4 flowers: +2 fan</strong> — collecting the complete flower set.<br>
+        <strong>All 4 seasons: +2 fan</strong> — collecting the complete season set.
       </div>
     </div>
 
     <div class="help-cat-label">🔒 Concealed Hand (門清)</div>
     <div class="combo-card">
       <div class="combo-desc" style="line-height:1.9">
-        A hand is <strong>concealed</strong> if all sets were drawn (not called from discards). Concealed hands earn +1 fan bonus (門清).<br><br>
-        Calling a Chow or a Pung from a discard breaks concealment — but declaring a kong from your own drawn tiles does not.
+        A hand is <strong>concealed</strong> if no sets were called from other players' discards. Earns +1 fan (門清).<br><br>
+        Calling a Chow or Pung from a discard breaks concealment. Declaring a kong from your own drawn tiles does <em>not</em> break concealment.
       </div>
     </div>
 
     <div class="help-cat-label">🚫 Common Restrictions</div>
     <div class="combo-card">
       <div class="combo-desc" style="line-height:1.9">
-        • A hand must meet the <strong>minimum fan</strong> requirement (usually 3 fan) to be a valid win.<br>
-        • <strong>False win (詐糊)</strong> — declaring a win with an invalid hand is penalized (typically pays everyone a fixed amount).<br>
-        • <strong>Chombo</strong> — a serious rule violation (e.g. illegal discard after a win). Penalty varies by group.<br>
-        • You cannot win off your own discard.
+        • Must meet the table's <strong>minimum fan</strong> (usually 3) to declare a win.<br>
+        • <strong>False win 詐糊</strong> — declaring an invalid win; typically penalized by paying all players a fixed amount.<br>
+        • <strong>Chombo</strong> — serious rule violation (illegal kong, wrong discard after win, etc.). Penalty set by house rules.<br>
+        • You cannot win off your own discard.<br>
+        • <strong>Last tile rule:</strong> Winning on the very last tile from the wall earns +1 fan (海底撈月 Fishing the Moon).
       </div>
     </div>
 
@@ -2738,17 +2760,18 @@
     <div class="combo-card">
       <div class="combo-desc">
         <table style="width:100%;font-size:12px;border-collapse:collapse;line-height:2">
-          <tr><td style="color:var(--gold);font-weight:700">+1 fan</td><td>Concealed Hand, Zimo, Last Tile, Robbing Kong, Seat Wind Pung, Round Wind Pung, each Dragon Pung, each Kong, each Bonus Tile</td></tr>
-          <tr><td style="color:var(--gold);font-weight:700">+2 fan</td><td>Win by Kong (橃上花)</td></tr>
-          <tr><td style="color:var(--gold);font-weight:700">+3 fan</td><td>All Triplets (碰碰糊), Mixed One Suit (混一色)</td></tr>
-          <tr><td style="color:var(--gold);font-weight:700">+4 fan</td><td>Seven Pairs (七對子)</td></tr>
-          <tr><td style="color:var(--gold);font-weight:700">+5 fan</td><td>Small Three Dragons (小三元)</td></tr>
-          <tr><td style="color:var(--gold);font-weight:700">+7 fan</td><td>Pure Suit (清一色)</td></tr>
-          <tr><td style="color:var(--gold);font-weight:700">+8 fan</td><td>Big Three Dragons (大三元), Double Kong (橃上橃)</td></tr>
-          <tr><td style="color:var(--gold);font-weight:700">+10 fan</td><td>Small Four Winds (小四喜), Terminals & Honors (混么九), All Honors (字一色), Nine Gates (九蓮寶燈), All Green/Blue/Red</td></tr>
-          <tr><td style="color:var(--gold);font-weight:700">+13 fan</td><td>Big Four Winds (大四喜), Thirteen Orphans (十三幺), Heavenly/Earthly Hand</td></tr>
-          <tr><td style="color:var(--gold);font-weight:700">+18 fan</td><td>Eighteen Arhats (十八羅漢)</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+1 fan</td><td>Zimo, Concealed Hand, Last Tile, Robbing Kong, each Dragon Pung, Seat Wind Pung, Round Wind Pung, each Kong, each Bonus Tile, Own Flower, Own Season</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+2 fan</td><td>Win by Kong (橃上花), Double Wind Pung (seat = round wind), All 4 Flowers, All 4 Seasons</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+3 fan</td><td>All Triplets (碰碰糊), Mixed One Suit (混一色)</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+4 fan</td><td>Seven Pairs (七對子)</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+5 fan</td><td>Small Three Dragons (小三元)</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+7 fan</td><td>Pure Suit (清一色)</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+8 fan</td><td>Big Three Dragons (大三元), Double Kong (橃上橃)</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+10 fan</td><td>Small Four Winds (小四喜), Terminals & Honors (混么九), All Honors (字一色), Nine Gates (九蓮寶燈), All Green / Blue / Red</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+13 fan</td><td>Big Four Winds (大四喜), Thirteen Orphans (十三幺), Heavenly Hand (天糊), Earthly Hand (地糊)</td></tr>
+          <tr><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+18 fan</td><td>Eighteen Arhats (十八羅漢 — 4 kongs + pair)</td></tr>
         </table>
+        <div style="font-size:10px;color:var(--dim);margin-top:8px">Source: Hong Kong Mahjong scoring rules (Wikipedia)</div>
       </div>
     </div>
 
@@ -3015,10 +3038,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.40</span>
+      <span class="settings-version-num" id="settings-version">v1.0.41</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.41</div>
+        <div class="changelog-desc">Center empty state + add HK Rules tab to Help</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.40</div>
         <div class="changelog-desc">Correct fan combo auto-detection — remove 4 false-positive stackings</div>
