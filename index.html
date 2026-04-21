@@ -1926,7 +1926,7 @@
     <div class="splash-tagline">May the tiles be in your favor.</div>
   </div>
   <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-  <div class="splash-version">v1.0.42</div>
+  <div class="splash-version">v1.0.43</div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
   </div>
@@ -2721,7 +2721,7 @@
         <strong>Melded Kong 明槓</strong> — Add a drawn 4th tile to an existing exposed pung. Draw a replacement tile. +1 fan.<br><br>
         <strong>Robbing a Kong 搶槓</strong> — If you can win using the tile someone adds to their pung (to upgrade it to a kong), you may steal it immediately to win. +1 fan.<br><br>
         <strong>Win by Kong 橃上花</strong> — If you win on the replacement tile drawn after declaring a kong. +2 fan.<br><br>
-        <strong>Double Kong 橃上橃</strong> — Win on the replacement tile of a replacement tile (two consecutive kongs). +8 fan.
+        <strong>Double Kong 橃上橃</strong> — Win on the replacement tile of a replacement tile (two consecutive kongs). +9 fan.
       </div>
     </div>
 
@@ -2767,7 +2767,7 @@
           <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+4 fan</td><td>Seven Pairs (七對子)</td></tr>
           <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+5 fan</td><td>Small Three Dragons (小三元)</td></tr>
           <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+7 fan</td><td>Pure Suit (清一色)</td></tr>
-          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+8 fan</td><td>Big Three Dragons (大三元), Double Kong (橃上橃)</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+8 fan</td><td>Big Three Dragons (大三元)</td></tr>
           <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+9 fan</td><td>Double Kong (橃上橃)</td></tr>
           <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+10 fan</td><td>Terminals & Honors (混么九), All Honors (字一色), Nine Gates (九蓮寶燈), All Green / Blue / Red</td></tr>
           <tr style="border-bottom:1px solid var(--border)"><td style="color:var(--gold);font-weight:700;white-space:nowrap;padding-right:8px">+13 fan</td><td>Big Four Winds (大四喜), Thirteen Orphans (十三幺), Heavenly Hand (天糊), Earthly Hand (地糊), Eighteen Arhats (十八羅漢)</td></tr>
@@ -3039,10 +3039,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.42</span>
+      <span class="settings-version-num" id="settings-version">v1.0.43</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.43</div>
+        <div class="changelog-desc">Update fan values to match Wikipedia HK Mahjong scoring rules</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.42</div>
         <div class="changelog-desc">Expand HK Rules tab with East double rule + Wikipedia reference</div>
@@ -4677,7 +4681,7 @@ function buildWinsPane() {
     ${combo('橃上花 Win by Kong','Winning tile drawn from supplement wall after a kong','+2 Fan','bonus','Counts as self-draw. All three pay.','')}
     ${combo('海底撈月 Fishing Moon','Win on the very last drawable tile in the wall','+1 Fan','bonus','The final tile drawn completes your hand.','')}
     ${combo('搶橃 Robbing the Kong',"Steal an opponent's added kong tile to win",'+1 Fan','bonus','When an opponent extends a pung to a kong, steal it if it completes your hand.','')}
-    ${combo('橃上橃 Double Kong','Win on the supplement tile from a second consecutive kong','+8 Fan','bonus','Extremely rare — must declare two consecutive kongs.',`${d(5)}${d(5)}${d(5)}${d(5)}${P}${b(9)}${b(9)}${b(9)}${b(9)}${P}${w(1)}${w(2)}${w(3)}${P}${w(7)}${w(8)}${w(9)}${P}${w(5)}${w(5)}`)}
+    ${combo('橃上橃 Double Kong','Win on the supplement tile from a second consecutive kong','+9 Fan','bonus','Extremely rare — must declare two consecutive kongs.',`${d(5)}${d(5)}${d(5)}${d(5)}${P}${b(9)}${b(9)}${b(9)}${b(9)}${P}${w(1)}${w(2)}${w(3)}${P}${w(7)}${w(8)}${w(9)}${P}${w(5)}${w(5)}`)}
     ${combo('天糊 Heavenly Hand','East wins with the initial 13 tiles on first draw','13 Fan','limit','Instant win before anyone discards.',`${w(1)}${w(1)}${w(1)}${P}${w(2)}${w(3)}${w(4)}${P}${w(5)}${w(6)}${w(7)}${P}${w(8)}${w(9)}${w(9)}${w(9)}${P}${w(5)}${w(5)}`)}
     ${combo('地糊 Earthly Hand',"Any non-East wins on East's very first discard",'13 Fan','limit','Instant win. No tiles may have been called.',`${E}${E}${E}${P}${d(1)}${d(2)}${d(3)}${P}${b(4)}${b(5)}${b(6)}${P}${w(7)}${w(8)}${w(9)}${P}${d(9)}${d(9)}`)}
 
@@ -4700,7 +4704,7 @@ function buildWinsPane() {
     ${combo('大三元 Big Three Dragons','Dà sān yuán — All 3 dragon triplets','8 Fan','','Triplets of all three dragons.',`${CR}${CR}${CR}${P}${CG}${CG}${CG}${P}${CW}${CW}${CW}${P}${w(1)}${w(2)}${w(3)}${P}${w(4)}${w(4)}`)}
 
     <div class="help-cat-label">Wind Hands</div>
-    ${combo('小四喜 Small Four Winds','Xiǎo sì xĭ — 3 wind triplets + 1 wind pair','10 Fan','','Three winds as triplets; fourth wind is the pair.',`${E}${E}${E}${P}${S}${S}${S}${P}${W}${W}${W}${P}${N}${N}${P}${w(3)}${w(4)}${w(5)}`)}
+    ${combo('小四喜 Small Four Winds','Xiǎo sì xĭ — 3 wind triplets + 1 wind pair','6 Fan','','Three winds as triplets; fourth wind is the pair.',`${E}${E}${E}${P}${S}${S}${S}${P}${W}${W}${W}${P}${N}${N}${P}${w(3)}${w(4)}${w(5)}`)}
     ${combo('大四喜 Big Four Winds','Dà sì xĭ — All 4 wind triplets','13 Fan','limit','Triplets of all four winds. Rarest of the wind hands.',`${E}${E}${E}${P}${S}${S}${S}${P}${W}${W}${W}${P}${N}${N}${N}${P}${CG}${CG}`)}
 
     <div class="help-cat-label">Special Hands</div>
@@ -4711,7 +4715,7 @@ function buildWinsPane() {
     ${combo('藍一色 All Blue','Circle (筒) tiles + White Dragon (白板) required','10 Fan','','All Circle tiles + must include White Dragon (白板) pair/triple. Pure circles alone = Pure Suit (7 fan).',`${d(1)}${d(2)}${d(3)}${P}${d(4)}${d(5)}${d(6)}${P}${d(7)}${d(8)}${d(9)}${P}${CW}${CW}${CW}${P}${d(5)}${d(5)}`)}
     ${combo('紅一色 All Red','Character (萬) tiles + Red Dragon (中) required','10 Fan','','All Character tiles + must include Red Dragon (中) pair/triple. Pure characters alone = Pure Suit (7 fan).',`${w(1)}${w(2)}${w(3)}${P}${w(4)}${w(5)}${w(6)}${P}${w(7)}${w(8)}${w(9)}${P}${CR}${CR}${CR}${P}${w(5)}${w(5)}`)}
     ${combo('十三幺 Thirteen Orphans','Shísān yāo — One of every terminal and honor + one duplicate','13 Fan','limit','One each of 1m 9m 1b 9b 1c 9c East South West North Red Green White, plus any duplicate.',`${w(1)}${w(9)}${b(1)}${b(9)}${d(1)}${d(9)}${E}${S}${W}${N}${CR}${CG}${CW}${PLUS}${qTile('dup')}`)}
-    ${combo('十八羅漢 Eighteen Arhats','Sì gàng zĭ — Four kongs + pair','18 Fan','','Four kongs and a pair. Each kong draws a replacement tile.',`${w(1)}${w(1)}${w(1)}${w(1)}${P}${b(5)}${b(5)}${b(5)}${b(5)}${P}${d(9)}${d(9)}${d(9)}${d(9)}${P}${E}${E}${E}${E}${P}${CR}${CR}`)}
+    ${combo('十八羅漢 Eighteen Arhats','Sì gàng zĭ — Four kongs + pair','13 Fan','limit','Four kongs and a pair. Each kong draws a replacement tile.',`${w(1)}${w(1)}${w(1)}${w(1)}${P}${b(5)}${b(5)}${b(5)}${b(5)}${P}${d(9)}${d(9)}${d(9)}${d(9)}${P}${E}${E}${E}${E}${P}${CR}${CR}`)}
     ${combo('花牌 Bonus Tiles','Each flower or season tile drawn adds fan to your hand','+1 Fan each','bonus','Bonus tiles are not part of your hand. Each adds 1 fan to your total score.','')}
   `;
 }
