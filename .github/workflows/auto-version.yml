@@ -12,9 +12,7 @@ jobs:
     # Skip if already a version-bump commit, or if package.json was changed in this push (already bumped locally)
     if: |
       !contains(github.event.head_commit.message, '[skip ci]') &&
-      !contains(github.event.head_commit.message, 'chore: bump version') &&
-      !contains(join(github.event.head_commit.modified, ','), 'package.json') &&
-      !contains(join(github.event.head_commit.added, ','), 'package.json')
+      !contains(github.event.head_commit.message, 'chore: bump version')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
