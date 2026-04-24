@@ -1972,7 +1972,7 @@
   </div>
   <div class="splash-footer">
     <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-    <div class="splash-version">v1.0.45</div>
+    <div class="splash-version">v1.0.46</div>
   </div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
@@ -3119,7 +3119,7 @@
     <div class="settings-row" style="cursor:pointer" id="settings-open-help">
       <div>
         <div class="settings-row-label" data-i18n="settings.help">❓ Help &amp; Reference</div>
-        <div class="settings-row-sub"   data-i18n="settings.help_sub">Fan combinations, rules, tile guide</div>
+        <div class="settings-row-sub"   data-i18n="settings.help_sub">Rules, tile guide, fan combinations</div>
       </div>
       <span style="color:var(--dim);font-size:18px">›</span>
     </div>
@@ -3158,10 +3158,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.45</span>
+      <span class="settings-version-num" id="settings-version">v1.0.46</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.46</div>
+        <div class="changelog-desc">Revert "feat: show round wind and east dealer in equal side-by-side boxes"</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.45</div>
         <div class="changelog-desc">Merge bet per fan and min fan onto one row</div>
@@ -4611,7 +4615,7 @@ const TRANSLATIONS = {
   'nt.title':'Create New Table','nt.cancel':'Cancel','nt.create':'Create Table','nt.saved_label':'Saved players — tap to fill:',
   'settings.title':'⚙️ Settings','settings.dark':'🌙 Dark Mode','settings.dark_sub':'Toggle light / dark theme',
   'settings.money':'💰 Show Money Amounts','settings.money_sub':'Display $ values alongside fan scores',
-  'settings.help':'❓ Help & Reference','settings.help_sub':'Fan combinations, rules, tile guide',
+  'settings.help':'❓ Help & Reference','settings.help_sub':'Rules, tile guide, fan combinations',
   'settings.close':'Close',
   'rw.prevailing':'Prevailing wind:',
   'settle.none':'✅ All square — no payments needed!','settle.close':'Close',
