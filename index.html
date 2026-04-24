@@ -1972,7 +1972,7 @@
   </div>
   <div class="splash-footer">
     <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-    <div class="splash-version">v1.0.46</div>
+    <div class="splash-version">v1.0.45</div>
   </div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
@@ -2030,10 +2030,7 @@
 
   <!-- Scores pane -->
   <div id="dpane-scores" class="tab-pane active">
-    <div id="d-info-row" style="display:none;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-      <div id="d-rw-banner" class="rw-banner" style="margin:0;flex-direction:column;align-items:center;text-align:center;justify-content:center;gap:4px"></div>
-      <div id="d-east-banner" class="east-dealer-banner" style="flex-direction:column;align-items:center;text-align:center;justify-content:center;gap:4px"></div>
-    </div>
+    <div id="d-rw-banner" class="rw-banner" style="display:none"></div>
     <div class="score-summary">
       <div class="summary-box pos-box">
         <div class="summary-label" data-i18n="scores.pos">Total Positive</div>
@@ -2062,6 +2059,7 @@
         <span id="d-minfan-saved" style="font-size:10px;color:var(--dim);min-height:14px"></span>
       </div>
     </div>
+    <div id="d-east-banner" class="east-dealer-banner" style="display:none"></div>
     <div id="d-players-grid" class="players-grid"></div>
     <div class="scores-action-row" style="padding:12px 0 4px">
       <button class="score-action-btn" id="btn-set-winds"><span data-i18n="act.winds">🧭 Set Winds</span></button>
@@ -3160,14 +3158,10 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.46</span>
+      <span class="settings-version-num" id="settings-version">v1.0.45</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
-      <div class="changelog-entry">
-        <div class="changelog-ver">v1.0.46</div>
-        <div class="changelog-desc">Center all text in bet/minfan boxes</div>
-      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.45</div>
         <div class="changelog-desc">Merge bet per fan and min fan onto one row</div>
@@ -3704,24 +3698,15 @@ function renderDScores() {
   const sorted   = [...t.players].sort((a,b) => (t.scores[b]||0) - (t.scores[a]||0));
   const topScore = t.scores[sorted[0]] || 0;
 
-  const WLBL_FULL  = ['東','南','西','北'];
-  const WENL_FULL  = ['East','South','West','North'];
-
-  // Info row (round wind + east dealer side by side)
-  const infoRow = document.getElementById('d-info-row');
+  // Round wind banner
   const rwBanner = document.getElementById('d-rw-banner');
-  const eastBanner = document.getElementById('d-east-banner');
-  if (infoRow && rwBanner && eastBanner) {
+  if (rwBanner) {
+    const WLBL_FULL  = ['東','南','西','北'];
+    const WENL_FULL  = ['East','South','West','North'];
     const rw = t.roundWind || 0;
-    const ei2 = t.eastIdx || 0;
-    const eastPlayer = t.players[ei2];
-    rwBanner.innerHTML = `<span class="rw-badge" style="font-size:20px">${WLBL_FULL[rw]}局</span>
-      <strong style="font-size:13px">${WENL_FULL[rw]} Round</strong>
-      <span style="font-size:11px;color:var(--dim)">${T('rw.prevailing')} ${WENL_FULL[rw]}</span>`;
-    eastBanner.innerHTML = `<div style="font-size:20px">🀀</div>
-      <strong style="font-size:13px">${esc(eastPlayer)}</strong>
-      <span style="font-size:11px;color:var(--dim)">Current Dealer · 莊家</span>`;
-    infoRow.style.display = 'grid';
+    rwBanner.style.display = '';
+    rwBanner.innerHTML = `<span class="rw-badge">${WLBL_FULL[rw]}局</span>
+      <div class="rw-label"><strong>${WENL_FULL[rw]} Round</strong><span>${T('rw.prevailing')} ${WENL_FULL[rw]}</span></div>`;
   }
 
   // Winning streaks
@@ -3731,6 +3716,20 @@ function renderDScores() {
   const WENGL = ['East','South','West','North'];
   const WCLS  = ['east','south','west','north'];
   const ei = t.eastIdx || 0;
+
+  // East dealer banner
+  const eastBanner = document.getElementById('d-east-banner');
+  if (eastBanner) {
+    const eastPlayer = t.players[ei];
+    eastBanner.style.display = '';
+    eastBanner.innerHTML = `
+      <div class="east-dealer-icon">🀀</div>
+      <div class="east-dealer-label">
+        <strong>${esc(eastPlayer)}</strong>
+        <span>Current Dealer · 莊家</span>
+      </div>
+      <div class="east-dealer-badge">東 East</div>`;
+  }
 
   document.getElementById('d-players-grid').innerHTML = t.players.map((p, i) => {
     const sc     = t.scores[p] || 0;
