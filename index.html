@@ -462,6 +462,22 @@
     }
     .saved-player-chip .spc-rm:hover { color: #e06c75; }
 
+    /* ── East Dealer Banner ── */
+    .east-dealer-banner {
+      display: flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, rgba(139,0,0,.22) 0%, rgba(139,0,0,.08) 100%);
+      border: 1px solid rgba(139,0,0,.45);
+      border-radius: 10px; padding: 9px 13px; margin-bottom: 10px;
+    }
+    .east-dealer-icon { font-size: 22px; line-height: 1; }
+    .east-dealer-label { flex: 1; }
+    .east-dealer-label strong { font-size: 14px; color: #fff; display: block; }
+    .east-dealer-label span   { font-size: 11px; color: rgba(255,255,255,.55); }
+    .east-dealer-badge { background: #8B0000; color: #fff; font-size: 11px; font-weight: 800; border-radius: 6px; padding: 2px 8px; letter-spacing: .3px; }
+
+    /* East player card special treatment */
+    .player-card.is-east { border-left: 3px solid rgba(139,0,0,.7); }
+
     /* ── Round Wind Banner ── */
     .rw-banner {
       display: flex; align-items: center; gap: 10px;
@@ -2015,6 +2031,7 @@
   <!-- Scores pane -->
   <div id="dpane-scores" class="tab-pane active">
     <div id="d-rw-banner" class="rw-banner" style="display:none"></div>
+    <div id="d-east-banner" class="east-dealer-banner" style="display:none"></div>
     <div class="score-summary">
       <div class="summary-box pos-box">
         <div class="summary-label" data-i18n="scores.pos">Total Positive</div>
@@ -3247,6 +3264,23 @@ let S = { tables: [], nextTableId: 1 };
 let currentId     = null; // currently open table id
 let editingRoundId = null; // id of round being edited (null = new round)
 
+/* ── Screen Wake Lock ── */
+let _wakeLock = null;
+async function requestWakeLock() {
+  if (!('wakeLock' in navigator)) return;
+  try {
+    _wakeLock = await navigator.wakeLock.request('screen');
+    _wakeLock.addEventListener('release', () => { _wakeLock = null; });
+  } catch (_) {}
+}
+function releaseWakeLock() {
+  if (_wakeLock) { _wakeLock.release(); _wakeLock = null; }
+}
+// Re-acquire after returning from background (lock releases automatically on hide)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && currentId) requestWakeLock();
+});
+
 function tableById(id) { return S.tables.find(t => t.id === id); }
 
 function loadState() {
@@ -3345,6 +3379,7 @@ function setNavVisible(v) {
 }
 
 function showMain() {
+  releaseWakeLock();
   document.getElementById('view-main').style.display     = 'block';
   document.getElementById('view-detail').style.display   = 'none';
   document.getElementById('view-help').style.display     = 'none';
@@ -3388,6 +3423,7 @@ function resetRoundForm() {
 
 function showDetail(id) {
   currentId = id;
+  requestWakeLock();
   const t = tableById(id);
   setNavVisible(false);
   document.getElementById('view-main').style.display   = 'none';
@@ -3675,10 +3711,25 @@ function renderDScores() {
   const WCLS  = ['east','south','west','north'];
   const ei = t.eastIdx || 0;
 
+  // East dealer banner
+  const eastBanner = document.getElementById('d-east-banner');
+  if (eastBanner) {
+    const eastPlayer = t.players[ei];
+    eastBanner.style.display = '';
+    eastBanner.innerHTML = `
+      <div class="east-dealer-icon">🀀</div>
+      <div class="east-dealer-label">
+        <strong>${esc(eastPlayer)}</strong>
+        <span>Current Dealer · 莊家</span>
+      </div>
+      <div class="east-dealer-badge">東 East</div>`;
+  }
+
   document.getElementById('d-players-grid').innerHTML = t.players.map((p, i) => {
     const sc     = t.scores[p] || 0;
     const rank   = sorted.indexOf(p) + 1;
-    const cls    = (sc === topScore && sc > 0) ? 'top' : sc < 0 ? 'losing' : '';
+    const isEast = i === ei;
+    const cls    = [(sc === topScore && sc > 0) ? 'top' : sc < 0 ? 'losing' : '', isEast ? 'is-east' : ''].join(' ').trim();
     const money  = fmtMoney(sc, stake);
     const wOff   = (i - ei + 4) % 4;
     const wBadge = `<span class="wind-badge wind-${WCLS[wOff]}">${WLBL[wOff]} ${WENGL[wOff]}</span>`;
