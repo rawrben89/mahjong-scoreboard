@@ -469,11 +469,18 @@
       border: 1px solid rgba(139,0,0,.45);
       border-radius: 10px; padding: 9px 13px; margin-bottom: 10px;
     }
+    body.light .east-dealer-banner {
+      background: linear-gradient(135deg, rgba(139,0,0,.08) 0%, rgba(139,0,0,.03) 100%);
+      border-color: rgba(139,0,0,.22);
+    }
     .east-dealer-icon { font-size: 22px; line-height: 1; }
     .east-dealer-label { flex: 1; }
     .east-dealer-label strong { font-size: 14px; color: #fff; display: block; }
     .east-dealer-label span   { font-size: 11px; color: rgba(255,255,255,.55); }
+    body.light .east-dealer-label strong { color: #6b0000; }
+    body.light .east-dealer-label span   { color: rgba(107,0,0,.6); }
     .east-dealer-badge { background: #8B0000; color: #fff; font-size: 11px; font-weight: 800; border-radius: 6px; padding: 2px 8px; letter-spacing: .3px; }
+    body.light .east-dealer-badge { background: rgba(139,0,0,.1); color: #6b0000; border: 1px solid rgba(139,0,0,.28); }
 
     /* East player card special treatment */
     .player-card.is-east { border-left: 3px solid rgba(139,0,0,.7); }
@@ -1019,12 +1026,22 @@
       box-shadow: 0 0 0 1px rgba(255,201,64,.12), 0 4px 24px rgba(255,201,64,.2), var(--inner-hi);
     }
     .player-card.top:hover { box-shadow: 0 0 0 1px rgba(255,201,64,.2), 0 6px 32px rgba(255,201,64,.28), var(--inner-hi); }
+    body.light .player-card {
+      background: linear-gradient(160deg, #ffffff 0%, var(--surface2) 100%);
+      border-color: var(--border);
+      box-shadow: var(--shadow-sm);
+    }
     body.light .player-card.top {
       background: linear-gradient(160deg, #fffbe8 0%, #fff8d6 50%, #fef4c0 100%);
       border-color: rgba(160,104,0,.5);
       box-shadow: 0 2px 16px rgba(160,104,0,.15), var(--shadow-sm);
     }
     .player-card.losing { border-color: rgba(232,69,69,.25); opacity: .78; }
+    body.light .player-card.losing {
+      background: linear-gradient(160deg, #fff5f5 0%, #ffeaea 100%);
+      border-color: rgba(204,34,34,.3);
+      opacity: 1;
+    }
     .p-rank  { position: absolute; top: 7px; right: 9px; font-size: 10px; color: var(--dim2); background: rgba(0,0,0,.4); border-radius: 20px; padding: 1px 7px; font-weight: 700; letter-spacing: .2px; border: 1px solid rgba(255,255,255,.05); }
     body.light .p-rank { background: rgba(0,0,0,.08); color: var(--dim); border-color: transparent; }
     .player-card.top .p-rank { color: var(--gold); background: rgba(230,168,24,.15); border-color: rgba(230,168,24,.25); }
@@ -1991,7 +2008,7 @@
   </div>
   <div class="splash-footer">
     <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-    <div class="splash-version">v1.0.48</div>
+    <div class="splash-version">v1.0.49</div>
   </div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
@@ -3177,10 +3194,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.48</span>
+      <span class="settings-version-num" id="settings-version">v1.0.49</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.49</div>
+        <div class="changelog-desc">Give app headers and modals a light background in white mode</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.48</div>
         <div class="changelog-desc">Ensure splash emoji tiles are visible in light mode</div>
