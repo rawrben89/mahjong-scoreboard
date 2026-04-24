@@ -592,20 +592,23 @@
       animation: tile-float 0s ease both;
       filter: drop-shadow(0 2px 8px rgba(0,0,0,.5));
     }
+    body.light .splash-bg-tile {
+      filter: drop-shadow(0 0 6px rgba(255,255,255,.5)) drop-shadow(0 2px 6px rgba(0,0,0,.3));
+    }
     @keyframes tile-float-left {
       0%   { opacity: 0; transform: translateX(-70px) rotate(-18deg) scale(.65); }
-      35%  { opacity: .6; }
-      100% { opacity: .45; transform: translateX(0)   rotate(-10deg) scale(1); }
+      35%  { opacity: .75; }
+      100% { opacity: .6; transform: translateX(0)   rotate(-10deg) scale(1); }
     }
     @keyframes tile-float-right {
       0%   { opacity: 0; transform: translateX(70px)  rotate(18deg)  scale(.65); }
-      35%  { opacity: .6; }
-      100% { opacity: .45; transform: translateX(0)   rotate(10deg)  scale(1); }
+      35%  { opacity: .75; }
+      100% { opacity: .6; transform: translateX(0)   rotate(10deg)  scale(1); }
     }
     @keyframes tile-float-up {
       0%   { opacity: 0; transform: translateY(50px)  rotate(-6deg)  scale(.65); }
-      35%  { opacity: .55; }
-      100% { opacity: .38; transform: translateY(0)   rotate(4deg)   scale(1); }
+      35%  { opacity: .7; }
+      100% { opacity: .55; transform: translateY(0)   rotate(4deg)   scale(1); }
     }
 
     .chip-zh { font-size: 13px; font-weight: 700; line-height: 1.2; }
@@ -1931,7 +1934,10 @@
   </style>
 </head>
 <body>
-<div id="splash-screen">
+<script>
+  (function(){var t=localStorage.getItem('hk-theme');if(t==='light'||(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme:light)').matches)){document.body.classList.add('light');}})();
+</script>
+<div id="splash-screen" style="background-color:#040a04;background-image:radial-gradient(ellipse 60% 50% at 50% 48%,#0c1f0c 0%,#040a04 70%)"  >
   <!-- Floating background tiles -->
   <div class="splash-bg-tiles">
     <!-- top strip — far left / center / far right -->
@@ -1972,7 +1978,7 @@
   </div>
   <div class="splash-footer">
     <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-    <div class="splash-version">v1.0.46</div>
+    <div class="splash-version">v1.0.47</div>
   </div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
@@ -3158,10 +3164,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.46</span>
+      <span class="settings-version-num" id="settings-version">v1.0.47</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.47</div>
+        <div class="changelog-desc">Update Help & Reference subtitle order to Rules, tile guide, fan combinations</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.46</div>
         <div class="changelog-desc">Revert "feat: show round wind and east dealer in equal side-by-side boxes"</div>
