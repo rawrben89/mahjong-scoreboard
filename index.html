@@ -2042,20 +2042,27 @@
         <div class="summary-val neg"><div id="d-sum-neg-pts">0</div><div id="d-sum-neg-money" class="sum-money"></div></div>
       </div>
     </div>
-    <div id="d-stake-row" class="stake-row" style="gap:12px">
-      <label data-i18n="scores.bet" style="flex:none;white-space:nowrap">💰 Bet per fan</label>
-      <input id="d-stake-input" type="number" class="stake-input" min="0.25" step="0.25" inputmode="decimal" value="0.25">
-      <span id="d-stake-saved" style="font-size:11px;color:var(--dim);min-width:24px;text-align:right"></span>
-      <div style="width:1px;background:var(--border);align-self:stretch"></div>
-      <label data-i18n="scores.minfan" style="flex:none;white-space:nowrap">🎯 Min fan</label>
-      <select id="d-minfan-input" class="stake-input" style="color:var(--accent);text-align:center">
-        <option value="1">1 fan</option>
-        <option value="2">2 fan</option>
-        <option value="3">3 fan</option>
-        <option value="4">4 fan</option>
-        <option value="5">5 fan</option>
-      </select>
-      <span id="d-minfan-saved" style="font-size:11px;color:var(--dim);min-width:24px;text-align:right"></span>
+    <div id="d-stake-row" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
+        <div style="font-size:11px;color:var(--dim);margin-bottom:6px" data-i18n="scores.bet">💰 Bet per fan</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input id="d-stake-input" type="number" class="stake-input" min="0.25" step="0.25" inputmode="decimal" value="0.25" style="flex:1;width:auto">
+          <span id="d-stake-saved" style="font-size:10px;color:var(--dim)"></span>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px">
+        <div style="font-size:11px;color:var(--dim);margin-bottom:6px" data-i18n="scores.minfan">🎯 Min fan to win</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <select id="d-minfan-input" class="stake-input" style="flex:1;width:auto;color:var(--accent);text-align:center">
+            <option value="1">1 fan</option>
+            <option value="2">2 fan</option>
+            <option value="3">3 fan</option>
+            <option value="4">4 fan</option>
+            <option value="5">5 fan</option>
+          </select>
+          <span id="d-minfan-saved" style="font-size:10px;color:var(--dim)"></span>
+        </div>
+      </div>
     </div>
     <div id="d-players-grid" class="players-grid"></div>
     <div class="scores-action-row" style="padding:12px 0 4px">
