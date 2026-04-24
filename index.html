@@ -630,6 +630,12 @@
       -webkit-backdrop-filter: blur(24px);
       box-shadow: 0 2px 20px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.04), 0 1px 0 rgba(78,201,82,.1);
     }
+    body.light .app-header {
+      background: linear-gradient(180deg, rgba(255,255,255,.97) 0%, rgba(244,248,244,.95) 100%);
+      border-bottom: 1px solid var(--border);
+      border-top: 1px solid rgba(30,124,34,.1);
+      box-shadow: 0 2px 12px rgba(0,0,0,.08), 0 1px 0 rgba(30,124,34,.08);
+    }
     .app-header .title   { flex: 1; text-align: center; }
     .app-header h1       { font-size: 18px; color: var(--gold); letter-spacing: .5px; font-weight: 700; text-shadow: 0 1px 14px rgba(255,201,64,.45); }
     .app-header p        { font-size: 10px; color: var(--dim); margin-top: 2px; letter-spacing: .4px; text-transform: uppercase; }
@@ -1251,7 +1257,14 @@
       max-width: 500px;
       box-shadow: 0 -12px 60px rgba(0,0,0,.8), 0 -1px 0 rgba(78,201,82,.12), var(--inner-hi2);
     }
+    body.light .modal-box {
+      background: linear-gradient(180deg, #ffffff 0%, #f4f8f4 100%);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      box-shadow: 0 -8px 40px rgba(0,0,0,.12), 0 -1px 0 rgba(30,124,34,.1);
+    }
     .modal-drag { width: 40px; height: 4px; background: rgba(255,255,255,.12); border-radius: 2px; margin: 0 auto 18px; }
+    body.light .modal-drag { background: rgba(0,0,0,.12); }
     .modal-box h3 { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
     .modal-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
     .modal-input {
@@ -1978,7 +1991,7 @@
   </div>
   <div class="splash-footer">
     <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-    <div class="splash-version">v1.0.47</div>
+    <div class="splash-version">v1.0.48</div>
   </div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
@@ -3164,10 +3177,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.47</span>
+      <span class="settings-version-num" id="settings-version">v1.0.48</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.48</div>
+        <div class="changelog-desc">Ensure splash emoji tiles are visible in light mode</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.47</div>
         <div class="changelog-desc">Update Help & Reference subtitle order to Rules, tile guide, fan combinations</div>
