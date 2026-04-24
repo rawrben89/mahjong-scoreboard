@@ -661,18 +661,18 @@
     }
     .back-btn:hover { background: var(--surface3); border-color: var(--dim2); box-shadow: var(--shadow-sm); }
     .header-action {
-      background: none;
-      border: none;
+      background: var(--red-dim);
+      border: 1px solid rgba(232,69,69,.4);
       color: var(--red);
+      border-radius: var(--radius-sm);
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
-      padding: 6px 4px;
-      opacity: .85;
-      transition: opacity .15s;
+      padding: 7px 13px;
+      transition: background .15s, border-color .15s, box-shadow .15s;
     }
-    .header-action:hover { opacity: 1; }
+    .header-action:hover { background: rgba(232,69,69,.18); border-color: var(--red); box-shadow: var(--shadow-sm); }
 
     /* ── Bottom Tab Bar ── */
     .tab-bar {
@@ -2008,7 +2008,7 @@
   </div>
   <div class="splash-footer">
     <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-    <div class="splash-version">v1.0.49</div>
+    <div class="splash-version">v1.0.50</div>
   </div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
@@ -3194,10 +3194,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.49</span>
+      <span class="settings-version-num" id="settings-version">v1.0.50</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.50</div>
+        <div class="changelog-desc">Light mode styles for east dealer banner and player cards</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.49</div>
         <div class="changelog-desc">Give app headers and modals a light background in white mode</div>
