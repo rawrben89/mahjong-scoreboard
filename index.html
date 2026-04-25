@@ -2008,7 +2008,7 @@
   </div>
   <div class="splash-footer">
     <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-    <div class="splash-version">v1.0.51</div>
+    <div class="splash-version">v1.0.52</div>
   </div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
@@ -3194,10 +3194,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.51</span>
+      <span class="settings-version-num" id="settings-version">v1.0.52</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.52</div>
+        <div class="changelog-desc">Round wind pung auto-detect + kong count from hand size</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.51</div>
         <div class="changelog-desc">Style delete button as a bordered box in detail header</div>
@@ -5716,18 +5720,15 @@ function autoDetectFan() {
   const det = detectFanFromHand(F.hand);
 
   // Seat wind and round wind pung detection — requires game context
+  // F.winner is a player INDEX (0-3), not a name; check !== null explicitly
   const t = tableById(currentId);
-  if (t && F.winner) {
+  if (t && F.winner !== null) {
     const WIND_KEYS = ['fe','fs','fw','fn'];
-    const winnerIdx = t.players.indexOf(F.winner);
-    if (winnerIdx >= 0) {
-      const seatOff     = (winnerIdx - (t.eastIdx || 0) + 4) % 4;
-      const seatKey     = WIND_KEYS[seatOff];
-      const roundKey    = WIND_KEYS[t.roundWind || 0];
-      const hcnt        = F.hand;
-      if ((hcnt[seatKey]  || 0) >= 3) det.c_seat_w  = true;
-      if ((hcnt[roundKey] || 0) >= 3) det.c_round_w = true;
-    }
+    const seatOff   = (F.winner - (t.eastIdx || 0) + 4) % 4;
+    const seatKey   = WIND_KEYS[seatOff];
+    const roundKey  = WIND_KEYS[t.roundWind || 0];
+    if ((F.hand[seatKey]  || 0) >= 3) det.c_seat_w  = true;
+    if ((F.hand[roundKey] || 0) >= 3) det.c_round_w = true;
   }
 
   // 大三元 subsumes 小三元; 大四喜 subsumes 小四喜
