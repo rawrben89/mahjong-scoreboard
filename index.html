@@ -2008,7 +2008,7 @@
   </div>
   <div class="splash-footer">
     <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-    <div class="splash-version">v1.0.52</div>
+    <div class="splash-version">v1.0.53</div>
   </div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
@@ -3194,10 +3194,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.52</span>
+      <span class="settings-version-num" id="settings-version">v1.0.53</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.53</div>
+        <div class="changelog-desc">Correct seat/round wind pung detection (F.winner is index not name)</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.52</div>
         <div class="changelog-desc">Round wind pung auto-detect + kong count from hand size</div>
@@ -5507,7 +5511,7 @@ function initRoundTilePicker() {
       if (!isBonus) {
         const total    = Object.values(F.hand).reduce((a, b) => a + b, 0);
         const kongs    = Object.values(F.hand).filter(n => n === 4).length;
-        const newMax   = 14 + kongs + (cur === 3 ? 1 : 0); // adding 4th tile creates a kong → max +1
+        const newMax   = 14 + kongs + (cur === 3 ? 1 : 0); // adding 4th of same type creates a new kong
         if (total + 1 > newMax) { toast(`Hand full — max ${newMax} tiles`); return; }
       }
       dict[key] = cur + 1;
@@ -5766,7 +5770,7 @@ function autoDetectFan() {
 function renderFanUI() {
   const comboFan   = getFanTotal();
   const bonusCount = Object.values(F.bonusTiles).reduce((a, b) => a + b, 0);
-  const kongCount  = Math.max(0, Object.values(F.hand).reduce((s,n)=>s+n,0) - 14); // +1 fan per kong
+  const kongCount  = Object.values(F.hand).filter(n => n === 4).length; // +1 fan per declared kong (tile tapped 4×)
   const zimoBonus  = F.winType === 'zimo' ? 1 : 0; // 自摸 self-draw +1 fan
   const fan        = comboFan + bonusCount + kongCount + zimoBonus;
   F.basePts = fan;
