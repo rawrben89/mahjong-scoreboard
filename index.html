@@ -2008,7 +2008,7 @@
   </div>
   <div class="splash-footer">
     <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-    <div class="splash-version">v1.0.50</div>
+    <div class="splash-version">v1.0.51</div>
   </div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
@@ -3194,10 +3194,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.50</span>
+      <span class="settings-version-num" id="settings-version">v1.0.51</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.51</div>
+        <div class="changelog-desc">Style delete button as a bordered box in detail header</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.50</div>
         <div class="changelog-desc">Light mode styles for east dealer banner and player cards</div>
@@ -5644,7 +5648,9 @@ function detectFanFromHand(hand) {
   else if (wp === 3 && wpr >= 1) det.c_s4w = true;
 
   // Full hand pattern checks — size is 14 + one extra per kong
-  const handKongs = Object.values(cnt).filter(n => n === 4).length;
+  // Kong count derived from TOTAL tile count, not per-tile count.
+  // Prevents pung(7-7-7)+chow(7-8-9) = 4×7 being mistaken for a kong.
+  const handKongs = Math.max(0, tiles.length - 14);
   if (tiles.length === 14 + handKongs) {
     const entries  = Object.entries(cnt);
     const pairCnt  = entries.filter(([,n]) => n === 2).length;
@@ -5709,6 +5715,21 @@ function detectFanFromHand(hand) {
 function autoDetectFan() {
   const det = detectFanFromHand(F.hand);
 
+  // Seat wind and round wind pung detection — requires game context
+  const t = tableById(currentId);
+  if (t && F.winner) {
+    const WIND_KEYS = ['fe','fs','fw','fn'];
+    const winnerIdx = t.players.indexOf(F.winner);
+    if (winnerIdx >= 0) {
+      const seatOff     = (winnerIdx - (t.eastIdx || 0) + 4) % 4;
+      const seatKey     = WIND_KEYS[seatOff];
+      const roundKey    = WIND_KEYS[t.roundWind || 0];
+      const hcnt        = F.hand;
+      if ((hcnt[seatKey]  || 0) >= 3) det.c_seat_w  = true;
+      if ((hcnt[roundKey] || 0) >= 3) det.c_round_w = true;
+    }
+  }
+
   // 大三元 subsumes 小三元; 大四喜 subsumes 小四喜
   if (det.c_b3d) det.c_s3d = false;
   if (det.c_b4w) det.c_s4w = false;
@@ -5744,7 +5765,7 @@ function autoDetectFan() {
 function renderFanUI() {
   const comboFan   = getFanTotal();
   const bonusCount = Object.values(F.bonusTiles).reduce((a, b) => a + b, 0);
-  const kongCount  = Object.values(F.hand).filter(n => n === 4).length; // +1 fan per kong
+  const kongCount  = Math.max(0, Object.values(F.hand).reduce((s,n)=>s+n,0) - 14); // +1 fan per kong
   const zimoBonus  = F.winType === 'zimo' ? 1 : 0; // 自摸 self-draw +1 fan
   const fan        = comboFan + bonusCount + kongCount + zimoBonus;
   F.basePts = fan;
