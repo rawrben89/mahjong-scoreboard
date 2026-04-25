@@ -2008,7 +2008,7 @@
   </div>
   <div class="splash-footer">
     <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-    <div class="splash-version">v1.0.53</div>
+    <div class="splash-version">v1.0.54</div>
   </div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
@@ -3194,10 +3194,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.53</span>
+      <span class="settings-version-num" id="settings-version">v1.0.54</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.54</div>
+        <div class="changelog-desc">Restore per-kong +1 fan to show immediately on 4th tile tap</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.53</div>
         <div class="changelog-desc">Correct seat/round wind pung detection (F.winner is index not name)</div>
@@ -5555,6 +5559,21 @@ function initRoundTilePicker() {
   document.getElementById('d-active-combo-chips').addEventListener('click', e => {
     const chip = e.target.closest('.combo-chip');
     if (!chip) return;
+    // Kong chip: remove one kong by reducing a 4-count tile back to 3
+    if (chip.classList.contains('kong-chip')) {
+      const kongKey = Object.keys(F.hand).find(k => F.hand[k] === 4);
+      if (kongKey) {
+        F.hand[kongKey] = 3;
+        const btn = document.querySelector(`#d-tile-picker .picker-btn[data-key="${kongKey}"]`);
+        if (btn) {
+          btn.querySelector('.p-cnt').textContent = '3';
+          btn.classList.add('has-cnt');
+        }
+        updateHandDisplay();
+        autoDetectFan();
+      }
+      return;
+    }
     const id = chip.dataset.chipId;
     F.fanSel.delete(id);
     F.fanManual.add(id);
@@ -5799,12 +5818,13 @@ function renderFanUI() {
     </div>`;
   }).join('');
   if (kongCount > 0) {
-    chipsHtml += `<div class="combo-chip" style="background:var(--surface2);border-color:#8B7355;cursor:default">
+    chipsHtml += `<div class="combo-chip kong-chip" style="background:var(--surface2);border-color:#8B7355;cursor:pointer" title="Tap ✕ to remove one kong">
       <div class="chip-body">
         <span class="chip-zh">槓</span>
         <span class="chip-en-lbl">Kong ×${kongCount}</span>
       </div>
       <span class="chip-fan">+${kongCount}</span>
+      <span class="chip-rm">✕</span>
     </div>`;
   }
   if (bonusCount > 0) {
