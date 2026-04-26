@@ -400,6 +400,7 @@
     .settings-changelog-toggle { background:none; border:none; color:var(--accent); font-size:12px; font-weight:600; cursor:pointer; padding:4px 0; }
     .changelog-entry { padding:7px 0; border-bottom:1px solid var(--border); }
     .changelog-entry:last-child { border-bottom:none; }
+    #settings-changelog .changelog-entry:nth-child(n+6) { display:none; }
     .changelog-ver { font-size:11px; font-weight:700; color:var(--gold); margin-bottom:2px; }
     .changelog-desc { font-size:12px; color:var(--dim); line-height:1.4; }
     .backup-btn {
@@ -2008,7 +2009,7 @@
   </div>
   <div class="splash-footer">
     <div class="splash-credit">© 2026 Rawrben · All rights reserved</div>
-    <div class="splash-version">v1.0.54</div>
+    <div class="splash-version">v1.0.55</div>
   </div>
   <div class="splash-progress-wrap">
     <div class="splash-progress-bar" id="splash-progress"></div>
@@ -3194,10 +3195,14 @@
     <!-- App Version & Changelog -->
     <div class="backup-section-lbl">📋 About</div>
     <div class="settings-version-row">
-      <span class="settings-version-num" id="settings-version">v1.0.54</span>
+      <span class="settings-version-num" id="settings-version">v1.0.55</span>
       <button class="settings-changelog-toggle" id="btn-changelog-toggle">What's new ›</button>
     </div>
     <div id="settings-changelog" style="display:none">
+      <div class="changelog-entry">
+        <div class="changelog-ver">v1.0.55</div>
+        <div class="changelog-desc">Make kong chip dismissible — tap X to remove one kong</div>
+      </div>
       <div class="changelog-entry">
         <div class="changelog-ver">v1.0.54</div>
         <div class="changelog-desc">Restore per-kong +1 fan to show immediately on 4th tile tap</div>
