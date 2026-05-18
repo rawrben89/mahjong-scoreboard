@@ -11,6 +11,44 @@
     #__bundler_thumbnail svg { width: 100%; height: 100%; object-fit: contain; }
     #__bundler_placeholder { color: #999; font-size: 14px; }
   </style>
+  <style id="nav-enhancements">
+    /* ── Nav bar enhancements ── */
+
+    /* Active pill indicator at top of active button */
+    .nav-btn { position: relative; overflow: visible !important; }
+    .nav-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      width: 28px; height: 3px;
+      border-radius: 0 0 4px 4px;
+      background: currentColor;
+      transition: transform .3s cubic-bezier(.34, 1.56, .64, 1);
+    }
+    .nav-btn.active::before {
+      transform: translateX(-50%) scaleX(1);
+    }
+
+    /* Spring-bounce icon on active */
+    .nav-btn .nav-icon {
+      font-size: 22px !important;
+      line-height: 1 !important;
+      transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), filter .25s ease !important;
+    }
+    .nav-btn.active .nav-icon {
+      transform: translateY(-3px) scale(1.18) !important;
+      filter: drop-shadow(0 3px 8px rgba(78, 201, 82, .55)) !important;
+    }
+
+    /* Label: slightly larger on active */
+    .nav-btn { font-size: 10px !important; transition: color .25s ease !important; }
+    .nav-btn.active { font-size: 10px !important; font-weight: 700 !important; }
+
+    /* Press feedback */
+    .nav-btn:active { background: rgba(78, 201, 82, .1) !important; border-radius: 12px; }
+    .nav-btn:active .nav-icon { transform: scale(.85) !important; }
+  </style>
   <noscript>
     <style>#__bundler_loading { display: none; }</style>
     <div style="position:fixed;bottom:12px;left:12px;font:13px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;color:#999;background:rgba(255,255,255,0.9);padding:6px 12px;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.08);z-index:10000;">
