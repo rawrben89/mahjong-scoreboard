@@ -21,43 +21,44 @@ console.log(`Version bumped to v${newVer}`);
 let commitMsg = '';
 try {
   commitMsg = execSync('git log -1 --pretty=%s', { cwd: root }).toString().trim();
-  // Strip conventional commit prefixes for readability
   commitMsg = commitMsg.replace(/^(feat|fix|chore|refactor|style|docs|test|perf|remove):\s*/i, '');
-  // Capitalise first letter
   commitMsg = commitMsg.charAt(0).toUpperCase() + commitMsg.slice(1);
 } catch (e) {
   commitMsg = 'New update.';
 }
 
 // ── Update splash + settings version + prepend changelog in index.html ───────
+// The bundle stores HTML as escaped JS strings:
+//   - attribute quotes appear as \" in the file
+//   - closing tag slashes appear as /  (e.g. <\/div> → </div>)
 let html = fs.readFileSync(idxPath, 'utf8');
 const htmlBefore = html;
 
 html = html.replace(
-  /<div class="splash-version">v[\d.]+<\/div>/,
-  `<div class="splash-version">v${newVer}</div>`
-);
-html = html.replace(
-  /<span class="settings-version-num" id="settings-version">v[\d.]+<\/span>/,
-  `<span class="settings-version-num" id="settings-version">v${newVer}</span>`
+  /<div class=\\"splash-version\\">v[\d.]+<\\u002Fdiv>/,
+  `<div class=\\"splash-version\\">v${newVer}<\\u002Fdiv>`
 );
 
-// Prepend new changelog entry after the opening <div id="settings-changelog">
-const changelogOpen = '<div id="settings-changelog" style="display:none">';
+html = html.replace(
+  /<span class=\\"settings-version-num\\" id=\\"settings-version\\">v[\d.]+<\\u002Fspan>/,
+  `<span class=\\"settings-version-num\\" id=\\"settings-version\\">v${newVer}<\\u002Fspan>`
+);
+
+const changelogOpen = '<div id=\\"settings-changelog\\" style=\\"display:none\\">';
 const newEntry =
-  `<div class="changelog-entry">\n` +
-  `        <div class="changelog-ver">v${newVer}</div>\n` +
-  `        <div class="changelog-desc">${commitMsg}</div>\n` +
-  `      </div>`;
-html = html.replace(changelogOpen, `${changelogOpen}\n      ${newEntry}`);
+  `<div class=\\"changelog-entry\\">\\n` +
+  `        <div class=\\"changelog-ver\\">v${newVer}<\\u002Fdiv>\\n` +
+  `        <div class=\\"changelog-desc\\">${commitMsg}<\\u002Fdiv>\\n` +
+  `      <\\u002Fdiv>`;
+html = html.replace(changelogOpen, `${changelogOpen}\\n      ${newEntry}`);
 
 if (html === htmlBefore) {
-  console.warn('⚠️  patterns not found in index.html — check the selectors');
-} else {
-  fs.writeFileSync(idxPath, html);
-  console.log(`index.html → version + changelog updated to v${newVer}`);
-  console.log(`  Changelog entry: "${commitMsg}"`);
+  console.error('✗ Patterns not found in index.html — bundle format may have changed');
+  process.exit(1);
 }
+fs.writeFileSync(idxPath, html);
+console.log(`index.html → version + changelog updated to v${newVer}`);
+console.log(`  Changelog entry: "${commitMsg}"`);
 
 // ── Update service worker cache key in sw.js ─────────────────────────────────
 let sw = fs.readFileSync(swPath, 'utf8');
